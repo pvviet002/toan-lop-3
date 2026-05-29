@@ -54,6 +54,16 @@
             background: rgba(255, 255, 255, 0.2); 
             border-radius: 10px;
         }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
         
         /* Hiệu ứng rung khi trả lời sai */
         .shake {
@@ -80,9 +90,17 @@
 <body class="p-4 md:p-6 lg:p-8">
 
     <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
-        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
-            <span>⬅️ Quay lại Sảnh chính</span>
-        </a>
+        <!-- Nhóm nút điều hướng và phóng to -->
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">⬅️ Quay lại Sảnh chính</span>
+                <span class="md:hidden">⬅️ Quay lại</span>
+            </a>
+            
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
         
         <!-- Bảng Điểm & Chuỗi -->
         <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
@@ -177,7 +195,6 @@
                         <span class="text-4xl font-bold text-slate-400">×</span>
                         <span id="q-b" class="text-5xl font-extrabold text-red-500">?</span>
                         <span class="text-4xl font-bold text-slate-400">=</span>
-                        <!-- Tối ưu bàn phím cho iPad -->
                         <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-input" class="w-24 h-16 text-center text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-emerald-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
                     </div>
 
@@ -192,7 +209,7 @@
             </div>
         </div>
 
-        <!-- Khung phép toán (Đã giảm chiều cao) -->
+        <!-- Khung phép toán -->
         <div id="formula-section" class="bg-slate-800 py-4 px-6 md:py-5 md:px-8 text-center relative w-full hidden shadow-inner">
             <h2 class="text-center text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Từ phép cộng sang phép nhân</h2>
             <div class="overflow-x-auto w-full pb-2 formula-scrollbar">
@@ -220,7 +237,6 @@
         let score = 0;
         let streak = 0;
 
-        // Khởi tạo câu hỏi đầu tiên khi tải trang
         window.addEventListener('DOMContentLoaded', () => {
             generateQuestion();
         });
@@ -411,7 +427,6 @@
             let globalAppleIndex = 1; 
             const showNumbers = hintLevel >= 2;
 
-            // ---- XỬ LÝ KÍCH THƯỚC VÀ NGẮT DÒNG HOÀN HẢO ----
             // Kích thước mặc định (Cấp 1: 1-4 rổ)
             let basketWidthClass = 'w-20 md:w-24 lg:w-28';
             let basketHeightClass = 'h-[85px] md:h-[100px] lg:h-[110px]';
@@ -458,11 +473,9 @@
                 appleNumSizeClass = 'text-[5px] md:text-[6px] min-w-[8px] px-0';
             }
 
-            // Sử dụng content-center để canh giữa dọc, overflow-hidden ở CSS cha để cấm cuộn
             container.className = `flex flex-wrap justify-center content-center items-center w-full h-full transition-opacity duration-500 ${containerGapY} ${containerGapX}`;
 
             for (let i = 0; i < numBaskets; i++) {
-                // Nhóm gồm 1 rổ + 1 dấu cộng
                 const group = document.createElement('div');
                 group.className = 'flex items-end gap-x-2 md:gap-x-3';
 
@@ -510,7 +523,6 @@
 
                 group.appendChild(column);
 
-                // Dấu cộng đi liền với rổ
                 if (i < numBaskets - 1) {
                     const plusContainer = document.createElement('div');
                     plusContainer.className = `flex flex-col justify-end ${plusSizeClass}`;
@@ -551,6 +563,29 @@
                 });
             }
         }
+
+        // --- Chức năng Fullscreen (Toàn màn hình) ---
+        function toggleFullScreen() {
+            const btn = document.getElementById('btn-fullscreen');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    console.log(`Lỗi khi bật toàn màn hình: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('btn-fullscreen');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '<span>🔳 Thu nhỏ</span>';
+            } else {
+                btn.innerHTML = '<span>🔲 Phóng to</span>';
+            }
+        });
     </script>
 </body>
 </html>
