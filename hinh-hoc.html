@@ -77,9 +77,17 @@
 <body class="p-4 md:p-6 lg:p-8">
 
     <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
-        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
-            <span>⬅️ Quay lại Sảnh chính</span>
-        </a>
+        <!-- Nhóm nút điều hướng và phóng to -->
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">⬅️ Quay lại Sảnh chính</span>
+                <span class="md:hidden">⬅️ Quay lại</span>
+            </a>
+            
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
         
         <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
             <div class="flex items-center space-x-1">
@@ -151,7 +159,8 @@
                 <div class="bg-orange-50 p-6 rounded-3xl border-2 border-orange-200 shadow-sm flex flex-col items-center flex-grow justify-center">
                     <label class="block text-center text-sm font-bold text-orange-700 uppercase tracking-wider mb-2">Câu hỏi dành cho bé</label>
                     
-                    <div id="question-text" class="text-xl md:text-2xl font-bold text-slate-700 text-center mb-6 h-[80px] flex items-center">
+                    <!-- Bỏ flex để không bị lỗi chữ chen lấn, dùng min-h thay vì h cố định -->
+                    <div id="question-text" class="text-lg md:text-xl leading-relaxed font-bold text-slate-700 text-center mb-6 min-h-[80px]">
                         <!-- Đề bài sinh từ JS -->
                     </div>
 
@@ -246,12 +255,12 @@
                 unitLabel.innerHTML = 'cm<sup>2</sup>';
             }
 
-            // Tạo câu hỏi Text
+            // Tạo câu hỏi Text - Đã xóa bỏ underline decoration-wavy
             const qBox = document.getElementById('question-text');
             if (currentType.includes('vuong')) {
-                qBox.innerHTML = `Một hình vuông có cạnh dài <span class="text-rose-500">${sideA} cm</span>.<br> Tính <span class="text-blue-600 underline decoration-wavy">${currentType.includes('chuvi') ? 'Chu vi' : 'Diện tích'}</span> của hình đó?`;
+                qBox.innerHTML = `Một hình vuông có cạnh dài <span class="text-rose-500">${sideA} cm</span>.<br> Tính <span class="text-blue-600">${currentType.includes('chuvi') ? 'Chu vi' : 'Diện tích'}</span> của hình đó?`;
             } else {
-                qBox.innerHTML = `Một hình chữ nhật có chiều dài <span class="text-rose-500">${sideA} cm</span> và chiều rộng <span class="text-amber-500">${sideB} cm</span>.<br> Tính <span class="text-blue-600 underline decoration-wavy">${currentType.includes('chuvi') ? 'Chu vi' : 'Diện tích'}</span> của hình đó?`;
+                qBox.innerHTML = `Một hình chữ nhật có chiều dài <span class="text-rose-500">${sideA} cm</span> và chiều rộng <span class="text-amber-500">${sideB} cm</span>.<br> Tính <span class="text-blue-600">${currentType.includes('chuvi') ? 'Chu vi' : 'Diện tích'}</span> của hình đó?`;
             }
 
             hintLevel = 0;
@@ -509,6 +518,32 @@
             
             formulaContainer.innerHTML = htmlContent;
         }
+
+        // --- Chức năng Fullscreen (Toàn màn hình) ---
+        function toggleFullScreen() {
+            const btn = document.getElementById('btn-fullscreen');
+            if (!document.fullscreenElement) {
+                // Yêu cầu mở toàn màn hình
+                document.documentElement.requestFullscreen().catch((err) => {
+                    console.log(`Lỗi khi bật toàn màn hình: ${err.message}`);
+                });
+            } else {
+                // Thoát toàn màn hình
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Lắng nghe sự kiện thay đổi trạng thái Fullscreen (VD: bé vuốt thoát ra)
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('btn-fullscreen');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '<span>🔳 Thu nhỏ</span>';
+            } else {
+                btn.innerHTML = '<span>🔲 Phóng to</span>';
+            }
+        });
     </script>
 </body>
 </html>
