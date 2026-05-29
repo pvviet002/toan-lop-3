@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Học Phép Chia - Chia Táo Vào Rổ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0fdfa; /* emerald-50 */
+        }
+        
+        .apple-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Hiệu ứng táo bay vào rổ (cho Gợi ý 2) */
+        .apple-fly {
+            animation: flyIn 0.6s ease-in-out forwards;
+        }
+        
+        @keyframes flyIn {
+            0% { transform: translateY(-30px) scale(0.5); opacity: 0; }
+            50% { transform: translateY(0) scale(1.2); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .btn-press:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .formula-scrollbar::-webkit-scrollbar {
+            height: 8px;
+        }
+        .formula-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 10px;
+        }
+        .formula-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2); 
+            border-radius: 10px;
+        }
+        
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .pulse-btn {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); } /* emerald color pulse */
+            70% { box-shadow: 0 0 0 15px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8">
+
+    <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
+        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
+            <span>⬅️ Quay lại Sảnh chính</span>
+        </a>
+        
+        <!-- Bảng Điểm & Chuỗi -->
+        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">⭐</span>
+                <span id="score-display" class="font-black text-amber-500 text-lg">0</span>
+            </div>
+            <div class="w-px h-6 bg-slate-200"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-lg">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container chính -->
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl border border-emerald-100 overflow-hidden flex flex-col">
+        
+        <!-- Header (Màu Emerald - Teal) -->
+        <div class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white p-5 md:p-6 text-center shadow-md">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Thử Tài Phép Chia ➗</h1>
+            <p class="text-emerald-100 text-sm md:text-md mt-2 font-medium">Bé hãy chia đều số táo này nhé, nếu khó quá thì dùng gợi ý!</p>
+        </div>
+
+        <!-- Thân Body chia 2 cột -->
+        <div class="flex flex-col lg:flex-row border-b border-slate-100">
+            
+            <!-- Cột Trái (Gợi ý & Hình ảnh) -->
+            <div class="w-full lg:w-3/5 bg-slate-50 p-4 md:p-8 flex flex-col justify-start">
+                
+                <!-- Bảng điều khiển Gợi ý -->
+                <div class="mb-4 md:mb-6">
+                    <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                        <button id="btn-hint-1" onclick="useHint(1)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-rose-100 text-rose-700 font-bold rounded-xl border border-rose-200 hover:bg-rose-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            1. Xem đống táo 🍎
+                        </button>
+                        <button id="btn-hint-2" onclick="useHint(2)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            2. Chia vào rổ 🧺
+                        </button>
+                        <button id="btn-hint-3" onclick="useHint(3)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            3. Phép nhân ngược ✖️
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Khu vực chứa rổ táo: Kích thước cố định, overflow-hidden -->
+                <div class="flex-grow w-full flex h-[260px] md:h-[320px] lg:h-[360px] p-2 overflow-hidden bg-white rounded-2xl shadow-inner border border-slate-100 relative">
+                    <div id="orchard-container" class="w-full h-full transition-opacity duration-500 flex justify-center items-center">
+                        <!-- Rổ táo / Đống táo được vẽ qua JS -->
+                    </div>
+                </div>
+                
+                <!-- Lời dẫn -->
+                <div id="story-box" class="mt-4 text-center w-full p-4 bg-emerald-100/50 rounded-2xl border border-emerald-200 border-dashed opacity-0 transition-opacity duration-500">
+                    <p class="text-slate-600 font-semibold text-lg md:text-xl no-select">
+                        Có <span class="text-red-500 font-bold text-2xl px-1" id="text-tao-tong">?</span> quả táo, chia đều cho <span class="text-amber-600 font-bold text-2xl px-1" id="text-ro">?</span> rổ.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Cột Phải (Quiz & Cài đặt) -->
+            <div class="w-full lg:w-2/5 p-6 md:p-8 flex flex-col justify-start space-y-6 bg-white border-l lg:border-t-0 border-t border-slate-100 relative">
+                
+                <!-- Khung Chọn Bảng Chia -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chọn Bảng Chia muốn ôn:</label>
+                        <select id="table-select" class="w-full p-3 border-2 border-slate-300 rounded-xl bg-white shadow-sm focus:border-teal-500 outline-none font-bold text-slate-700 text-lg">
+                            <option value="2">Chia cho 2</option>
+                            <option value="3" selected>Chia cho 3</option>
+                            <option value="4">Chia cho 4</option>
+                            <option value="5">Chia cho 5</option>
+                            <option value="6">Chia cho 6</option>
+                            <option value="7">Chia cho 7</option>
+                            <option value="8">Chia cho 8</option>
+                            <option value="9">Chia cho 9</option>
+                        </select>
+                    </div>
+                    <button onclick="generateQuestion()" class="btn-press w-full py-3 bg-teal-500 text-white font-bold rounded-xl shadow-md hover:bg-teal-600 text-lg flex justify-center items-center gap-2">
+                        <span>🔄 Tạo câu hỏi mới</span>
+                    </button>
+                </div>
+
+                <!-- Khung Trả lời -->
+                <div class="bg-sky-50 p-6 rounded-3xl border-2 border-sky-200 shadow-sm flex flex-col items-center flex-grow justify-center">
+                    <label class="block text-center text-sm font-bold text-sky-700 uppercase tracking-wider mb-4">Hỏi mỗi rổ có mấy quả?</label>
+                    
+                    <div class="flex items-center justify-center space-x-3 mb-6" id="question-area">
+                        <span id="q-total" class="text-5xl font-extrabold text-red-500">?</span>
+                        <span class="text-4xl font-bold text-slate-400">÷</span>
+                        <span id="q-baskets" class="text-5xl font-extrabold text-amber-500">?</span>
+                        <span class="text-4xl font-bold text-slate-400">=</span>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-input" class="w-24 h-16 text-center text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-sky-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
+                    </div>
+
+                    <button id="btn-action" onclick="handleAction()" class="btn-press px-8 py-3 bg-sky-500 text-white font-bold rounded-full shadow-md hover:bg-sky-600 text-lg w-full transition-all duration-300">
+                        Kiểm tra đáp án ✔️
+                    </button>
+
+                    <!-- Lời nhắn phản hồi -->
+                    <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung phép toán (Kiểm tra lại bằng phép nhân) -->
+        <div id="formula-section" class="bg-slate-800 py-4 px-6 md:py-5 md:px-8 text-center relative w-full hidden shadow-inner border-t-4 border-teal-500">
+            <h2 class="text-center text-[10px] md:text-xs font-bold text-teal-400 uppercase tracking-widest mb-2">Kiểm tra lại bằng phép nhân</h2>
+            <div class="overflow-x-auto w-full pb-2 formula-scrollbar">
+                <div id="math-formula" class="min-w-max text-3xl md:text-4xl text-white font-bold flex items-center justify-center px-4 mx-auto">
+                    <!-- Render từ KaTeX -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nơi chứa các đoạn âm thanh -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // State Phép chia
+        let totalApples = 0;
+        let numBaskets = 0;
+        let applesPerBasket = 0; // Là đáp án cần tìm
+        
+        let hintLevel = 0; 
+        let isCorrect = false;
+        
+        let score = 0;
+        let streak = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            generateQuestion();
+        });
+
+        function playSound(id) {
+            const sound = document.getElementById(id);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Trình duyệt chặn autoplay audio"));
+            }
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('streak-display').innerText = streak;
+        }
+
+        function generateQuestion() {
+            // Lấy divisor (số chia) từ dropdown
+            numBaskets = parseInt(document.getElementById('table-select').value);
+            
+            // Random quotient (thương số - từ 1 đến 9)
+            applesPerBasket = Math.floor(Math.random() * 9) + 1; 
+            
+            // Tính dividend (số bị chia)
+            totalApples = numBaskets * applesPerBasket;
+
+            hintLevel = 0;
+            isCorrect = false;
+            
+            document.getElementById('q-total').innerText = totalApples;
+            document.getElementById('q-baskets').innerText = numBaskets;
+            
+            const input = document.getElementById('answer-input');
+            input.value = '';
+            input.disabled = false;
+            input.classList.remove('bg-sky-100', 'border-sky-500', 'text-sky-700');
+            input.classList.add('bg-white', 'border-slate-300');
+            
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Kiểm tra đáp án ✔️';
+            btnAction.className = 'btn-press px-8 py-3 bg-sky-500 text-white font-bold rounded-full shadow-md hover:bg-sky-600 text-lg w-full transition-all duration-300';
+            
+            const feedback = document.getElementById('feedback-msg');
+            feedback.innerText = '';
+            feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center';
+
+            document.getElementById('formula-section').classList.add('hidden');
+            document.getElementById('story-box').classList.remove('opacity-100');
+            document.getElementById('story-box').classList.add('opacity-0');
+            
+            updateHintButtons();
+            updateVisuals();
+            
+            input.focus();
+        }
+
+        function handleAction() {
+            if (!isCorrect) {
+                checkAnswer();
+            } else {
+                generateQuestion();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                handleAction();
+            }
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answer-input');
+            const feedback = document.getElementById('feedback-msg');
+            const userAnswer = parseInt(input.value);
+
+            if (isNaN(userAnswer)) {
+                feedback.innerText = 'Bé chưa nhập kết quả kìa! 🧐';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-amber-600';
+                return;
+            }
+
+            if (userAnswer === applesPerBasket) {
+                isCorrect = true;
+                playSound('snd-correct');
+                
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#0ea5e9', '#14b8a6', '#f59e0b', '#ef4444']
+                });
+
+                let pointsGained = 10;
+                if (hintLevel === 1) pointsGained = 8;
+                if (hintLevel === 2) pointsGained = 5;
+                if (hintLevel === 3) pointsGained = 2;
+                
+                score += pointsGained;
+                streak += 1;
+                updateScoreBoard();
+
+                feedback.innerHTML = `Hoan hô! Bé được <b>+${pointsGained}⭐</b> 🎉`;
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-sky-600';
+                
+                input.disabled = true;
+                input.classList.remove('bg-white', 'border-slate-300');
+                input.classList.add('bg-sky-100', 'border-sky-500', 'text-sky-700');
+                
+                const btnAction = document.getElementById('btn-action');
+                btnAction.innerText = 'Câu tiếp theo ➡️';
+                btnAction.className = 'btn-press px-8 py-3 bg-teal-500 text-white font-bold rounded-full shadow-md hover:bg-teal-600 text-lg w-full transition-all duration-300 pulse-btn';
+                
+                if (hintLevel < 3) {
+                    hintLevel = 3;
+                    updateHintButtons();
+                    updateVisuals(false); 
+                    updateMathFormula();
+                }
+            } else {
+                playSound('snd-wrong');
+                streak = 0; 
+                updateScoreBoard();
+                
+                feedback.innerText = 'Chưa chính xác rồi, bé thử lại nhé! 🤔';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
+                
+                const questionArea = document.getElementById('question-area');
+                questionArea.classList.remove('shake');
+                void questionArea.offsetWidth;
+                questionArea.classList.add('shake');
+                
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function useHint(level) {
+            if (hintLevel >= level) return; 
+            hintLevel = level;
+            updateHintButtons();
+            playSound('snd-pop');
+            
+            if (hintLevel >= 1) {
+                updateVisuals(true);
+            }
+            if (hintLevel >= 3) {
+                updateMathFormula();
+            }
+        }
+
+        function updateHintButtons() {
+            const btn1 = document.getElementById('btn-hint-1');
+            const btn2 = document.getElementById('btn-hint-2');
+            const btn3 = document.getElementById('btn-hint-3');
+
+            btn1.disabled = hintLevel >= 1;
+            btn1.className = btn1.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-rose-100 text-rose-700 font-bold rounded-xl border border-rose-200 hover:bg-rose-200 shadow-sm transition-colors";
+
+            btn2.disabled = (hintLevel >= 2 || hintLevel < 1);
+            btn2.className = btn2.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors";
+
+            btn3.disabled = (hintLevel >= 3 || hintLevel < 2);
+            btn3.className = btn3.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors";
+        }
+
+        function updateVisuals(animate = true) {
+            const container = document.getElementById('orchard-container');
+            container.innerHTML = '';
+            
+            if (hintLevel < 1) {
+                return;
+            }
+
+            document.getElementById('text-tao-tong').innerText = totalApples;
+            document.getElementById('text-ro').innerText = numBaskets;
+            document.getElementById('story-box').classList.remove('opacity-0');
+            document.getElementById('story-box').classList.add('opacity-100');
+
+            // GỢI Ý 1: Chỉ hiện 1 đống táo tổng cộng
+            if (hintLevel === 1) {
+                container.className = "w-full h-full flex justify-center items-center overflow-y-auto custom-scrollbar";
+                
+                const pileDiv = document.createElement('div');
+                // Tùy số lượng để gom lưới đống táo
+                let gridCols = totalApples > 40 ? 'grid-cols-10' : (totalApples > 20 ? 'grid-cols-7' : 'grid-cols-5');
+                let gapClass = totalApples > 40 ? 'gap-1' : 'gap-2';
+                let appleSize = totalApples > 40 ? 'text-xl' : 'text-3xl';
+                
+                pileDiv.className = `grid ${gridCols} ${gapClass} bg-rose-50 p-6 rounded-3xl border-2 border-rose-200 border-dashed shadow-inner`;
+                
+                for(let i=0; i<totalApples; i++){
+                    const apple = document.createElement('div');
+                    apple.className = `apple-pop no-select ${appleSize}`;
+                    if(animate) apple.style.animationDelay = `${i * 0.02}s`;
+                    else apple.style.animation = 'none';
+                    apple.innerText = '🍎';
+                    pileDiv.appendChild(apple);
+                }
+                
+                container.appendChild(pileDiv);
+                return;
+            }
+
+            // GỢI Ý 2 & 3: Hiển thị rổ và chia táo vào
+            
+            // Xử lý Adaptive Sizing
+            let basketWidthClass = 'w-20 md:w-24 lg:w-28';
+            let basketHeightClass = 'min-h-[85px] md:min-h-[100px] lg:min-h-[110px]';
+            let basketPadding = 'p-2 md:p-3';
+            let appleSizeClass = 'text-xl md:text-2xl lg:text-3xl';
+            let gapClass = 'gap-1 md:gap-2';
+            let containerGapY = 'gap-y-4 md:gap-y-6 lg:gap-y-8';
+            let containerGapX = 'gap-x-2 md:gap-x-4';
+            
+            if (numBaskets >= 5) {
+                basketWidthClass = 'w-16 md:w-20 lg:w-24';
+                basketHeightClass = 'min-h-[70px] md:min-h-[85px] lg:min-h-[95px]';
+                basketPadding = 'p-1.5 md:p-2';
+                appleSizeClass = 'text-base md:text-lg lg:text-xl';
+                containerGapY = 'gap-y-2 md:gap-y-4 lg:gap-y-6';
+                containerGapX = 'gap-x-2 md:gap-x-3';
+            }
+
+            if (numBaskets >= 7) {
+                basketWidthClass = 'w-12 md:w-16 lg:w-20';
+                basketHeightClass = 'min-h-[55px] md:min-h-[70px] lg:min-h-[80px]';
+                basketPadding = 'p-1';
+                appleSizeClass = 'text-sm md:text-base lg:text-lg';
+                gapClass = 'gap-0.5 md:gap-1';
+                containerGapY = 'gap-y-1.5 md:gap-y-2 lg:gap-y-4';
+                containerGapX = 'gap-x-1 md:gap-x-2';
+            }
+
+            if (applesPerBasket >= 7) {
+                appleSizeClass = numBaskets >= 7 ? 'text-[10px] md:text-xs lg:text-sm' : 'text-xs md:text-sm lg:text-base';
+                gapClass = numBaskets >= 7 ? 'gap-0' : 'gap-0.5';
+            }
+
+            container.className = `flex flex-wrap justify-center content-center items-center w-full h-full transition-opacity duration-500 ${containerGapY} ${containerGapX}`;
+
+            for (let i = 0; i < numBaskets; i++) {
+                const column = document.createElement('div');
+                column.className = 'flex flex-col items-center space-y-2 md:space-y-3';
+
+                const basket = document.createElement('div');
+                basket.className = `bg-amber-100 border-b-[4px] md:border-b-[6px] lg:border-b-8 border-amber-500 rounded-2xl md:rounded-3xl ${basketPadding} ${basketWidthClass} ${basketHeightClass} flex flex-col items-center justify-center shadow-md relative transition-all duration-300`;
+                
+                const appleGrid = document.createElement('div');
+                appleGrid.className = `grid grid-cols-3 ${gapClass} justify-items-center w-full`;
+                
+                for (let j = 0; j < applesPerBasket; j++) {
+                    const appleWrapper = document.createElement('div');
+                    // Gợi ý 2 sẽ dùng animation táo bay vào rổ
+                    appleWrapper.className = `flex flex-col items-center no-select ${animate ? 'apple-fly' : ''}`;
+                    if (animate) {
+                        appleWrapper.style.animationDelay = `${(i * 0.1) + (j * 0.05)}s`; 
+                    } else {
+                        appleWrapper.style.animation = 'none';
+                        appleWrapper.style.opacity = '1';
+                        appleWrapper.style.transform = 'none';
+                    }
+                    
+                    const appleEmoji = document.createElement('div');
+                    appleEmoji.className = `${appleSizeClass} leading-none`;
+                    appleEmoji.innerText = '🍎';
+                    
+                    appleWrapper.appendChild(appleEmoji);
+                    appleGrid.appendChild(appleWrapper);
+                }
+                
+                basket.appendChild(appleGrid);
+                column.appendChild(basket);
+                container.appendChild(column);
+            }
+        }
+
+        function updateMathFormula() {
+            const section = document.getElementById('formula-section');
+            if (hintLevel < 3) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            const formulaContainer = document.getElementById('math-formula');
+            
+            // Phép nhân ngược: applesPerBasket (đáp án) x numBaskets = totalApples
+            const latexString = `{\\color{#0ea5e9}${applesPerBasket}} \\times {\\color{#f59e0b}${numBaskets}} = {\\color{#ef4444}${totalApples}}`;
+            
+            if (window.katex) {
+                katex.render(latexString, formulaContainer, {
+                    throwOnError: false,
+                    displayMode: true
+                });
+            }
+        }
+    </script>
+</body>
+</html>

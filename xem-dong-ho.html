@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Học Xem Đồng Hồ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #eef2ff; /* sky-50 */
+        }
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .btn-press:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        /* Ẩn thanh cuộn */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Ẩn mũi tên tăng giảm mặc định của input type="number" */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .pulse-btn {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); } /* indigo color pulse */
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+
+        /* Hiệu ứng xoay kim mượt mà */
+        .clock-hand {
+            transition: transform 0.5s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8">
+
+    <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
+        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
+            <span>⬅️ Quay lại Sảnh chính</span>
+        </a>
+        
+        <!-- Bảng Điểm & Chuỗi -->
+        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">⭐</span>
+                <span id="score-display" class="font-black text-amber-500 text-lg">0</span>
+            </div>
+            <div class="w-px h-6 bg-slate-200"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-lg">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container chính -->
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl border border-indigo-100 overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-500 to-violet-600 text-white p-5 md:p-6 text-center shadow-md">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Tập Xem Đồng Hồ ⏰</h1>
+            <p class="text-indigo-100 text-sm md:text-md mt-2 font-medium">Bé hãy nhìn kim đồng hồ và điền đúng giờ vào ô trống nhé!</p>
+        </div>
+
+        <!-- Thân Body chia 2 cột -->
+        <div class="flex flex-col lg:flex-row border-b border-slate-100">
+            
+            <!-- Cột Trái (Gợi ý & Hình ảnh Đồng hồ) -->
+            <div class="w-full lg:w-3/5 bg-slate-50 p-4 md:p-8 flex flex-col justify-start items-center">
+                
+                <!-- Bảng điều khiển Gợi ý -->
+                <div class="mb-4 md:mb-6 w-full">
+                    <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ đọc giờ</h3>
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                        <button id="btn-hint-1" onclick="useHint(1)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            1. Hiện số phút vòng ngoài
+                        </button>
+                        <button id="btn-hint-2" onclick="useHint(2)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-rose-100 text-rose-700 font-bold rounded-xl border border-rose-200 hover:bg-rose-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            2. Tô màu phân biệt kim
+                        </button>
+                        <button id="btn-hint-3" onclick="useHint(3)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            3. Đọc giờ bằng chữ 📝
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Khu vực chứa Đồng Hồ -->
+                <div class="flex-grow w-full flex items-center justify-center p-2 mt-4 min-h-[300px]">
+                    <!-- Đồng hồ vẽ bằng SVG -->
+                    <div id="clock-container" class="w-full max-w-[280px] md:max-w-[340px] aspect-square transition-opacity duration-500">
+                        <!-- Render từ JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột Phải (Quiz & Cài đặt) -->
+            <div class="w-full lg:w-2/5 p-6 md:p-8 flex flex-col justify-start space-y-6 bg-white border-l lg:border-t-0 border-t border-slate-100 relative">
+                
+                <!-- Khung Chọn Độ Khó -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chọn mức độ muốn luyện:</label>
+                        <select id="level-select" class="w-full p-3 border-2 border-slate-300 rounded-xl bg-white shadow-sm focus:border-indigo-500 outline-none font-bold text-slate-700 text-lg">
+                            <option value="0">Giờ đúng (VD: 3:00)</option>
+                            <option value="30">Giờ rưỡi (VD: 3:30)</option>
+                            <option value="15" selected>Mỗi 15 phút (VD: 3:15, 3:45)</option>
+                            <option value="5">Mỗi 5 phút (VD: 3:05, 3:20)</option>
+                            <option value="1">Phút bất kỳ (Khó nhất)</option>
+                        </select>
+                    </div>
+                    <button onclick="generateQuestion()" class="btn-press w-full py-3 bg-indigo-500 text-white font-bold rounded-xl shadow-md hover:bg-indigo-600 text-lg flex justify-center items-center gap-2">
+                        <span>🔄 Tạo giờ ngẫu nhiên</span>
+                    </button>
+                </div>
+
+                <!-- Khung Trả lời -->
+                <div class="bg-amber-50 p-6 rounded-3xl border-2 border-amber-200 shadow-sm flex flex-col items-center flex-grow justify-center">
+                    <label class="block text-center text-sm font-bold text-amber-700 uppercase tracking-wider mb-4">Đồng hồ đang chỉ mấy giờ?</label>
+                    
+                    <div class="flex items-center justify-center space-x-2 md:space-x-4 mb-6" id="question-area">
+                        <!-- Ô nhập Giờ -->
+                        <div class="flex flex-col items-center">
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="ans-h" min="1" max="12" class="w-20 h-16 md:w-24 md:h-20 text-center text-4xl md:text-5xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-indigo-500 outline-none shadow-inner" placeholder="Giờ" onkeypress="handleEnter(event)">
+                        </div>
+
+                        <span class="text-5xl md:text-6xl font-black text-slate-400 pb-2">:</span>
+                        
+                        <!-- Ô nhập Phút -->
+                        <div class="flex flex-col items-center">
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="ans-m" min="0" max="59" class="w-20 h-16 md:w-24 md:h-20 text-center text-4xl md:text-5xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-indigo-500 outline-none shadow-inner" placeholder="Phút" onkeypress="handleEnter(event)">
+                        </div>
+                    </div>
+
+                    <button id="btn-action" onclick="handleAction()" class="btn-press px-8 py-3 bg-amber-500 text-white font-bold rounded-full shadow-md hover:bg-amber-600 text-lg w-full transition-all duration-300">
+                        Kiểm tra đáp án ✔️
+                    </button>
+
+                    <!-- Lời nhắn phản hồi -->
+                    <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung Cách Đọc Giờ (Chỉ hiện khi Hint 3 hoặc làm đúng) -->
+        <div id="formula-section" class="bg-slate-800 py-6 px-6 md:py-8 md:px-10 text-center relative w-full hidden shadow-inner border-t-4 border-indigo-500">
+            <h2 class="text-center text-[10px] md:text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3">Cách đọc giờ này là:</h2>
+            <div id="math-formula" class="text-2xl md:text-4xl lg:text-5xl text-white font-bold flex items-center justify-center flex-col space-y-3 leading-snug">
+                <!-- Render Text từ JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nơi chứa các đoạn âm thanh -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // State
+        let currentHour = 12;
+        let currentMinute = 0;
+        
+        let hintLevel = 0; 
+        let isCorrect = false;
+        
+        let score = 0;
+        let streak = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            generateQuestion();
+        });
+
+        function playSound(id) {
+            const sound = document.getElementById(id);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Trình duyệt chặn autoplay audio"));
+            }
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('streak-display').innerText = streak;
+        }
+
+        function generateQuestion() {
+            const level = parseInt(document.getElementById('level-select').value);
+            
+            // Random Hour: 1 to 12
+            currentHour = Math.floor(Math.random() * 12) + 1;
+            
+            // Random Minute based on Level
+            if (level === 0) {
+                currentMinute = 0; // Giờ đúng
+            } else if (level === 30) {
+                currentMinute = 30; // Giờ rưỡi
+            } else if (level === 15) {
+                const choices = [0, 15, 30, 45];
+                currentMinute = choices[Math.floor(Math.random() * choices.length)];
+            } else if (level === 5) {
+                currentMinute = Math.floor(Math.random() * 12) * 5; // 0, 5, 10... 55
+            } else {
+                currentMinute = Math.floor(Math.random() * 60); // 0 to 59
+            }
+
+            hintLevel = 0;
+            isCorrect = false;
+            
+            const inputH = document.getElementById('ans-h');
+            const inputM = document.getElementById('ans-m');
+            inputH.value = '';
+            inputM.value = '';
+            inputH.disabled = false;
+            inputM.disabled = false;
+            
+            inputH.className = "w-20 h-16 md:w-24 md:h-20 text-center text-4xl md:text-5xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-indigo-500 outline-none shadow-inner";
+            inputM.className = "w-20 h-16 md:w-24 md:h-20 text-center text-4xl md:text-5xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-indigo-500 outline-none shadow-inner";
+            
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Kiểm tra đáp án ✔️';
+            btnAction.className = 'btn-press px-8 py-3 bg-amber-500 text-white font-bold rounded-full shadow-md hover:bg-amber-600 text-lg w-full transition-all duration-300';
+            
+            const feedback = document.getElementById('feedback-msg');
+            feedback.innerText = '';
+            feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center';
+
+            document.getElementById('formula-section').classList.add('hidden');
+            
+            updateHintButtons();
+            drawClock();
+            
+            inputH.focus();
+        }
+
+        function handleAction() {
+            if (!isCorrect) {
+                checkAnswer();
+            } else {
+                generateQuestion();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                handleAction();
+            }
+        }
+
+        function checkAnswer() {
+            const inputH = document.getElementById('ans-h');
+            const inputM = document.getElementById('ans-m');
+            const feedback = document.getElementById('feedback-msg');
+            
+            const userH = parseInt(inputH.value);
+            const userM = parseInt(inputM.value);
+
+            if (isNaN(userH) || isNaN(userM)) {
+                feedback.innerText = 'Bé nhớ nhập đầy đủ cả Giờ và Phút nhé! 🧐';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-amber-600';
+                return;
+            }
+
+            // Xử lý logic 12h = 0h nếu bé vô tình hiểu nhầm, nhưng chuẩn nhất là 1-12
+            let checkH = currentHour;
+            if (checkH === 0) checkH = 12;
+
+            if (userH === checkH && userM === currentMinute) {
+                isCorrect = true;
+                playSound('snd-correct');
+                
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#6366f1', '#14b8a6', '#f59e0b', '#ef4444']
+                });
+
+                let pointsGained = 10;
+                if (hintLevel === 1) pointsGained = 8;
+                if (hintLevel === 2) pointsGained = 5;
+                if (hintLevel === 3) pointsGained = 2;
+                
+                score += pointsGained;
+                streak += 1;
+                updateScoreBoard();
+
+                feedback.innerHTML = `Hoan hô! Bé xem giờ rất chuẩn <b>+${pointsGained}⭐</b> 🎉`;
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-indigo-600';
+                
+                inputH.disabled = true;
+                inputM.disabled = true;
+                
+                let successClass = "w-20 h-16 md:w-24 md:h-20 text-center text-4xl md:text-5xl font-extrabold text-indigo-700 border-b-4 border-indigo-500 bg-indigo-100 rounded-xl outline-none shadow-inner";
+                inputH.className = successClass;
+                inputM.className = successClass;
+                
+                const btnAction = document.getElementById('btn-action');
+                btnAction.innerText = 'Câu tiếp theo ➡️';
+                btnAction.className = 'btn-press px-8 py-3 bg-indigo-500 text-white font-bold rounded-full shadow-md hover:bg-indigo-600 text-lg w-full transition-all duration-300 pulse-btn';
+                
+                if (hintLevel < 3) {
+                    hintLevel = 3;
+                    updateHintButtons();
+                    drawClock(); 
+                    updateTextReading();
+                }
+            } else {
+                playSound('snd-wrong');
+                streak = 0; 
+                updateScoreBoard();
+                
+                feedback.innerText = 'Chưa chính xác rồi, bé nhìn lại kim xem nhé! 🤔';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
+                
+                const questionArea = document.getElementById('question-area');
+                questionArea.classList.remove('shake');
+                void questionArea.offsetWidth;
+                questionArea.classList.add('shake');
+            }
+        }
+
+        function useHint(level) {
+            if (hintLevel >= level) return; 
+            hintLevel = level;
+            updateHintButtons();
+            playSound('snd-pop');
+            
+            drawClock();
+            
+            if (hintLevel >= 3) {
+                updateTextReading();
+            }
+        }
+
+        function updateHintButtons() {
+            const btn1 = document.getElementById('btn-hint-1');
+            const btn2 = document.getElementById('btn-hint-2');
+            const btn3 = document.getElementById('btn-hint-3');
+
+            btn1.disabled = hintLevel >= 1;
+            btn1.className = btn1.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm transition-colors";
+
+            btn2.disabled = (hintLevel >= 2 || hintLevel < 1);
+            btn2.className = btn2.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-rose-100 text-rose-700 font-bold rounded-xl border border-rose-200 hover:bg-rose-200 shadow-sm transition-colors";
+
+            btn3.disabled = (hintLevel >= 3 || hintLevel < 2);
+            btn3.className = btn3.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors";
+        }
+
+        function drawClock() {
+            const container = document.getElementById('clock-container');
+            
+            // Xây dựng SVG String
+            let svg = `<svg viewBox="0 0 240 240" class="w-full h-full drop-shadow-xl overflow-visible">`;
+            
+            // Nền đồng hồ
+            svg += `<circle cx="120" cy="120" r="90" fill="white" stroke="#e2e8f0" stroke-width="6"/>`;
+
+            // Gợi ý 1: Hiển thị số phút vòng ngoài
+            if (hintLevel >= 1) {
+                for (let i = 1; i <= 60; i++) {
+                    if (i % 5 === 0) {
+                        let angle = i * 6 * Math.PI / 180;
+                        let x = 120 + 105 * Math.sin(angle);
+                        let y = 120 - 105 * Math.cos(angle);
+                        let displayNum = i === 60 ? 0 : i;
+                        svg += `<text x="${x}" y="${y}" fill="#3b82f6" font-size="12" font-weight="900" text-anchor="middle" dominant-baseline="central">${displayNum}</text>`;
+                    }
+                }
+                // Vạch chỉ viền nhạt
+                svg += `<circle cx="120" cy="120" r="105" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 4"/>`;
+            }
+
+            // Vạch kẻ và số giờ (1-12)
+            for (let i = 1; i <= 60; i++) {
+                let angle = i * 6 * Math.PI / 180;
+                let isHour = i % 5 === 0;
+                let r1 = isHour ? 80 : 85;
+                let r2 = 90;
+                let x1 = 120 + r1 * Math.sin(angle);
+                let y1 = 120 - r1 * Math.cos(angle);
+                let x2 = 120 + r2 * Math.sin(angle);
+                let y2 = 120 - r2 * Math.cos(angle);
+                
+                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${isHour ? '#334155' : '#cbd5e1'}" stroke-width="${isHour ? 3 : 1}" stroke-linecap="round"/>`;
+
+                if (isHour) {
+                    let num = i / 5;
+                    let nx = 120 + 64 * Math.sin(angle);
+                    let ny = 120 - 64 * Math.cos(angle);
+                    svg += `<text x="${nx}" y="${ny}" fill="#1e293b" font-size="22" font-weight="900" text-anchor="middle" dominant-baseline="central">${num}</text>`;
+                }
+            }
+
+            // Màu kim thay đổi khi bật Gợi ý 2
+            let hourColor = hintLevel >= 2 ? '#e11d48' : '#1e293b'; // Rose-600 or Slate-800
+            let minColor = hintLevel >= 2 ? '#2563eb' : '#475569';  // Blue-600 or Slate-600
+            
+            // Tính toán góc quay của kim
+            // Kim giờ dịch chuyển thêm dựa trên số phút
+            let hAngle = (currentHour % 12) * 30 + currentMinute * 0.5; 
+            let mAngle = currentMinute * 6;
+
+            // Kim Giờ
+            svg += `<g transform="rotate(${hAngle}, 120, 120)" class="clock-hand">
+                        <line x1="120" y1="120" x2="120" y2="70" stroke="${hourColor}" stroke-width="7" stroke-linecap="round"/>
+                        <!-- Đuôi kim -->
+                        <line x1="120" y1="120" x2="120" y2="130" stroke="${hourColor}" stroke-width="7" stroke-linecap="round"/>
+                    </g>`;
+            
+            // Kim Phút
+            svg += `<g transform="rotate(${mAngle}, 120, 120)" class="clock-hand">
+                        <line x1="120" y1="120" x2="120" y2="45" stroke="${minColor}" stroke-width="4" stroke-linecap="round"/>
+                        <!-- Đuôi kim -->
+                        <line x1="120" y1="120" x2="120" y2="135" stroke="${minColor}" stroke-width="4" stroke-linecap="round"/>
+                    </g>`;
+                    
+            // Chốt ở tâm
+            svg += `<circle cx="120" cy="120" r="5" fill="#f8fafc" stroke="${hourColor}" stroke-width="3"/>`;
+            
+            svg += `</svg>`;
+            
+            container.innerHTML = svg;
+        }
+
+        function updateTextReading() {
+            const section = document.getElementById('formula-section');
+            if (hintLevel < 3) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            const formulaContainer = document.getElementById('math-formula');
+            
+            // Logic đọc giờ tiếng Việt
+            let displayH = currentHour;
+            let displayM = currentMinute;
+            
+            let htmlContent = '';
+            
+            if (displayM === 0) {
+                htmlContent = `<span><span class="text-rose-400">${displayH}</span> giờ đúng</span>`;
+            } 
+            else if (displayM === 15) {
+                htmlContent = `<span><span class="text-rose-400">${displayH}</span> giờ <span class="text-blue-400">mười lăm</span> phút</span>`;
+            }
+            else if (displayM === 30) {
+                htmlContent = `<span><span class="text-rose-400">${displayH}</span> giờ <span class="text-blue-400">rưỡi</span></span>
+                               <span class="text-lg md:text-xl lg:text-2xl text-slate-400 mt-2 font-medium">(hoặc ${displayH} giờ 30 phút)</span>`;
+            }
+            else {
+                // Cách đọc giờ hơn thông thường
+                htmlContent = `<span><span class="text-rose-400">${displayH}</span> giờ <span class="text-blue-400">${displayM}</span> phút</span>`;
+                
+                // Nếu phút > 30, thêm cách đọc "Giờ kém" chuẩn chương trình lớp 3
+                if (displayM > 30) {
+                    let nextH = displayH === 12 ? 1 : displayH + 1;
+                    let remM = 60 - displayM;
+                    htmlContent += `<span class="text-lg md:text-2xl lg:text-3xl text-indigo-300 mt-3 font-semibold tracking-wide">hay còn gọi là:</span>
+                                    <span><span class="text-rose-400">${nextH}</span> giờ kém <span class="text-blue-400">${remM}</span> phút</span>`;
+                }
+            }
+            
+            formulaContainer.innerHTML = htmlContent;
+        }
+    </script>
+</body>
+</html>

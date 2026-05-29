@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Học Hình Học</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fff1f2; /* rose-50 */
+        }
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .btn-press:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .pulse-btn {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } /* rose color pulse */
+            70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+
+        /* Lưới hình học */
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: center;
+        }
+        
+        .shape-draw {
+            transition: all 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8">
+
+    <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
+        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
+            <span>⬅️ Quay lại Sảnh chính</span>
+        </a>
+        
+        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">⭐</span>
+                <span id="score-display" class="font-black text-amber-500 text-lg">0</span>
+            </div>
+            <div class="w-px h-6 bg-slate-200"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-lg">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl border border-rose-100 overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-rose-500 to-pink-500 text-white p-5 md:p-6 text-center shadow-md">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Vui Học Hình Học 📐</h1>
+            <p class="text-rose-100 text-sm md:text-md mt-2 font-medium">Bé tính chu vi và diện tích các hình dưới đây nhé!</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row border-b border-slate-100">
+            
+            <!-- Cột Trái (Gợi ý & Bản vẽ) -->
+            <div class="w-full lg:w-3/5 bg-slate-50 p-4 md:p-8 flex flex-col justify-start items-center">
+                
+                <div class="mb-4 md:mb-6 w-full">
+                    <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                        <button id="btn-hint-1" onclick="useHint(1)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-sky-100 text-sky-700 font-bold rounded-xl border border-sky-200 hover:bg-sky-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            1. Vẽ lên ô ly 📏
+                        </button>
+                        <button id="btn-hint-2" onclick="useHint(2)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            2. Công thức là gì? 🧠
+                        </button>
+                        <button id="btn-hint-3" onclick="useHint(3)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            3. Cách tính chi tiết 📝
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Khu vực chứa bản vẽ (Lưới 30x30px/ô) -->
+                <div class="flex-grow w-full flex items-center justify-center p-2 mt-2 min-h-[320px]">
+                    <div id="drawing-board" class="w-full h-full min-h-[300px] max-w-[500px] bg-white rounded-2xl shadow-inner border border-slate-300 grid-bg relative overflow-hidden flex items-center justify-center">
+                        <!-- Hình vẽ chèn qua JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột Phải (Quiz & Cài đặt) -->
+            <div class="w-full lg:w-2/5 p-6 md:p-8 flex flex-col justify-start space-y-6 bg-white border-l lg:border-t-0 border-t border-slate-100 relative">
+                
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chọn chủ đề muốn luyện:</label>
+                        <select id="topic-select" class="w-full p-3 border-2 border-slate-300 rounded-xl bg-white shadow-sm focus:border-rose-500 outline-none font-bold text-slate-700 text-lg">
+                            <option value="chuvi_vuong">Chu vi Hình vuông</option>
+                            <option value="dientich_vuong">Diện tích Hình vuông</option>
+                            <option value="chuvi_chunhat" selected>Chu vi Hình chữ nhật</option>
+                            <option value="dientich_chunhat">Diện tích Hình chữ nhật</option>
+                        </select>
+                    </div>
+                    <button onclick="generateQuestion()" class="btn-press w-full py-3 bg-rose-500 text-white font-bold rounded-xl shadow-md hover:bg-rose-600 text-lg flex justify-center items-center gap-2">
+                        <span>🔄 Đổi kích thước hình</span>
+                    </button>
+                </div>
+
+                <div class="bg-orange-50 p-6 rounded-3xl border-2 border-orange-200 shadow-sm flex flex-col items-center flex-grow justify-center">
+                    <label class="block text-center text-sm font-bold text-orange-700 uppercase tracking-wider mb-2">Câu hỏi dành cho bé</label>
+                    
+                    <div id="question-text" class="text-xl md:text-2xl font-bold text-slate-700 text-center mb-6 h-[80px] flex items-center">
+                        <!-- Đề bài sinh từ JS -->
+                    </div>
+
+                    <div class="flex items-center justify-center space-x-3 mb-6" id="question-area">
+                        <span class="text-2xl font-bold text-slate-500">Đáp án:</span>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-input" class="w-24 h-16 text-center text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-orange-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
+                        <span id="unit-label" class="text-2xl font-bold text-slate-500">cm</span>
+                    </div>
+
+                    <button id="btn-action" onclick="handleAction()" class="btn-press px-8 py-3 bg-orange-500 text-white font-bold rounded-full shadow-md hover:bg-orange-600 text-lg w-full transition-all duration-300">
+                        Kiểm tra đáp án ✔️
+                    </button>
+
+                    <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung giải chi tiết -->
+        <div id="formula-section" class="bg-slate-800 py-6 px-6 md:py-8 md:px-10 text-center relative w-full hidden shadow-inner border-t-4 border-rose-500">
+            <h2 id="formula-title" class="text-center text-[10px] md:text-xs font-bold text-rose-300 uppercase tracking-widest mb-3">Công thức:</h2>
+            <div id="math-formula" class="text-2xl md:text-4xl lg:text-5xl text-white font-bold flex items-center justify-center flex-col space-y-4 leading-snug">
+                <!-- Render Text từ JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nơi chứa các đoạn âm thanh -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // State
+        let currentType = ''; // chuvi_vuong, dientich_vuong...
+        let sideA = 0; // Cạnh (vuông) hoặc Chiều dài (CN)
+        let sideB = 0; // Chiều rộng (CN)
+        let correctAnswer = 0;
+        
+        let hintLevel = 0; 
+        let isCorrect = false;
+        let score = 0;
+        let streak = 0;
+
+        // 1 ô vuông trên lưới css tương ứng 30px.
+        const GRID_CELL_SIZE = 30;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            generateQuestion();
+        });
+
+        function playSound(id) {
+            const sound = document.getElementById(id);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Auto-play blocked"));
+            }
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('streak-display').innerText = streak;
+        }
+
+        function generateQuestion() {
+            currentType = document.getElementById('topic-select').value;
+            
+            // Random kích thước (Tối đa 8x8 để vẽ vừa lưới)
+            if (currentType.includes('vuong')) {
+                sideA = Math.floor(Math.random() * 6) + 3; // Cạnh từ 3 đến 8 cm
+                sideB = sideA;
+            } else {
+                sideA = Math.floor(Math.random() * 5) + 4; // Chiều dài từ 4 đến 8
+                sideB = Math.floor(Math.random() * 3) + 2; // Chiều rộng từ 2 đến (Dài-1)
+                if (sideB >= sideA) sideB = sideA - 1; // Đảm bảo Dài > Rộng
+            }
+
+            // Tính đáp án và set Đơn vị
+            const unitLabel = document.getElementById('unit-label');
+            if (currentType === 'chuvi_vuong') {
+                correctAnswer = sideA * 4;
+                unitLabel.innerHTML = 'cm';
+            } else if (currentType === 'dientich_vuong') {
+                correctAnswer = sideA * sideA;
+                unitLabel.innerHTML = 'cm<sup>2</sup>';
+            } else if (currentType === 'chuvi_chunhat') {
+                correctAnswer = (sideA + sideB) * 2;
+                unitLabel.innerHTML = 'cm';
+            } else if (currentType === 'dientich_chunhat') {
+                correctAnswer = sideA * sideB;
+                unitLabel.innerHTML = 'cm<sup>2</sup>';
+            }
+
+            // Tạo câu hỏi Text
+            const qBox = document.getElementById('question-text');
+            if (currentType.includes('vuong')) {
+                qBox.innerHTML = `Một hình vuông có cạnh dài <span class="text-rose-500">${sideA} cm</span>.<br> Tính <span class="text-blue-600 underline decoration-wavy">${currentType.includes('chuvi') ? 'Chu vi' : 'Diện tích'}</span> của hình đó?`;
+            } else {
+                qBox.innerHTML = `Một hình chữ nhật có chiều dài <span class="text-rose-500">${sideA} cm</span> và chiều rộng <span class="text-amber-500">${sideB} cm</span>.<br> Tính <span class="text-blue-600 underline decoration-wavy">${currentType.includes('chuvi') ? 'Chu vi' : 'Diện tích'}</span> của hình đó?`;
+            }
+
+            hintLevel = 0;
+            isCorrect = false;
+            
+            const input = document.getElementById('answer-input');
+            input.value = '';
+            input.disabled = false;
+            input.classList.remove('bg-orange-100', 'border-orange-500', 'text-orange-700');
+            input.classList.add('bg-white', 'border-slate-300');
+            
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Kiểm tra đáp án ✔️';
+            btnAction.className = 'btn-press px-8 py-3 bg-orange-500 text-white font-bold rounded-full shadow-md hover:bg-orange-600 text-lg w-full transition-all duration-300';
+            
+            const feedback = document.getElementById('feedback-msg');
+            feedback.innerText = '';
+            feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center';
+
+            document.getElementById('formula-section').classList.add('hidden');
+            
+            updateHintButtons();
+            drawShape();
+            
+            input.focus();
+        }
+
+        function handleAction() {
+            if (!isCorrect) {
+                checkAnswer();
+            } else {
+                generateQuestion();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                handleAction();
+            }
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answer-input');
+            const feedback = document.getElementById('feedback-msg');
+            const userAnswer = parseInt(input.value);
+
+            if (isNaN(userAnswer)) {
+                feedback.innerText = 'Bé chưa nhập kết quả kìa! 🧐';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                isCorrect = true;
+                playSound('snd-correct');
+                
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#f43f5e', '#3b82f6', '#f59e0b', '#10b981']
+                });
+
+                let pointsGained = 10;
+                if (hintLevel === 1) pointsGained = 8;
+                if (hintLevel === 2) pointsGained = 5;
+                if (hintLevel === 3) pointsGained = 2;
+                
+                score += pointsGained;
+                streak += 1;
+                updateScoreBoard();
+
+                feedback.innerHTML = `Hoan hô! Bé tính rất giỏi <b>+${pointsGained}⭐</b> 🎉`;
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-orange-600';
+                
+                input.disabled = true;
+                input.classList.remove('bg-white', 'border-slate-300');
+                input.classList.add('bg-orange-100', 'border-orange-500', 'text-orange-700');
+                
+                const btnAction = document.getElementById('btn-action');
+                btnAction.innerText = 'Câu tiếp theo ➡️';
+                btnAction.className = 'btn-press px-8 py-3 bg-rose-500 text-white font-bold rounded-full shadow-md hover:bg-rose-600 text-lg w-full transition-all duration-300 pulse-btn';
+                
+                if (hintLevel < 3) {
+                    hintLevel = 3;
+                    updateHintButtons();
+                    drawShape();
+                    updateFormula();
+                }
+            } else {
+                playSound('snd-wrong');
+                streak = 0; 
+                updateScoreBoard();
+                
+                feedback.innerText = 'Chưa chính xác, bé kiểm tra lại công thức nhé! 🤔';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-red-500';
+                
+                const questionArea = document.getElementById('question-area');
+                questionArea.classList.remove('shake');
+                void questionArea.offsetWidth;
+                questionArea.classList.add('shake');
+            }
+        }
+
+        function useHint(level) {
+            if (hintLevel >= level) return; 
+            hintLevel = level;
+            updateHintButtons();
+            playSound('snd-pop');
+            
+            drawShape();
+            
+            if (hintLevel >= 2) {
+                updateFormula();
+            }
+        }
+
+        function updateHintButtons() {
+            const btn1 = document.getElementById('btn-hint-1');
+            const btn2 = document.getElementById('btn-hint-2');
+            const btn3 = document.getElementById('btn-hint-3');
+
+            btn1.disabled = hintLevel >= 1;
+            btn1.className = btn1.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-sky-100 text-sky-700 font-bold rounded-xl border border-sky-200 hover:bg-sky-200 shadow-sm transition-colors";
+
+            btn2.disabled = (hintLevel >= 2 || hintLevel < 1);
+            btn2.className = btn2.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors";
+
+            btn3.disabled = (hintLevel >= 3 || hintLevel < 2);
+            btn3.className = btn3.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors";
+        }
+
+        function drawShape() {
+            const board = document.getElementById('drawing-board');
+            board.innerHTML = '';
+
+            if (hintLevel < 1) {
+                // Hint mức 0: Hiển thị icon dấu hỏi to
+                board.innerHTML = '<span class="text-6xl text-slate-300">❓</span><p class="text-slate-400 font-medium absolute bottom-4">Bấm Gợi ý 1 để vẽ hình</p>';
+                return;
+            }
+
+            // Hint mức 1 trở lên: Vẽ hình thật lên lưới
+            const isChuVi = currentType.includes('chuvi');
+            
+            // Tính px
+            const wPx = sideA * GRID_CELL_SIZE;
+            const hPx = sideB * GRID_CELL_SIZE;
+
+            // Container bọc hình để căn giữa
+            const wrapper = document.createElement('div');
+            wrapper.className = 'relative flex items-center justify-center';
+            wrapper.style.width = `${wPx}px`;
+            wrapper.style.height = `${hPx}px`;
+
+            // Màu sắc tùy thuộc diện tích (tô đặc) hay chu vi (tô viền đậm)
+            const bgColor = isChuVi ? 'rgba(56, 189, 248, 0.2)' : 'rgba(244, 63, 94, 0.4)'; // Sky lợt vs Rose đậm
+            const borderColor = isChuVi ? '#0284c7' : '#e11d48'; // Blue đậm vs Rose đậm
+            const borderW = isChuVi ? '4px' : '2px';
+            
+            const shape = document.createElement('div');
+            shape.className = 'shape-draw absolute top-0 left-0 shadow-lg';
+            shape.style.width = '100%';
+            shape.style.height = '100%';
+            shape.style.backgroundColor = bgColor;
+            shape.style.border = `${borderW} solid ${borderColor}`;
+
+            // Nếu là diện tích, chia ô bên trong
+            if (!isChuVi) {
+                shape.style.backgroundImage = `
+                    linear-gradient(to right, rgba(255,255,255,0.4) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.4) 1px, transparent 1px)`;
+                shape.style.backgroundSize = `${GRID_CELL_SIZE}px ${GRID_CELL_SIZE}px`;
+            }
+
+            // Nhãn kích thước
+            const labelA = document.createElement('div');
+            labelA.className = 'absolute -top-7 w-full text-center font-bold text-slate-700 bg-white/80 rounded-md px-1';
+            labelA.innerText = `${sideA} cm`;
+
+            const labelB = document.createElement('div');
+            labelB.className = 'absolute -left-12 h-full flex items-center font-bold text-slate-700 bg-white/80 rounded-md px-1';
+            labelB.innerText = `${sideB} cm`;
+
+            wrapper.appendChild(shape);
+            wrapper.appendChild(labelA);
+            if (!currentType.includes('vuong')) {
+                wrapper.appendChild(labelB);
+            } else {
+                // Hình vuông thì dán nhãn cạnh bên phải cho giống nhau
+                const labelA2 = document.createElement('div');
+                labelA2.className = 'absolute -right-12 h-full flex items-center font-bold text-slate-700 bg-white/80 rounded-md px-1';
+                labelA2.innerText = `${sideA} cm`;
+                wrapper.appendChild(labelA2);
+            }
+
+            board.appendChild(wrapper);
+        }
+
+        function updateFormula() {
+            const section = document.getElementById('formula-section');
+            if (hintLevel < 2) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            const title = document.getElementById('formula-title');
+            const formulaContainer = document.getElementById('math-formula');
+            
+            let htmlContent = '';
+
+            if (hintLevel === 2) {
+                title.innerText = 'CÔNG THỨC:';
+                if (currentType === 'chuvi_vuong') {
+                    htmlContent = `<span class="text-rose-200 text-3xl md:text-4xl">Chu vi H.Vuông = Cạnh × 4</span>`;
+                } else if (currentType === 'dientich_vuong') {
+                    htmlContent = `<span class="text-rose-200 text-3xl md:text-4xl">Diện tích H.Vuông = Cạnh × Cạnh</span>`;
+                } else if (currentType === 'chuvi_chunhat') {
+                    htmlContent = `<span class="text-rose-200 text-3xl md:text-4xl">Chu vi H.Chữ Nhật = (Dài + Rộng) × 2</span>`;
+                } else {
+                    htmlContent = `<span class="text-rose-200 text-3xl md:text-4xl">Diện tích H.Chữ Nhật = Dài × Rộng</span>`;
+                }
+            } 
+            else if (hintLevel === 3) {
+                title.innerText = 'CÁCH TÍNH CHI TIẾT:';
+                
+                let latexStr = '';
+                if (currentType === 'chuvi_vuong') {
+                    latexStr = `{\\color{#fca5a5}${sideA}} \\times 4 = {\\color{#fde047}${correctAnswer}} \\text{ (cm)}`;
+                } else if (currentType === 'dientich_vuong') {
+                    latexStr = `{\\color{#fca5a5}${sideA}} \\times {\\color{#fca5a5}${sideA}} = {\\color{#fde047}${correctAnswer}} \\text{ (cm}^2\\text{)}`;
+                } else if (currentType === 'chuvi_chunhat') {
+                    latexStr = `({\\color{#fca5a5}${sideA}} + {\\color{#fbbf24}${sideB}}) \\times 2 = {\\color{#fde047}${correctAnswer}} \\text{ (cm)}`;
+                } else {
+                    latexStr = `{\\color{#fca5a5}${sideA}} \\times {\\color{#fbbf24}${sideB}} = {\\color{#fde047}${correctAnswer}} \\text{ (cm}^2\\text{)}`;
+                }
+                
+                // Reset content then let KaTeX render
+                formulaContainer.innerHTML = '';
+                if (window.katex) {
+                    katex.render(latexStr, formulaContainer, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                }
+                return; // Thoát để không ghi đè HTML
+            }
+            
+            formulaContainer.innerHTML = htmlContent;
+        }
+    </script>
+</body>
+</html>

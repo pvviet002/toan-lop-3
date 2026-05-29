@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Học Phép Nhân - Trắc Nghiệm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <!-- Thư viện Confetti cho hiệu ứng chúc mừng -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0fdf4;
+        }
+        
+        .apple-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .btn-press:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        /* Ẩn hoàn toàn thanh cuộn cho khu vực hiển thị rổ táo */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Thanh cuộn đen cho phần công thức dưới cùng */
+        .formula-scrollbar::-webkit-scrollbar {
+            height: 8px;
+        }
+        .formula-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 10px;
+        }
+        .formula-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2); 
+            border-radius: 10px;
+        }
+        
+        /* Hiệu ứng rung khi trả lời sai */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Hiệu ứng nhấp nháy cho nút Next */
+        .pulse-btn {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8">
+
+    <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
+        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
+            <span>⬅️ Quay lại Sảnh chính</span>
+        </a>
+        
+        <!-- Bảng Điểm & Chuỗi -->
+        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">⭐</span>
+                <span id="score-display" class="font-black text-amber-500 text-lg">0</span>
+            </div>
+            <div class="w-px h-6 bg-slate-200"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-lg">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container chính -->
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl border border-green-100 overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-5 md:p-6 text-center shadow-md">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Thử Tài Phép Nhân 🍎</h1>
+            <p class="text-green-100 text-sm md:text-md mt-2 font-medium">Bé hãy điền kết quả, nếu khó quá thì dùng các nút gợi ý nhé!</p>
+        </div>
+
+        <!-- Thân Body chia 2 cột -->
+        <div class="flex flex-col lg:flex-row border-b border-slate-100">
+            
+            <!-- Cột Trái (Gợi ý & Hình ảnh) -->
+            <div class="w-full lg:w-3/5 bg-slate-50 p-4 md:p-8 flex flex-col justify-start">
+                
+                <!-- Bảng điều khiển Gợi ý -->
+                <div class="mb-4 md:mb-6">
+                    <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                        <button id="btn-hint-1" onclick="useHint(1)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            1. Hiện rổ táo 🧺
+                        </button>
+                        <button id="btn-hint-2" onclick="useHint(2)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            2. Hiện số đếm 🔢
+                        </button>
+                        <button id="btn-hint-3" onclick="useHint(3)" class="btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            3. Phép cộng ➕
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Khu vực chứa rổ táo: Kích thước cố định, overflow-hidden để cấm cuộn -->
+                <div class="flex-grow w-full flex h-[260px] md:h-[320px] lg:h-[360px] p-2 overflow-hidden bg-white rounded-2xl shadow-inner border border-slate-100">
+                    <div id="orchard-container" class="w-full h-full transition-opacity duration-500">
+                        <!-- Rổ táo được vẽ qua JS -->
+                    </div>
+                </div>
+                
+                <!-- Lời dẫn -->
+                <div id="story-box" class="mt-4 text-center w-full p-4 bg-green-100/50 rounded-2xl border border-green-200 border-dashed opacity-0 transition-opacity duration-500">
+                    <p class="text-slate-600 font-semibold text-lg md:text-xl no-select">
+                        Có <span class="text-green-600 font-bold text-2xl px-1" id="text-ro">?</span> rổ, mỗi rổ đựng <span class="text-red-500 font-bold text-2xl px-1" id="text-tao">?</span> quả táo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Cột Phải (Quiz & Cài đặt) -->
+            <div class="w-full lg:w-2/5 p-6 md:p-8 flex flex-col justify-start space-y-6 bg-white border-l lg:border-t-0 border-t border-slate-100 relative">
+                
+                <!-- Khung Chọn Bảng Nhân -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chọn Bảng Nhân muốn ôn:</label>
+                        <select id="table-select" class="w-full p-3 border-2 border-slate-300 rounded-xl bg-white shadow-sm focus:border-indigo-500 outline-none font-bold text-slate-700 text-lg">
+                            <option value="2">Bảng nhân 2</option>
+                            <option value="3">Bảng nhân 3</option>
+                            <option value="4">Bảng nhân 4</option>
+                            <option value="5">Bảng nhân 5</option>
+                            <option value="6">Bảng nhân 6</option>
+                            <option value="7" selected>Bảng nhân 7</option>
+                            <option value="8">Bảng nhân 8</option>
+                            <option value="9">Bảng nhân 9</option>
+                        </select>
+                    </div>
+                    <!-- Nút tạo câu hỏi mới -->
+                    <button onclick="generateQuestion()" class="btn-press w-full py-3 bg-indigo-500 text-white font-bold rounded-xl shadow-md hover:bg-indigo-600 text-lg flex justify-center items-center gap-2">
+                        <span>🔄 Tạo câu hỏi mới</span>
+                    </button>
+                </div>
+
+                <!-- Khung Trả lời -->
+                <div class="bg-emerald-50 p-6 rounded-3xl border-2 border-emerald-200 shadow-sm flex flex-col items-center flex-grow justify-center">
+                    <label class="block text-center text-sm font-bold text-emerald-700 uppercase tracking-wider mb-4">Câu hỏi dành cho bé</label>
+                    
+                    <div class="flex items-center justify-center space-x-3 mb-6" id="question-area">
+                        <span id="q-a" class="text-5xl font-extrabold text-green-600">?</span>
+                        <span class="text-4xl font-bold text-slate-400">×</span>
+                        <span id="q-b" class="text-5xl font-extrabold text-red-500">?</span>
+                        <span class="text-4xl font-bold text-slate-400">=</span>
+                        <!-- Tối ưu bàn phím cho iPad -->
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-input" class="w-24 h-16 text-center text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 bg-white rounded-xl focus:border-emerald-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
+                    </div>
+
+                    <!-- Nút Kiểm Tra / Câu tiếp theo -->
+                    <button id="btn-action" onclick="handleAction()" class="btn-press px-8 py-3 bg-emerald-500 text-white font-bold rounded-full shadow-md hover:bg-emerald-600 text-lg w-full transition-all duration-300">
+                        Kiểm tra đáp án ✔️
+                    </button>
+
+                    <!-- Lời nhắn phản hồi -->
+                    <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung phép toán (Đã giảm chiều cao) -->
+        <div id="formula-section" class="bg-slate-800 py-4 px-6 md:py-5 md:px-8 text-center relative w-full hidden shadow-inner">
+            <h2 class="text-center text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Từ phép cộng sang phép nhân</h2>
+            <div class="overflow-x-auto w-full pb-2 formula-scrollbar">
+                <div id="math-formula" class="min-w-max text-3xl md:text-4xl text-white font-bold flex items-center justify-center px-4 mx-auto">
+                    <!-- Render từ KaTeX -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nơi chứa các đoạn âm thanh -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // State
+        let numBaskets = 0;
+        let applesPerBasket = 0;
+        let hintLevel = 0; 
+        let isCorrect = false;
+        
+        // Hệ thống điểm
+        let score = 0;
+        let streak = 0;
+
+        // Khởi tạo câu hỏi đầu tiên khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {
+            generateQuestion();
+        });
+
+        function playSound(id) {
+            const sound = document.getElementById(id);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Trình duyệt chặn autoplay audio"));
+            }
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('streak-display').innerText = streak;
+        }
+
+        function generateQuestion() {
+            const table = parseInt(document.getElementById('table-select').value);
+            const randomFactor = Math.floor(Math.random() * 9) + 1; 
+            
+            if (Math.random() > 0.5) {
+                numBaskets = table;
+                applesPerBasket = randomFactor;
+            } else {
+                numBaskets = randomFactor;
+                applesPerBasket = table;
+            }
+
+            hintLevel = 0;
+            isCorrect = false;
+            
+            document.getElementById('q-a').innerText = numBaskets;
+            document.getElementById('q-b').innerText = applesPerBasket;
+            const input = document.getElementById('answer-input');
+            input.value = '';
+            input.disabled = false;
+            input.classList.remove('bg-green-100', 'border-green-500', 'text-green-700');
+            input.classList.add('bg-white', 'border-slate-300');
+            
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Kiểm tra đáp án ✔️';
+            btnAction.className = 'btn-press px-8 py-3 bg-emerald-500 text-white font-bold rounded-full shadow-md hover:bg-emerald-600 text-lg w-full transition-all duration-300';
+            
+            const feedback = document.getElementById('feedback-msg');
+            feedback.innerText = '';
+            feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center';
+
+            document.getElementById('formula-section').classList.add('hidden');
+            document.getElementById('story-box').classList.remove('opacity-100');
+            document.getElementById('story-box').classList.add('opacity-0');
+            
+            updateHintButtons();
+            updateVisuals();
+            
+            input.focus();
+        }
+
+        function handleAction() {
+            if (!isCorrect) {
+                checkAnswer();
+            } else {
+                generateQuestion();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                handleAction();
+            }
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answer-input');
+            const feedback = document.getElementById('feedback-msg');
+            const userAnswer = parseInt(input.value);
+            const correctAnswer = numBaskets * applesPerBasket;
+
+            if (isNaN(userAnswer)) {
+                feedback.innerText = 'Bé chưa nhập kết quả kìa! 🧐';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-amber-600';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                isCorrect = true;
+                playSound('snd-correct');
+                
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
+                });
+
+                let pointsGained = 10;
+                if (hintLevel === 1) pointsGained = 8;
+                if (hintLevel === 2) pointsGained = 5;
+                if (hintLevel === 3) pointsGained = 2;
+                
+                score += pointsGained;
+                streak += 1;
+                updateScoreBoard();
+
+                feedback.innerHTML = `Hoan hô! Bé được <b>+${pointsGained}⭐</b> 🎉`;
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-emerald-600';
+                
+                input.disabled = true;
+                input.classList.remove('bg-white', 'border-slate-300');
+                input.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                
+                const btnAction = document.getElementById('btn-action');
+                btnAction.innerText = 'Câu tiếp theo ➡️';
+                btnAction.className = 'btn-press px-8 py-3 bg-indigo-500 text-white font-bold rounded-full shadow-md hover:bg-indigo-600 text-lg w-full transition-all duration-300 pulse-btn';
+                
+                if (hintLevel < 3) {
+                    hintLevel = 3;
+                    updateHintButtons();
+                    updateVisuals(false); 
+                    updateMathFormula();
+                }
+            } else {
+                playSound('snd-wrong');
+                streak = 0; 
+                updateScoreBoard();
+                
+                feedback.innerText = 'Chưa chính xác rồi, bé thử lại nhé! 🤔';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-red-500';
+                
+                const questionArea = document.getElementById('question-area');
+                questionArea.classList.remove('shake');
+                void questionArea.offsetWidth;
+                questionArea.classList.add('shake');
+                
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function useHint(level) {
+            if (hintLevel >= level) return; 
+            hintLevel = level;
+            updateHintButtons();
+            playSound('snd-pop');
+            
+            if (hintLevel >= 1) {
+                updateVisuals();
+            }
+            if (hintLevel >= 3) {
+                updateMathFormula();
+            }
+        }
+
+        function updateHintButtons() {
+            const btn1 = document.getElementById('btn-hint-1');
+            const btn2 = document.getElementById('btn-hint-2');
+            const btn3 = document.getElementById('btn-hint-3');
+
+            btn1.disabled = hintLevel >= 1;
+            btn1.className = btn1.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors";
+
+            btn2.disabled = (hintLevel >= 2 || hintLevel < 1);
+            btn2.className = btn2.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm transition-colors";
+
+            btn3.disabled = (hintLevel >= 3 || hintLevel < 2);
+            btn3.className = btn3.disabled 
+                ? "w-full sm:w-auto px-4 py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed"
+                : "btn-press w-full sm:w-auto px-4 py-2.5 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm transition-colors";
+        }
+
+        function updateVisuals(playPopSound = true) {
+            const container = document.getElementById('orchard-container');
+            container.innerHTML = '';
+            
+            if (hintLevel < 1) {
+                return;
+            }
+
+            document.getElementById('text-ro').innerText = numBaskets;
+            document.getElementById('text-tao').innerText = applesPerBasket;
+            document.getElementById('story-box').classList.remove('opacity-0');
+            document.getElementById('story-box').classList.add('opacity-100');
+
+            let globalAppleIndex = 1; 
+            const showNumbers = hintLevel >= 2;
+
+            // ---- XỬ LÝ KÍCH THƯỚC VÀ NGẮT DÒNG HOÀN HẢO ----
+            // Kích thước mặc định (Cấp 1: 1-4 rổ)
+            let basketWidthClass = 'w-20 md:w-24 lg:w-28';
+            let basketHeightClass = 'h-[85px] md:h-[100px] lg:h-[110px]';
+            let basketPadding = 'p-2 md:p-3';
+            let appleSizeClass = 'text-xl md:text-2xl lg:text-3xl';
+            let appleNumSizeClass = 'text-[8px] md:text-[10px] min-w-[14px] px-0.5';
+            let plusSizeClass = 'text-2xl md:text-3xl pb-[4px] md:pb-[6px]';
+            let gapClass = 'gap-1 md:gap-2';
+            let labelSizeClass = 'text-base md:text-lg lg:text-xl px-3 py-0.5 md:py-1';
+            let containerGapY = 'gap-y-4 md:gap-y-6 lg:gap-y-8';
+            let containerGapX = 'gap-x-2 md:gap-x-4';
+            
+            // Cấp 2: 5-6 rổ (Chia 2 hàng)
+            if (numBaskets >= 5) {
+                basketWidthClass = 'w-16 md:w-20 lg:w-24';
+                basketHeightClass = 'h-[70px] md:h-[85px] lg:h-[95px]';
+                basketPadding = 'p-1.5 md:p-2';
+                appleSizeClass = 'text-base md:text-lg lg:text-xl';
+                appleNumSizeClass = 'text-[7px] md:text-[8px] min-w-[12px] px-0';
+                plusSizeClass = 'text-xl md:text-2xl pb-[2px] md:pb-[4px]';
+                labelSizeClass = 'text-sm md:text-base lg:text-lg px-2 py-0.5';
+                containerGapY = 'gap-y-2 md:gap-y-4 lg:gap-y-6';
+                containerGapX = 'gap-x-2 md:gap-x-3';
+            }
+
+            // Cấp 3: 7-9 rổ (Chia 3 hàng)
+            if (numBaskets >= 7) {
+                basketWidthClass = 'w-12 md:w-16 lg:w-20';
+                basketHeightClass = 'h-[55px] md:h-[70px] lg:h-[80px]';
+                basketPadding = 'p-1';
+                appleSizeClass = 'text-sm md:text-base lg:text-lg';
+                appleNumSizeClass = 'text-[6px] md:text-[7px] min-w-[10px] px-0';
+                gapClass = 'gap-0.5 md:gap-1';
+                plusSizeClass = 'text-lg md:text-xl pb-[1px] md:pb-[2px]';
+                labelSizeClass = 'text-xs md:text-sm px-1.5 py-0.5';
+                containerGapY = 'gap-y-1.5 md:gap-y-2 lg:gap-y-4';
+                containerGapX = 'gap-x-1 md:gap-x-2';
+            }
+
+            // Ép size táo nhỏ lại nếu quá nhiều táo/rổ
+            if (applesPerBasket >= 7) {
+                appleSizeClass = numBaskets >= 7 ? 'text-[10px] md:text-xs lg:text-sm' : 'text-xs md:text-sm lg:text-base';
+                gapClass = numBaskets >= 7 ? 'gap-0' : 'gap-0.5';
+                appleNumSizeClass = 'text-[5px] md:text-[6px] min-w-[8px] px-0';
+            }
+
+            // Sử dụng content-center để canh giữa dọc, overflow-hidden ở CSS cha để cấm cuộn
+            container.className = `flex flex-wrap justify-center content-center items-center w-full h-full transition-opacity duration-500 ${containerGapY} ${containerGapX}`;
+
+            for (let i = 0; i < numBaskets; i++) {
+                // Nhóm gồm 1 rổ + 1 dấu cộng
+                const group = document.createElement('div');
+                group.className = 'flex items-end gap-x-2 md:gap-x-3';
+
+                const column = document.createElement('div');
+                column.className = 'flex flex-col items-center space-y-2 md:space-y-3';
+
+                const basket = document.createElement('div');
+                basket.className = `bg-amber-100 border-b-[4px] md:border-b-[6px] lg:border-b-8 border-amber-500 rounded-2xl md:rounded-3xl ${basketPadding} ${basketWidthClass} ${basketHeightClass} flex flex-col items-center justify-center shadow-md relative transition-all duration-300`;
+                
+                const appleGrid = document.createElement('div');
+                appleGrid.className = `grid grid-cols-3 ${gapClass} justify-items-center w-full`;
+                
+                for (let j = 0; j < applesPerBasket; j++) {
+                    const appleWrapper = document.createElement('div');
+                    appleWrapper.className = 'flex flex-col items-center apple-pop no-select';
+                    if (playPopSound) {
+                        appleWrapper.style.animationDelay = `${(i * 0.04) + (j * 0.04)}s`; 
+                    } else {
+                        appleWrapper.style.animation = 'none'; 
+                    }
+                    
+                    const appleEmoji = document.createElement('div');
+                    appleEmoji.className = `${appleSizeClass} leading-none`;
+                    appleEmoji.innerText = '🍎';
+                    
+                    const appleNum = document.createElement('div');
+                    appleNum.className = `${appleNumSizeClass} font-extrabold text-red-600 bg-white rounded border border-red-200 shadow-sm text-center scale-90 transition-all duration-300 mt-[1px]`;
+                    appleNum.style.visibility = showNumbers ? 'visible' : 'hidden';
+                    appleNum.style.opacity = showNumbers ? '1' : '0';
+                    appleNum.innerText = globalAppleIndex++;
+                    
+                    appleWrapper.appendChild(appleEmoji);
+                    appleWrapper.appendChild(appleNum);
+                    appleGrid.appendChild(appleWrapper);
+                }
+                
+                basket.appendChild(appleGrid);
+                column.appendChild(basket);
+
+                const numberLabel = document.createElement('div');
+                numberLabel.className = `${labelSizeClass} font-black text-red-600 bg-red-100 rounded-xl border border-red-200 shadow-sm no-select transition-opacity duration-300`;
+                numberLabel.style.opacity = showNumbers ? '1' : '0';
+                numberLabel.innerText = applesPerBasket;
+                column.appendChild(numberLabel);
+
+                group.appendChild(column);
+
+                // Dấu cộng đi liền với rổ
+                if (i < numBaskets - 1) {
+                    const plusContainer = document.createElement('div');
+                    plusContainer.className = `flex flex-col justify-end ${plusSizeClass}`;
+                    
+                    const plusSign = document.createElement('div');
+                    plusSign.className = `font-black text-slate-300 no-select transition-opacity duration-300`;
+                    plusSign.style.opacity = showNumbers ? '1' : '0';
+                    plusSign.innerText = '+';
+                    
+                    plusContainer.appendChild(plusSign);
+                    group.appendChild(plusContainer);
+                }
+
+                container.appendChild(group);
+            }
+        }
+
+        function updateMathFormula() {
+            const section = document.getElementById('formula-section');
+            if (hintLevel < 3) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            const formulaContainer = document.getElementById('math-formula');
+            const result = numBaskets * applesPerBasket;
+            
+            let additionArray = Array(numBaskets).fill(`{\\color{#ef4444}${applesPerBasket}}`);
+            let additionString = additionArray.join(' + ');
+            
+            const latexString = `${additionString} = {\\color{#22c55e}${numBaskets}} \\times {\\color{#ef4444}${applesPerBasket}} = {\\color{#fcd34d}${result}}`;
+            
+            if (window.katex) {
+                katex.render(latexString, formulaContainer, {
+                    throwOnError: false,
+                    displayMode: true
+                });
+            }
+        }
+    </script>
+</body>
+</html>
