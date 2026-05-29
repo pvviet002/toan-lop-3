@@ -198,6 +198,18 @@
     <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
     <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
 
+    <!-- Modal Thông báo iPad -->
+    <div id="ipad-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="ipad-modal-content">
+            <div class="text-center">
+                <div class="text-5xl mb-4">📱</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Mẹo cho iPad/iPhone</h3>
+                <p class="text-slate-600 mb-6 text-sm leading-relaxed">Trình duyệt Safari trên thiết bị này không hỗ trợ nút phóng to tự động.<br><br>Để chơi toàn màn hình, ba mẹ hãy nhấn nút <b class="text-indigo-600">Chia sẻ (Share)</b> ở viền Safari và chọn <b class="text-indigo-600">Thêm vào MH chính (Add to Home Screen)</b> nhé!</p>
+                <button onclick="closeModal()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-full w-full transition-colors">Đã hiểu ✔️</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State
         let currentHour = 12;
@@ -272,6 +284,7 @@
             updateHintButtons();
             drawClock();
             
+            // Đã gỡ bỏ inputH.focus() để iPad không tự động bật bàn phím che màn hình
         }
 
         function handleAction() {
@@ -515,25 +528,69 @@
 
         // --- Chức năng Fullscreen (Toàn màn hình) ---
         function toggleFullScreen() {
-            const btn = document.getElementById('btn-fullscreen');
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch((err) => {
-                    console.log(`Lỗi khi bật toàn màn hình: ${err.message}`);
-                });
+            const doc = document.documentElement;
+            // Hỗ trợ nhiều trình duyệt (bao gồm webkit cho các thiết bị cũ)
+            const requestFullScreen = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const exitFullScreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+            if (!isFullScreen) {
+                if (requestFullScreen) {
+                    try {
+                        let promise = requestFullScreen.call(doc);
+                        if (promise) {
+                            promise.catch(err => {
+                                showModal(); // Trình duyệt chặn
+                            });
+                        }
+                    } catch (e) {
+                        showModal();
+                    }
+                } else {
+                    // Trình duyệt không hỗ trợ (Safari iOS/iPadOS)
+                    showModal();
+                }
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
+                if (exitFullScreen) {
+                    exitFullScreen.call(document);
                 }
             }
         }
 
-        document.addEventListener('fullscreenchange', () => {
-            const btn = document.getElementById('btn-fullscreen');
-            if (document.fullscreenElement) {
-                btn.innerHTML = '<span>🔳 Thu nhỏ</span>';
-            } else {
-                btn.innerHTML = '<span>🔲 Phóng to</span>';
-            }
+        // Hiển thị hộp thoại hướng dẫn
+        function showModal() {
+            const modal = document.getElementById('ipad-modal');
+            const content = document.getElementById('ipad-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        // Đóng hộp thoại
+        function closeModal() {
+            const modal = document.getElementById('ipad-modal');
+            const content = document.getElementById('ipad-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Lắng nghe sự kiện thay đổi trạng thái Fullscreen cho mọi trình duyệt
+        const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+        events.forEach(evt => {
+            document.addEventListener(evt, () => {
+                const btn = document.getElementById('btn-fullscreen');
+                const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+                if (isFullScreen) {
+                    btn.innerHTML = '<span>🔳 Thu nhỏ</span>';
+                } else {
+                    btn.innerHTML = '<span>🔲 Phóng to</span>';
+                }
+            });
         });
     </script>
 </body>
