@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Toán Lớp 3 Trực Quan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        /* Đảm bảo phông chữ hiển thị chuẩn trên iPad và tránh lỗi tách dấu tiếng Việt */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+        <div class="bg-indigo-600 text-white p-6 text-center">
+            <h1 class="text-2xl font-bold tracking-wide">Mô Phỏng Phép Nhân Trực Quan</h1>
+            <p class="text-indigo-100 text-sm mt-1">Công cụ hỗ trợ bé học toán chuẩn bị lên lớp 3</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-8">
+            
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col justify-between min-h-[320px]">
+                <div>
+                    <h2 class="text-md font-bold text-slate-700 uppercase tracking-wider mb-4">Hình ảnh trực quan</h2>
+                    <div id="visual-container" class="grid gap-3 justify-center items-center transition-all duration-300">
+                        </div>
+                </div>
+                <div class="text-center text-xs text-slate-400 font-medium mt-4">
+                    Bé hãy đếm tổng số khối vuông màu vàng ở trên nhé!
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-between space-y-6">
+                <div>
+                    <h2 class="text-md font-bold text-slate-700 uppercase tracking-wider mb-4">Phép tính toán học</h2>
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6 text-center shadow-inner">
+                        <div id="math-formula" class="text-3xl text-indigo-900 font-bold min-h-[45px] flex items-center justify-center"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h3 class="text-sm font-semibold text-slate-600">Thay đổi phép tính:</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Số nhóm (Hàng):</label>
+                            <select id="val-a" onchange="renderAll()" class="w-full p-2.5 border border-slate-300 rounded-lg bg-white shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium">
+                                <option value="2">2 nhóm</option>
+                                <option value="3" selected>3 nhóm</option>
+                                <option value="4">4 nhóm</option>
+                                <option value="5">5 nhóm</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Mỗi nhóm có (Cột):</label>
+                            <select id="val-b" onchange="renderAll()" class="w-full p-2.5 border border-slate-300 rounded-lg bg-white shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium">
+                                <option value="2">2 vật</option>
+                                <option value="3">3 vật</option>
+                                <option value="4" selected>4 vật</option>
+                                <option value="5">5 vật</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-400 italic bg-amber-50 border border-amber-100 rounded-lg p-3">
+                    * Mẹo giảng dạy: Hãy hướng dẫn bé đọc là "3 nhóm, mỗi nhóm có 4 ô vuông" để bé hiểu bản chất phép nhân trước khi học thuộc lòng bảng cửu chương.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Hàm cập nhật mô phỏng hình ảnh khối vuông
+        function updateVisuals(a, b) {
+            const container = document.getElementById('visual-container');
+            container.innerHTML = '';
+            
+            // Cấu hình số cột động cho Grid dựa trên số lượng vật trong nhóm
+            container.className = `grid gap-3 justify-center items-center`;
+            container.style.gridTemplateColumns = `repeat(${b}, minmax(0, 1fr))`;
+
+            // Sinh tự động các khối hộp tượng trưng
+            for (let i = 0; i < a * b; i++) {
+                const box = document.createElement('div');
+                box.className = 'w-10 h-10 md:w-12 md:h-12 bg-amber-400 rounded-lg shadow border-2 border-amber-500 flex items-center justify-center font-bold text-amber-900 transition-transform duration-200 hover:scale-110 select-none text-sm md:text-base';
+                box.innerText = i + 1;
+                container.appendChild(box);
+            }
+        }
+
+        // Hàm render công thức toán bằng KaTeX
+        function updateFormula(a, b) {
+            const formulaContainer = document.getElementById('math-formula');
+            const result = a * b;
+            const latexString = `${a} \\times ${b} = ${result}`;
+            
+            if (window.katex) {
+                katex.render(latexString, formulaContainer, {
+                    throwOnError: false
+                });
+            } else {
+                formulaContainer.innerText = `${a} x ${b} = ${result}`;
+            }
+        }
+
+        // Hàm tổng hợp để cập nhật toàn bộ giao diện
+        function renderAll() {
+            const a = parseInt(document.getElementById('val-a').value);
+            const b = parseInt(document.getElementById('val-b').value);
+            updateVisuals(a, b);
+            updateFormula(a, b);
+        }
+
+        // Đảm bảo thư viện được tải xong hoàn toàn trước khi render lần đầu
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(renderAll, 300);
+        });
+    </script>
+</body>
+</html>
