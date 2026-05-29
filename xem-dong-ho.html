@@ -38,6 +38,7 @@
         }
         input[type="number"] {
             -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         .shake {
@@ -68,9 +69,17 @@
 <body class="p-4 md:p-6 lg:p-8">
 
     <div class="max-w-6xl mx-auto mb-4 flex justify-between items-center">
-        <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">
-            <span>⬅️ Quay lại Sảnh chính</span>
-        </a>
+        <!-- Nhóm nút điều hướng và phóng to -->
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">⬅️ Quay lại Sảnh chính</span>
+                <span class="md:hidden">⬅️ Quay lại</span>
+            </a>
+            
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
         
         <!-- Bảng Điểm & Chuỗi -->
         <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-amber-200 flex items-center space-x-4">
@@ -504,6 +513,29 @@
             
             formulaContainer.innerHTML = htmlContent;
         }
+
+        // --- Chức năng Fullscreen (Toàn màn hình) ---
+        function toggleFullScreen() {
+            const btn = document.getElementById('btn-fullscreen');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    console.log(`Lỗi khi bật toàn màn hình: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('btn-fullscreen');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '<span>🔳 Thu nhỏ</span>';
+            } else {
+                btn.innerHTML = '<span>🔲 Phóng to</span>';
+            }
+        });
     </script>
 </body>
 </html>
