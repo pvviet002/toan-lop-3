@@ -3,79 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vui Học Toán Lớp 3</title>
+    <title>Vui Học Toán Lớp 3 - Mục Lục</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f8fafc;
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-        /* Hiệu ứng ấn nút cho iPad */
-        .card-hover:active {
-            transform: scale(0.98);
+
+        /* Tiêu đề cong lượn sóng giống sách */
+        .title-shadow {
+            text-shadow: 2px 2px 0px #fff, 4px 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Hiệu ứng hover cho các hàng bài học */
+        .row-hover:hover {
+            background-color: #f3e8ff; /* Tím nhạt */
+            transform: translateX(4px);
+            border-left: 4px solid #a855f7;
+        }
+        
+        .row-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 4px solid transparent;
         }
     </style>
 </head>
-<body class="p-6 md:p-10">
+<body class="p-4 md:p-8 lg:p-12">
 
-    <div class="max-w-5xl mx-auto">
-        <div class="mb-10 text-center">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight mb-2">
-                Trạm Toán Học Lớp 3 🚀
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Tiêu đề Mục lục -->
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-black text-[#8b6b9c] uppercase tracking-widest title-shadow">
+                Mục Lục
             </h1>
-            <p class="text-slate-500 text-lg">Chọn một chuyên đề dưới đây để bắt đầu khám phá nhé!</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <!-- Bảng Mục lục -->
+        <div class="bg-white shadow-xl rounded-xl overflow-hidden border-2 border-[#b9acd4]">
+            
+            <!-- Header Bảng -->
+            <div class="flex bg-[#967ab3] text-white font-bold text-center text-sm md:text-lg">
+                <div class="w-16 md:w-24 py-3 md:py-4 border-r-2 border-white">Chủ đề</div>
+                <div class="flex-1 py-3 md:py-4 border-r-2 border-white">Nội dung</div>
+                <div class="w-14 md:w-20 py-3 md:py-4">Trang</div>
+            </div>
 
-            <a href="phep-nhan.html" class="card-hover block bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 p-6 transition-all duration-200">
-                <div class="flex items-center space-x-5">
-                    <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
-                        ✖️
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-700">Phép nhân trực quan</h2>
-                        <p class="text-slate-500 text-sm mt-1">Học bản chất phép nhân qua các khối hình sinh động.</p>
-                    </div>
-                </div>
+            <!-- CHỦ ĐỀ 1 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">1</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">ÔN TẬP VÀ BỔ SUNG</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">6</div>
+            </div>
+            
+            <!-- Danh sách bài Chủ đề 1 -->
+            <a href="bai-1.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 1. Ôn tập các số đến 1 000</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">6</div>
+            </a>
+            <a href="bai-2.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 2. Ôn tập phép cộng, phép trừ trong phạm vi 1 000</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">9</div>
+            </a>
+            <a href="bai-3.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 3. Tìm thành phần trong phép cộng, phép trừ</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">11</div>
+            </a>
+            <a href="bai-4.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 4. Ôn tập bảng nhân 2; 5, bảng chia 2; 5</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">14</div>
+            </a>
+            <!-- Liên kết file Phép nhân vào Bài 5 -->
+            <a href="phep-nhan.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-purple-700 font-medium text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 5. Bảng nhân 3, bảng chia 3 (Đã có ứng dụng ✖️)</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">16</div>
+            </a>
+            <a href="bai-6.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 6. Bảng nhân 4, bảng chia 4</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">19</div>
+            </a>
+            <!-- Liên kết file Đồng hồ vào Bài 7 (Ôn tập đo lường) -->
+            <a href="xem-dong-ho.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-purple-700 font-medium text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 7. Ôn tập hình học và đo lường (Đã có ứng dụng ⏰)</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">21</div>
+            </a>
+            <a href="bai-8.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 8. Luyện tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">24</div>
             </a>
 
-            <a href="phep-chia.html" class="card-hover block bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 p-6 transition-all duration-200">
-                <div class="flex items-center space-x-5">
-                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
-                        ➗
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-700">Phép chia cơ bản</h2>
-                        <span class="inline-block mt-1 px-2 py-1 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md">Học phép chia cơ bản</span>
-                    </div>
-                </div>
+            <!-- CHỦ ĐỀ 2 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white border-t-2">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">2</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">BẢNG NHÂN, BẢNG CHIA</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">28</div>
+            </div>
+            
+            <!-- Danh sách bài Chủ đề 2 -->
+            <!-- Liên kết file Phép chia vào Bài 9 -->
+            <a href="phep-chia.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-purple-700 font-medium text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 9. Bảng nhân 6, bảng chia 6 (Đã có ứng dụng ➗)</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">28</div>
+            </a>
+            <a href="bai-10.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 10. Bảng nhân 7, bảng chia 7</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">31</div>
+            </a>
+            <a href="bai-11.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 11. Bảng nhân 8, bảng chia 8</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">33</div>
+            </a>
+            <a href="bai-12.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 12. Bảng nhân 9, bảng chia 9</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">36</div>
+            </a>
+            <a href="bai-13.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 13. Tìm thành phần trong phép nhân, phép chia</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">39</div>
+            </a>
+            <a href="bai-14.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 14. Một phần mấy</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">42</div>
+            </a>
+            <a href="bai-15.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 15. Luyện tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">46</div>
             </a>
 
-            <a href="xem-dong-ho.html" class="card-hover block bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 p-6 transition-all duration-200">
-                <div class="flex items-center space-x-5">
-                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
-                        ⏰
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-700">Tập xem đồng hồ</h2>
-                        <span class="inline-block mt-1 px-2 py-1 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md">Học cách xem giờ đồng hồ kim</span>
-                    </div>
-                </div>
+            <!-- CHỦ ĐỀ 3 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white border-t-2">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">3</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">LÀM QUEN VỚI HÌNH PHẲNG, HÌNH KHỐI</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">49</div>
+            </div>
+            
+            <a href="bai-16.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 16. Điểm ở giữa, trung điểm của đoạn thẳng</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">49</div>
+            </a>
+            <a href="bai-17.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 17. Hình tròn. Tâm, bán kính, đường kính của hình tròn</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">52</div>
+            </a>
+            <a href="bai-18.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 18. Góc, góc vuông, góc không vuông</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">54</div>
+            </a>
+            <!-- Liên kết file Hình học vào Bài 19 -->
+            <a href="hinh-hoc.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-purple-700 font-medium text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 19. Hình tam giác, hình tứ giác. Hình chữ nhật, hình vuông (Đã có ứng dụng 📐)</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">56</div>
+            </a>
+            <a href="bai-20.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 20. Thực hành vẽ góc vuông, vẽ đường tròn, hình vuông, hình chữ nhật và vẽ trang trí</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">61</div>
+            </a>
+            <a href="bai-21.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 21. Khối lập phương, khối hộp chữ nhật</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">63</div>
+            </a>
+            <a href="bai-22.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 22. Luyện tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">65</div>
             </a>
 
-            <a href="hinh-hoc.html" class="card-hover block bg-white rounded-2xl shadow-sm hover:shadow-md border border-slate-100 p-6 transition-all duration-200">
-                <div class="flex items-center space-x-5">
-                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
-                        📐
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-700">Hình học & Đo lường</h2>
-                        <span class="inline-block mt-1 px-2 py-1 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md">Học đo lường</span>
-                    </div>
-                </div>
+            <!-- CHỦ ĐỀ 4 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white border-t-2">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">4</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">PHÉP NHÂN, PHÉP CHIA TRONG PHẠM VI 100</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">67</div>
+            </div>
+            
+            <a href="bai-23.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 23. Nhân số có hai chữ số với số có một chữ số</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">67</div>
+            </a>
+            <a href="bai-24.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 24. Gấp một số lên một số lần</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">70</div>
+            </a>
+            <a href="bai-25.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 25. Phép chia hết, phép chia có dư</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">72</div>
+            </a>
+            <a href="bai-26.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 26. Chia số có hai chữ số cho số có một chữ số</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">75</div>
+            </a>
+            <a href="bai-27.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 27. Giảm một số đi một số lần</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">79</div>
+            </a>
+            <a href="bai-28.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 28. Bài toán giải bằng hai bước tính</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">81</div>
+            </a>
+            <a href="bai-29.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 29. Luyện tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">83</div>
             </a>
 
+            <!-- CHỦ ĐỀ 5 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white border-t-2">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">5</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">MỘT SỐ ĐƠN VỊ ĐO ĐỘ DÀI, KHỐI LƯỢNG, DUNG TÍCH, NHIỆT ĐỘ</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">85</div>
+            </div>
+            
+            <a href="bai-30.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 30. Mi-li-mét</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">85</div>
+            </a>
+            <a href="bai-31.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 31. Gam</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">87</div>
+            </a>
+            <a href="bai-32.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 32. Mi-li-lít</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">89</div>
+            </a>
+            <a href="bai-33.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 33. Nhiệt độ. Đơn vị đo nhiệt độ</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">91</div>
+            </a>
+            <a href="bai-34.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 34. Thực hành và trải nghiệm với các đơn vị mi-li-mét, gam, mi-li-lít, độ C</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">93</div>
+            </a>
+            <a href="bai-35.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 35. Luyện tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">95</div>
+            </a>
+
+            <!-- CHỦ ĐỀ 6 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white border-t-2">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">6</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">PHÉP NHÂN, PHÉP CHIA TRONG PHẠM VI 1 000</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">97</div>
+            </div>
+            
+            <a href="bai-36.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 36. Nhân số có ba chữ số với số có một chữ số</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">97</div>
+            </a>
+            <a href="bai-37.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 37. Chia số có ba chữ số cho số có một chữ số</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">99</div>
+            </a>
+            <a href="bai-38.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 38. Biểu thức số. Tính giá trị của biểu thức số</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">104</div>
+            </a>
+            <a href="bai-39.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 39. So sánh số lớn gấp mấy lần số bé</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">109</div>
+            </a>
+            <a href="bai-40.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 40. Luyện tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">111</div>
+            </a>
+
+            <!-- CHỦ ĐỀ 7 -->
+            <div class="flex bg-[#b9acd4] text-slate-800 font-bold text-sm md:text-base border-b-2 border-white border-t-2">
+                <div class="w-16 md:w-24 py-2 border-r-2 border-white text-center flex items-center justify-center text-lg md:text-xl">7</div>
+                <div class="flex-1 py-2 px-3 md:px-5 border-r-2 border-white uppercase flex items-center">ÔN TẬP HỌC KÌ 1</div>
+                <div class="w-14 md:w-20 py-2 text-center flex items-center justify-center">113</div>
+            </div>
+            
+            <a href="bai-41.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 41. Ôn tập phép nhân, phép chia trong phạm vi 100, 1 000</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">113</div>
+            </a>
+            <a href="bai-42.html" class="flex bg-white row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 42. Ôn tập biểu thức số</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">116</div>
+            </a>
+            <a href="bai-43.html" class="flex bg-[#f8f9fa] row-link row-hover border-b border-slate-200 text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 43. Ôn tập hình học và đo lường</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">118</div>
+            </a>
+            <a href="bai-44.html" class="flex bg-white row-link row-hover text-slate-700 text-sm md:text-base">
+                <div class="w-16 md:w-24 py-2.5 border-r-2 border-white"></div>
+                <div class="flex-1 py-2.5 px-3 md:px-5 border-r-2 border-white">Bài 44. Ôn tập chung</div>
+                <div class="w-14 md:w-20 py-2.5 text-center">120</div>
+            </a>
+
+        </div>
+        
+        <div class="text-center mt-8 text-slate-400 text-sm">
+            Hệ thống bài giảng bám sát sách giáo khoa Toán Lớp 3
         </div>
     </div>
 
