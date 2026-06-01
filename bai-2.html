@@ -3,354 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 2.1: Tính Nhẩm</title>
+    <title>Bài 2: Ôn tập phép cộng, phép trừ trong phạm vi 1 000</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #fff1f2; /* rose-50 */ }
-        .no-select { user-select: none; -webkit-user-select: none; }
-        .btn-press:active:not(:disabled) { transform: scale(0.95); }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .title-shadow {
+            text-shadow: 2px 2px 0px #fff, 4px 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
         
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
-
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-        .pulse-btn { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); } 100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); } }
-
-        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
-        @keyframes bounceIn { 100% { transform: scale(1); opacity: 1; } }
-
-        /* Bảng phép tính */
-        .math-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 2rem; font-weight: 800; color: #4c1d95; margin-bottom: 12px;}
-        .math-operator { color: #9f1239; width: 30px; text-align: center; }
-        .math-equals { color: #cbd5e1; width: 30px; text-align: center; }
-        .math-num { width: 80px; text-align: right; }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body class="p-4 md:p-6 lg:p-8 flex flex-col min-h-screen">
+<body class="p-4 md:p-8 lg:p-12 min-h-screen flex flex-col">
 
-    <!-- Header / Navigation Global -->
-    <div class="max-w-4xl mx-auto w-full mb-4 flex justify-between items-center">
-        <div class="flex items-center space-x-2 md:space-x-3">
-            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
-                <span class="hidden md:inline">⬅️ Quay lại Sảnh chính</span><span class="md:hidden">⬅️ Quay lại</span>
+    <div class="max-w-5xl mx-auto w-full flex-grow flex flex-col">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-bold text-sm transition-colors">
+                <span>⬅️ Sảnh chính</span>
             </a>
-            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
-                <span>🔲 Phóng to</span>
-            </button>
-        </div>
-        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-rose-200 flex items-center space-x-4">
-            <div class="flex items-center space-x-1"><span class="text-xl">⭐</span><span id="global-score" class="font-black text-amber-500 text-lg">0</span></div>
-            <div class="w-px h-6 bg-slate-200"></div>
-            <div class="flex items-center space-x-1"><span class="text-xl">🔥</span><span id="global-streak" class="font-black text-orange-500 text-lg">0</span></div>
-        </div>
-    </div>
-
-    <!-- MAIN APP CONTAINER -->
-    <div class="max-w-4xl mx-auto w-full bg-white rounded-3xl shadow-2xl border border-rose-100 overflow-hidden flex flex-col flex-grow">
-        
-        <div class="bg-gradient-to-r from-rose-500 to-pink-600 text-white p-5 md:p-6 text-center shadow-md relative z-10">
-            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Bài 1: Tính Nhẩm 🧠</h1>
-            <p class="text-rose-100 text-sm md:text-md mt-2 font-medium">Bé hãy nhẩm nhanh kết quả của các phép tính sau nhé!</p>
-        </div>
-
-        <div class="flex flex-col lg:flex-row border-b border-slate-100 bg-white flex-grow">
-            <!-- Cột Trái (Gợi ý) -->
-            <div class="w-full lg:w-2/5 bg-rose-50/50 p-4 md:p-8 flex flex-col justify-start">
-                <div class="mb-4 md:mb-6">
-                    <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
-                    <div class="flex flex-col sm:flex-row lg:flex-col justify-center items-center gap-3">
-                        <button id="btn-hint-1" onclick="useHint(1)" class="btn-press w-full px-4 py-3 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm disabled:opacity-50 transition-colors">1. Mẹo tính 💡</button>
-                        <button id="btn-hint-2" onclick="useHint(2)" class="btn-press w-full px-4 py-3 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm disabled:opacity-50 transition-colors">2. Phép tính đầu 🪄</button>
-                        <button id="btn-hint-3" onclick="useHint(3)" class="btn-press w-full px-4 py-3 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm disabled:opacity-50 transition-colors">3. Đáp án 🎯</button>
-                    </div>
-                </div>
-
-                <!-- Mascot / Hình ảnh vui nhộn -->
-                <div class="flex-grow flex items-center justify-center p-4">
-                    <div class="text-center bounce-in">
-                        <div class="text-8xl drop-shadow-lg no-select animate-bounce" style="animation-duration: 3s;">🦉</div>
-                        <p class="mt-4 text-rose-400 font-bold text-lg">Cú thông thái đang xem bé tính đấy!</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cột Phải (Quiz) -->
-            <div class="w-full lg:w-3/5 p-6 md:p-8 flex flex-col justify-start space-y-6 bg-white border-l lg:border-t-0 border-t border-slate-100 relative">
-                <div class="flex justify-between items-center w-full mb-2">
-                    <div class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold border border-slate-200" id="question-type-badge">
-                        Dạng: Tròn chục
-                    </div>
-                    <button onclick="generateQuestion()" class="btn-press px-5 py-2.5 bg-rose-50 text-rose-600 font-bold rounded-xl shadow-sm border border-rose-200 hover:bg-rose-100 text-sm flex items-center gap-2 transition-colors">
-                        <span>🔄 Đổi số</span>
-                    </button>
-                </div>
-
-                <div class="bg-pink-50/50 p-6 md:p-8 rounded-3xl border-2 border-pink-200 shadow-sm flex flex-col items-center flex-grow justify-center mt-0" id="quiz-container">
-                    
-                    <div id="math-container" class="flex flex-col gap-2 w-full mb-8">
-                        <!-- Sinh bởi JS -->
-                    </div>
-
-                    <button id="btn-action" onclick="checkAnswers()" class="btn-press px-8 py-4 bg-rose-500 text-white font-black rounded-full shadow-lg hover:bg-rose-600 text-xl w-full max-w-[300px] transition-all duration-300">
-                        Kiểm tra đáp án ✔️
-                    </button>
-                    <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
-                </div>
+            <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-violet-200 flex items-center space-x-2 font-bold text-violet-600">
+                <span>Toán Lớp 3</span>
             </div>
         </div>
 
-        <div id="formula-section" class="bg-slate-800 py-6 px-6 text-center relative w-full hidden shadow-inner border-t-4 border-rose-500">
-            <h2 class="text-[10px] md:text-xs font-bold text-rose-400 uppercase tracking-widest mb-3">Ghi nhớ:</h2>
-            <div id="math-formula" class="text-lg md:text-xl text-white font-medium flex flex-col space-y-2 max-w-2xl mx-auto leading-relaxed"></div>
+        <!-- Tiêu đề -->
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-black text-violet-600 uppercase tracking-wide title-shadow leading-tight mb-4">
+                Bài 2: Ôn tập phép cộng, phép trừ
+            </h1>
+            <p class="text-slate-500 font-medium text-lg md:text-xl">Phạm vi 1 000 • Bé hãy chọn một bài tập để bắt đầu nhé!</p>
         </div>
+
+        <!-- Lưới Bài Tập (9 Bài theo đúng SGK) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            
+            <!-- Luyện tập Tiết 1 -->
+            <!-- Bài 2.1 -->
+            <a href="bai-2_1.html" class="bg-white rounded-3xl p-6 border-2 border-rose-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">🧠</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 1</h2>
+                <p class="text-rose-600 font-bold bg-rose-50 px-4 py-1.5 rounded-lg w-full">Tính nhẩm</p>
+            </a>
+
+            <!-- Bài 2.2 -->
+            <a href="bai-2_2.html" class="bg-white rounded-3xl p-6 border-2 border-violet-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">✍️</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 2</h2>
+                <p class="text-violet-600 font-bold bg-violet-50 px-4 py-1.5 rounded-lg w-full">Đặt tính (theo mẫu)</p>
+            </a>
+
+            <!-- Bài 2.3 -->
+            <a href="bai-2_3.html" class="bg-white rounded-3xl p-6 border-2 border-sky-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📝</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 3</h2>
+                <p class="text-sky-600 font-bold bg-sky-50 px-4 py-1.5 rounded-lg w-full">Đặt tính rồi tính</p>
+            </a>
+
+            <!-- Bài 2.4 -->
+            <a href="bai-2_4.html" class="bg-white rounded-3xl p-6 border-2 border-amber-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 4</h2>
+                <p class="text-amber-600 font-bold bg-amber-50 px-4 py-1.5 rounded-lg w-full">Điền bảng Tổng</p>
+            </a>
+
+            <!-- Bài 2.5 -->
+            <a href="bai-2_5.html" class="bg-white rounded-3xl p-6 border-2 border-emerald-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">🐃</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 5</h2>
+                <p class="text-emerald-600 font-bold bg-emerald-50 px-4 py-1.5 rounded-lg w-full">Toán: Trâu và Nghé</p>
+            </a>
+
+            <!-- Luyện tập Tiết 2 -->
+            <!-- Bài 2.6 -->
+            <a href="bai-2_6.html" class="bg-white rounded-3xl p-6 border-2 border-fuchsia-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-fuchsia-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📉</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 2 - Bài 1</h2>
+                <p class="text-fuchsia-600 font-bold bg-fuchsia-50 px-4 py-1.5 rounded-lg w-full">Điền bảng Hiệu</p>
+            </a>
+
+            <!-- Bài 2.7 -->
+            <a href="bai-2_7.html" class="bg-white rounded-3xl p-6 border-2 border-orange-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">➡️</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 2 - Bài 2</h2>
+                <p class="text-orange-600 font-bold bg-orange-50 px-4 py-1.5 rounded-lg w-full">Tính theo sơ đồ</p>
+            </a>
+
+            <!-- Bài 2.8 -->
+            <a href="bai-2_8.html" class="bg-white rounded-3xl p-6 border-2 border-indigo-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">🏺</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 2 - Bài 3</h2>
+                <p class="text-indigo-600 font-bold bg-indigo-50 px-4 py-1.5 rounded-lg w-full">Những chiếc chum</p>
+            </a>
+
+            <!-- Bài 2.9 -->
+            <a href="bai-2_9.html" class="bg-white rounded-3xl p-6 border-2 border-teal-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">🏫</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 2 - Bài 4</h2>
+                <p class="text-teal-600 font-bold bg-teal-50 px-4 py-1.5 rounded-lg w-full">Toán: Khối 3 và 4</p>
+            </a>
+
+        </div>
+
+    </div>
+    
+    <div class="text-center mt-12 text-slate-400 text-sm font-medium">
+        Hệ thống bài tập bám sát Sách giáo khoa Toán Lớp 3 🌟
     </div>
 
-    <!-- Modal iPad -->
-    <div id="ipad-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="ipad-modal-content">
-            <div class="text-center">
-                <div class="text-5xl mb-4">📱</div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Mẹo cho iPad</h3>
-                <p class="text-slate-600 mb-6 text-sm leading-relaxed">Trình duyệt Safari trên thiết bị này không hỗ trợ nút phóng to tự động.<br><br>Để chơi toàn màn hình, ba mẹ hãy nhấn nút <b class="text-rose-600">Chia sẻ (Share)</b> ở viền Safari và chọn <b class="text-rose-600">Thêm vào MH chính (Add to Home Screen)</b> nhé!</p>
-                <button onclick="closeModal()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-full w-full transition-colors">Đã hiểu ✔️</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- AUDIO -->
-    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
-    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
-    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
-
-    <script>
-        // State
-        let num1 = 0, num2 = 0, sum = 0;
-        let subOp1 = 0, subOp2 = 0;
-        let isHundreds = false;
-        let hintLevel = 0, isCorrect = false;
-        let globalScore = 0, globalStreak = 0;
-        
-        // Theo dõi câu hỏi hiện tại
-        let currentQuestionIndex = 0;
-        
-        // Danh sách 4 câu hỏi cố định mô phỏng SGK
-        const predefinedQuestions = [
-            { n1: 50, n2: 40, isH: false, swapSub: false }, // a) 50 + 40, 90 - 50, 90 - 40
-            { n1: 500, n2: 400, isH: true, swapSub: false },// b) 500 + 400, 900 - 500, 900 - 400
-            { n1: 80, n2: 20, isH: false, swapSub: false }, // c) 80 + 20, 100 - 80, 100 - 20
-            { n1: 300, n2: 700, isH: true, swapSub: true }  // d) 300 + 700, 1000 - 700, 1000 - 300
-        ];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            generateQuestion();
-        });
-
-        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
-        function updateScoreBoard() { document.getElementById('global-score').innerText = globalScore; document.getElementById('global-streak').innerText = globalStreak; }
-
-        function generateQuestion() {
-            if (currentQuestionIndex < predefinedQuestions.length) {
-                // 4 câu đầu tiên tuân thủ chặt chẽ theo SGK
-                let q = predefinedQuestions[currentQuestionIndex];
-                isHundreds = q.isH;
-                num1 = q.n1;
-                num2 = q.n2;
-                subOp1 = q.swapSub ? num2 : num1;
-                subOp2 = q.swapSub ? num1 : num2;
-                currentQuestionIndex++;
-            } else {
-                // Từ câu thứ 5 trở đi là sinh số ngẫu nhiên
-                isHundreds = Math.random() > 0.5;
-                let multiplier = isHundreds ? 100 : 10;
-                
-                let a = Math.floor(Math.random() * 9) + 1; // 1 đến 9
-                let b = Math.floor(Math.random() * (10 - a)) + 1; // 1 đến (10-a)
-                
-                if (a + b < 5 && Math.random() > 0.5) b += 3;
-                
-                num1 = a * multiplier;
-                num2 = b * multiplier;
-                
-                if (Math.random() > 0.5) {
-                    let temp = num1; num1 = num2; num2 = temp;
-                }
-                
-                // Random vị trí của phép trừ
-                let swapSub = Math.random() > 0.5;
-                subOp1 = swapSub ? num2 : num1;
-                subOp2 = swapSub ? num1 : num2;
-            }
-
-            document.getElementById('question-type-badge').innerText = isHundreds ? 'Dạng: Tròn trăm' : 'Dạng: Tròn chục';
-            sum = num1 + num2;
-
-            // Render HTML
-            const container = document.getElementById('math-container');
-            container.innerHTML = `
-                <div class="math-row bounce-in" style="animation-delay: 0.1s">
-                    <span class="math-num">${num1}</span>
-                    <span class="math-operator">+</span>
-                    <span class="math-num text-left">${num2}</span>
-                    <span class="math-equals">=</span>
-                    <input type="number" id="ans-1" class="w-24 md:w-32 h-14 md:h-16 text-center text-3xl md:text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 rounded-xl focus:border-rose-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
-                </div>
-                <div class="math-row bounce-in" style="animation-delay: 0.2s">
-                    <span class="math-num">${sum}</span>
-                    <span class="math-operator">-</span>
-                    <span class="math-num text-left">${subOp1}</span>
-                    <span class="math-equals">=</span>
-                    <input type="number" id="ans-2" class="w-24 md:w-32 h-14 md:h-16 text-center text-3xl md:text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 rounded-xl focus:border-rose-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
-                </div>
-                <div class="math-row bounce-in" style="animation-delay: 0.3s">
-                    <span class="math-num">${sum}</span>
-                    <span class="math-operator">-</span>
-                    <span class="math-num text-left">${subOp2}</span>
-                    <span class="math-equals">=</span>
-                    <input type="number" id="ans-3" class="w-24 md:w-32 h-14 md:h-16 text-center text-3xl md:text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 rounded-xl focus:border-rose-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
-                </div>
-            `;
-
-            // Reset States
-            hintLevel = 0; isCorrect = false;
-            
-            const btnAction = document.getElementById('btn-action');
-            btnAction.innerText = 'Kiểm tra đáp án ✔️';
-            btnAction.className = 'btn-press px-8 py-4 bg-rose-500 text-white font-black rounded-full shadow-lg hover:bg-rose-600 text-xl w-full max-w-[300px] transition-all duration-300';
-            
-            const feedback = document.getElementById('feedback-msg');
-            feedback.innerText = '';
-            
-            document.getElementById('formula-section').classList.add('hidden');
-            updateHintButtons();
-        }
-
-        function handleEnter(e) { if (e.key === 'Enter') checkAnswers(); }
-
-        function checkAnswers() {
-            if (isCorrect) { generateQuestion(); return; }
-
-            const a1 = parseInt(document.getElementById('ans-1').value);
-            const a2 = parseInt(document.getElementById('ans-2').value);
-            const a3 = parseInt(document.getElementById('ans-3').value);
-            const feedback = document.getElementById('feedback-msg');
-
-            let allFilled = !isNaN(a1) && !isNaN(a2) && !isNaN(a3);
-            
-            // Xử lý UI cho từng ô
-            const checkField = (id, val, exp) => {
-                const el = document.getElementById(id);
-                if (isNaN(val)) return false;
-                if (val === exp) {
-                    el.classList.remove('bg-white', 'border-slate-300', 'bg-red-50', 'border-red-400', 'text-red-700', 'bg-yellow-100');
-                    el.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
-                    el.disabled = true;
-                    return true;
-                } else {
-                    el.classList.remove('bg-white', 'border-slate-300', 'bg-green-100', 'border-green-500', 'text-green-700', 'bg-yellow-100');
-                    el.classList.add('bg-red-50', 'border-red-400', 'text-red-700');
-                    return false;
-                }
-            };
-
-            let c1 = checkField('ans-1', a1, sum);
-            let c2 = checkField('ans-2', a2, subOp2);
-            let c3 = checkField('ans-3', a3, subOp1);
-
-            if (!allFilled) {
-                feedback.innerText = 'Bé nhớ tính và điền hết 3 phép tính nhé! 🧐';
-                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
-                playSound('snd-wrong');
-                return;
-            }
-
-            if (c1 && c2 && c3) {
-                isCorrect = true; playSound('snd-correct'); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                let pts = 10; if (hintLevel === 1) pts = 8; if (hintLevel === 2) pts = 5; if (hintLevel === 3) pts = 2;
-                globalScore += pts; globalStreak += 1; updateScoreBoard();
-
-                feedback.innerHTML = `Hoan hô! Bé nhẩm siêu quá <b>+${pts}⭐</b> 🎉`; 
-                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-pink-600';
-                
-                const btnAction = document.getElementById('btn-action');
-                btnAction.innerText = 'Câu tiếp theo ➡️'; 
-                btnAction.className = 'btn-press px-8 py-4 bg-fuchsia-500 text-white font-black rounded-full shadow-lg hover:bg-fuchsia-600 text-xl w-full max-w-[300px] transition-all duration-300 pulse-btn';
-                
-                if (hintLevel < 3) { hintLevel = 3; updateHintButtons(); updateFormula(); }
-            } else {
-                playSound('snd-wrong'); globalStreak = 0; updateScoreBoard();
-                feedback.innerText = 'Có phép tính chưa đúng, bé nhẩm lại nhé! 🤔'; 
-                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-red-500';
-                const area = document.getElementById('quiz-container'); area.classList.remove('shake'); void area.offsetWidth; area.classList.add('shake');
-            }
-        }
-
-        function useHint(level) {
-            if (hintLevel >= level || isCorrect) return; 
-            hintLevel = level; updateHintButtons(); playSound('snd-pop');
-            updateFormula();
-
-            if (hintLevel === 2) {
-                const el = document.getElementById('ans-1');
-                if(!el.disabled) {
-                    el.value = sum;
-                    el.classList.add('bg-yellow-100');
-                    setTimeout(() => el.classList.remove('bg-yellow-100'), 1000);
-                }
-            } else if (hintLevel === 3) {
-                document.getElementById('ans-1').value = sum;
-                document.getElementById('ans-2').value = subOp2;
-                document.getElementById('ans-3').value = subOp1;
-            }
-        }
-
-        function updateHintButtons() {
-            for(let i=1; i<=3; i++) {
-                const btn = document.getElementById(`btn-hint-${i}`); btn.disabled = hintLevel >= i;
-                btn.className = btn.disabled ? "w-full px-4 py-3 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed" : `btn-press w-full px-4 py-3 bg-${i==1?'blue':i==2?'amber':'purple'}-100 text-${i==1?'blue':i==2?'amber':'purple'}-700 font-bold rounded-xl border border-${i==1?'blue':i==2?'amber':'purple'}-200 shadow-sm transition-colors`;
-            }
-        }
-
-        function updateFormula() {
-            const section = document.getElementById('formula-section'); if (hintLevel < 1) return;
-            section.classList.remove('hidden'); const formulaContainer = document.getElementById('math-formula');
-            
-            let htmlContent = '';
-            
-            if (hintLevel >= 1) {
-                htmlContent += `<div class="mb-2 text-rose-200">
-                    💡 <b class="text-white">Mẹo:</b> Khi ta biết kết quả của phép cộng, ta dễ dàng tìm được kết quả của hai phép trừ tương ứng.
-                </div>`;
-            }
-
-            if (hintLevel >= 3) {
-                let color1 = subOp1 === num1 ? "text-pink-300" : "text-sky-300";
-                let color2 = subOp2 === num1 ? "text-pink-300" : "text-sky-300";
-                htmlContent += `
-                <div class="mt-2 bg-slate-700/50 p-4 rounded-xl border border-slate-600 inline-block text-center space-y-2 mx-auto">
-                    <div>Vì <span class="text-pink-300 font-black">${num1}</span> + <span class="text-sky-300 font-black">${num2}</span> = <span class="text-green-300 font-black">${sum}</span></div>
-                    <div>Nên <span class="text-green-300 font-black">${sum}</span> - <span class="${color1} font-black">${subOp1}</span> = <span class="${color2} font-black">${subOp2}</span></div>
-                    <div>Và <span class="text-green-300 font-black">${sum}</span> - <span class="${color2} font-black">${subOp2}</span> = <span class="${color1} font-black">${subOp1}</span></div>
-                </div>`;
-            }
-
-            formulaContainer.innerHTML = htmlContent;
-        }
-
-        // --- Chức năng Fullscreen ---
-        function toggleFullScreen() {
-            const doc = document.documentElement; const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen; const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { if (req) { try { let p = req.call(doc); if (p) p.catch(e => showModal()); } catch (e) { showModal(); } } else showModal(); } else if (ext) ext.call(document);
-        }
-        function showModal() { document.getElementById('ipad-modal').classList.remove('hidden'); setTimeout(() => { document.getElementById('ipad-modal').classList.remove('opacity-0'); document.getElementById('ipad-modal-content').classList.remove('scale-95'); }, 10); }
-        function closeModal() { document.getElementById('ipad-modal').classList.add('opacity-0'); document.getElementById('ipad-modal-content').classList.add('scale-95'); setTimeout(() => { document.getElementById('ipad-modal').classList.add('hidden'); }, 300); }
-        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => document.addEventListener(evt, () => { const btn = document.getElementById('btn-fullscreen'); btn.innerHTML = (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) ? '<span>🔳 Thu nhỏ</span>' : '<span>🔲 Phóng to</span>'; }));
-    </script>
 </body>
 </html>
