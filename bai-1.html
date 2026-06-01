@@ -938,8 +938,6 @@
             // Adjust card size dynamically if there are many cards (5 or 6) to fit smaller screens
             let cardSizeClass = numCount >= 5 ? 'w-12 h-12 md:w-16 md:h-16 text-lg md:text-xl' : 'w-16 h-16 md:w-20 md:h-20 text-xl md:text-2xl';
 
-            document.getElementById('bt6-original-nums').innerHTML = bt6_numbers.map(n => `<div class="${cardSizeClass} flex items-center justify-center font-extrabold text-slate-600 bg-slate-50 border-4 border-slate-200 rounded-2xl shadow-sm">${n}</div>`).join('');
-            
             renderBT6Cards(numCount, cardSizeClass);
 
             bt6_hintLevel = 0; bt6_isCorrect = false;
