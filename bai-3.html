@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 3: Tìm thành phần trong phép cộng, phép trừ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .title-shadow {
+            text-shadow: 2px 2px 0px #fff, 4px 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 lg:p-12 min-h-screen flex flex-col">
+
+    <div class="max-w-5xl mx-auto w-full flex-grow flex flex-col">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-bold text-sm transition-colors">
+                <span>⬅️ Sảnh chính</span>
+            </a>
+            <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-orange-200 flex items-center space-x-2 font-bold text-orange-600">
+                <span>Toán Lớp 3</span>
+            </div>
+        </div>
+
+        <!-- Tiêu đề -->
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-black text-orange-500 uppercase tracking-wide title-shadow leading-tight mb-4">
+                Bài 3: Tìm thành phần
+            </h1>
+            <p class="text-orange-400 font-bold text-xl md:text-2xl title-shadow mb-4 uppercase">Trong phép cộng, phép trừ</p>
+            <p class="text-slate-500 font-medium text-lg md:text-xl">Bé hãy chọn một bài tập để bắt đầu luyện tập nhé!</p>
+        </div>
+
+        <!-- Lưới Bài Tập (7 Bài theo SGK) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            
+            <!-- KHÁM PHÁ & HOẠT ĐỘNG 1 -->
+            <!-- Bài 3.1 -->
+            <a href="bai-3_1.html" class="bg-white rounded-3xl p-6 border-2 border-amber-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">❓</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 1</h2>
+                <p class="text-amber-600 font-bold bg-amber-50 px-4 py-1.5 rounded-lg w-full">Tìm số hạng</p>
+            </a>
+
+            <!-- Bài 3.2 -->
+            <a href="bai-3_2.html" class="bg-white rounded-3xl p-6 border-2 border-sky-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 2</h2>
+                <p class="text-sky-600 font-bold bg-sky-50 px-4 py-1.5 rounded-lg w-full">Điền bảng Tổng</p>
+            </a>
+
+            <!-- Bài 3.3 -->
+            <a href="bai-3_3.html" class="bg-white rounded-3xl p-6 border-2 border-blue-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">⛵</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 1 - Bài 3</h2>
+                <p class="text-blue-600 font-bold bg-blue-50 px-4 py-1.5 rounded-lg w-full">Toán: Bến thuyền</p>
+            </a>
+
+            <!-- KHÁM PHÁ & HOẠT ĐỘNG 2 -->
+            <!-- Bài 3.4 -->
+            <a href="bai-3_4.html" class="bg-white rounded-3xl p-6 border-2 border-rose-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">➖</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 2 - Bài 1</h2>
+                <p class="text-rose-600 font-bold bg-rose-50 px-4 py-1.5 rounded-lg w-full">Tìm số bị trừ, số trừ</p>
+            </a>
+
+            <!-- Bài 3.5 -->
+            <a href="bai-3_5.html" class="bg-white rounded-3xl p-6 border-2 border-fuchsia-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-fuchsia-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📉</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Tiết 2 - Bài 2</h2>
+                <p class="text-fuchsia-600 font-bold bg-fuchsia-50 px-4 py-1.5 rounded-lg w-full">Điền bảng Hiệu</p>
+            </a>
+
+            <!-- LUYỆN TẬP -->
+            <!-- Bài 3.6 -->
+            <a href="bai-3_6.html" class="bg-white rounded-3xl p-6 border-2 border-emerald-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">✅</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Luyện tập - Bài 1</h2>
+                <p class="text-emerald-600 font-bold bg-emerald-50 px-4 py-1.5 rounded-lg w-full">Trắc nghiệm tìm số</p>
+            </a>
+
+            <!-- Bài 3.7 -->
+            <a href="bai-3_7.html" class="bg-white rounded-3xl p-6 border-2 border-teal-200 shadow-md card-hover flex flex-col items-center text-center group cursor-pointer block outline-none">
+                <div class="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">🦆</div>
+                <h2 class="text-xl font-extrabold text-slate-800 mb-2">Luyện tập - Bài 2</h2>
+                <p class="text-teal-600 font-bold bg-teal-50 px-4 py-1.5 rounded-lg w-full">Toán: Đàn vịt</p>
+            </a>
+
+        </div>
+
+    </div>
+    
+    <div class="text-center mt-12 text-slate-400 text-sm font-medium">
+        Hệ thống bài tập bám sát Sách giáo khoa Toán Lớp 3 🌟
+    </div>
+
+</body>
+</html>
