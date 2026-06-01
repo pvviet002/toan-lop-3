@@ -132,9 +132,21 @@
     <script>
         // State
         let num1 = 0, num2 = 0, sum = 0;
+        let subOp1 = 0, subOp2 = 0;
         let isHundreds = false;
         let hintLevel = 0, isCorrect = false;
         let globalScore = 0, globalStreak = 0;
+        
+        // Theo dõi câu hỏi hiện tại
+        let currentQuestionIndex = 0;
+        
+        // Danh sách 4 câu hỏi cố định mô phỏng SGK
+        const predefinedQuestions = [
+            { n1: 50, n2: 40, isH: false, swapSub: false }, // a) 50 + 40, 90 - 50, 90 - 40
+            { n1: 500, n2: 400, isH: true, swapSub: false },// b) 500 + 400, 900 - 500, 900 - 400
+            { n1: 80, n2: 20, isH: false, swapSub: false }, // c) 80 + 20, 100 - 80, 100 - 20
+            { n1: 300, n2: 700, isH: true, swapSub: true }  // d) 300 + 700, 1000 - 700, 1000 - 300
+        ];
 
         window.addEventListener('DOMContentLoaded', () => {
             generateQuestion();
@@ -144,29 +156,39 @@
         function updateScoreBoard() { document.getElementById('global-score').innerText = globalScore; document.getElementById('global-streak').innerText = globalStreak; }
 
         function generateQuestion() {
-            // 50% cơ hội là số tròn chục, 50% là số tròn trăm
-            isHundreds = Math.random() > 0.5;
+            if (currentQuestionIndex < predefinedQuestions.length) {
+                // 4 câu đầu tiên tuân thủ chặt chẽ theo SGK
+                let q = predefinedQuestions[currentQuestionIndex];
+                isHundreds = q.isH;
+                num1 = q.n1;
+                num2 = q.n2;
+                subOp1 = q.swapSub ? num2 : num1;
+                subOp2 = q.swapSub ? num1 : num2;
+                currentQuestionIndex++;
+            } else {
+                // Từ câu thứ 5 trở đi là sinh số ngẫu nhiên
+                isHundreds = Math.random() > 0.5;
+                let multiplier = isHundreds ? 100 : 10;
+                
+                let a = Math.floor(Math.random() * 9) + 1; // 1 đến 9
+                let b = Math.floor(Math.random() * (10 - a)) + 1; // 1 đến (10-a)
+                
+                if (a + b < 5 && Math.random() > 0.5) b += 3;
+                
+                num1 = a * multiplier;
+                num2 = b * multiplier;
+                
+                if (Math.random() > 0.5) {
+                    let temp = num1; num1 = num2; num2 = temp;
+                }
+                
+                // Random vị trí của phép trừ
+                let swapSub = Math.random() > 0.5;
+                subOp1 = swapSub ? num2 : num1;
+                subOp2 = swapSub ? num1 : num2;
+            }
+
             document.getElementById('question-type-badge').innerText = isHundreds ? 'Dạng: Tròn trăm' : 'Dạng: Tròn chục';
-
-            let multiplier = isHundreds ? 100 : 10;
-            
-            // Sinh số a và b sao cho tổng a+b <= 10 (theo đúng mẫu sách giáo khoa)
-            let a = Math.floor(Math.random() * 9) + 1; // 1 đến 9
-            let b = Math.floor(Math.random() * (10 - a)) + 1; // 1 đến (10-a)
-            
-            // Nếu vô tình ra số quá bé, cố ép nó to lên xíu cho đẹp
-            if (a + b < 5 && Math.random() > 0.5) {
-                b += 3;
-            }
-
-            num1 = a * multiplier;
-            num2 = b * multiplier;
-            
-            // Thỉnh thoảng tráo đổi vị trí cho đa dạng
-            if (Math.random() > 0.5) {
-                let temp = num1; num1 = num2; num2 = temp;
-            }
-
             sum = num1 + num2;
 
             // Render HTML
@@ -182,14 +204,14 @@
                 <div class="math-row bounce-in" style="animation-delay: 0.2s">
                     <span class="math-num">${sum}</span>
                     <span class="math-operator">-</span>
-                    <span class="math-num text-left">${num1}</span>
+                    <span class="math-num text-left">${subOp1}</span>
                     <span class="math-equals">=</span>
                     <input type="number" id="ans-2" class="w-24 md:w-32 h-14 md:h-16 text-center text-3xl md:text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 rounded-xl focus:border-rose-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
                 </div>
                 <div class="math-row bounce-in" style="animation-delay: 0.3s">
                     <span class="math-num">${sum}</span>
                     <span class="math-operator">-</span>
-                    <span class="math-num text-left">${num2}</span>
+                    <span class="math-num text-left">${subOp2}</span>
                     <span class="math-equals">=</span>
                     <input type="number" id="ans-3" class="w-24 md:w-32 h-14 md:h-16 text-center text-3xl md:text-4xl font-extrabold text-slate-800 border-b-4 border-slate-300 rounded-xl focus:border-rose-500 outline-none shadow-inner" placeholder="?" onkeypress="handleEnter(event)">
                 </div>
@@ -238,8 +260,8 @@
             };
 
             let c1 = checkField('ans-1', a1, sum);
-            let c2 = checkField('ans-2', a2, num2);
-            let c3 = checkField('ans-3', a3, num1);
+            let c2 = checkField('ans-2', a2, subOp2);
+            let c3 = checkField('ans-3', a3, subOp1);
 
             if (!allFilled) {
                 feedback.innerText = 'Bé nhớ tính và điền hết 3 phép tính nhé! 🧐';
@@ -283,8 +305,8 @@
                 }
             } else if (hintLevel === 3) {
                 document.getElementById('ans-1').value = sum;
-                document.getElementById('ans-2').value = num2;
-                document.getElementById('ans-3').value = num1;
+                document.getElementById('ans-2').value = subOp2;
+                document.getElementById('ans-3').value = subOp1;
             }
         }
 
@@ -308,11 +330,13 @@
             }
 
             if (hintLevel >= 3) {
+                let color1 = subOp1 === num1 ? "text-pink-300" : "text-sky-300";
+                let color2 = subOp2 === num1 ? "text-pink-300" : "text-sky-300";
                 htmlContent += `
                 <div class="mt-2 bg-slate-700/50 p-4 rounded-xl border border-slate-600 inline-block text-center space-y-2 mx-auto">
                     <div>Vì <span class="text-pink-300 font-black">${num1}</span> + <span class="text-sky-300 font-black">${num2}</span> = <span class="text-green-300 font-black">${sum}</span></div>
-                    <div>Nên <span class="text-green-300 font-black">${sum}</span> - <span class="text-pink-300 font-black">${num1}</span> = <span class="text-sky-300 font-black">${num2}</span></div>
-                    <div>Và <span class="text-green-300 font-black">${sum}</span> - <span class="text-sky-300 font-black">${num2}</span> = <span class="text-pink-300 font-black">${num1}</span></div>
+                    <div>Nên <span class="text-green-300 font-black">${sum}</span> - <span class="${color1} font-black">${subOp1}</span> = <span class="${color2} font-black">${subOp2}</span></div>
+                    <div>Và <span class="text-green-300 font-black">${sum}</span> - <span class="${color2} font-black">${subOp2}</span> = <span class="${color1} font-black">${subOp1}</span></div>
                 </div>`;
             }
 
