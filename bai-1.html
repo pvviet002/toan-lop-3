@@ -60,6 +60,9 @@
         .timeline-dot { width: 16px; height: 16px; background-color: white; border: 4px solid #14b8a6; border-radius: 50%; }
         .timeline-num { font-size: 1.25rem; font-weight: bold; color: #475569; background: white; padding: 2px 8px; border-radius: 4px;}
         .timeline-num.highlight { background-color: #ccfbf1; border: 2px solid #14b8a6; color: #0f766e; font-size: 1.5rem; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        /* Styles cho Bài 6 (Kéo thả) */
+        .bt6-sort-item.dragging { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
 <body class="p-2 md:p-6 lg:p-8 flex flex-col min-h-screen">
@@ -91,6 +94,7 @@
             <button onclick="switchMainTab(3)" id="main-tab-3" class="flex-1 py-4 px-6 text-center whitespace-nowrap border-b-4 focus:outline-none transition-colors border-transparent hover:text-white hover:bg-slate-700">Bài 3: Cấu tạo số</button>
             <button onclick="switchMainTab(4)" id="main-tab-4" class="flex-1 py-4 px-6 text-center whitespace-nowrap border-b-4 focus:outline-none transition-colors border-transparent hover:text-white hover:bg-slate-700">Bài 4: Số liền trước/sau</button>
             <button onclick="switchMainTab(5)" id="main-tab-5" class="flex-1 py-4 px-6 text-center whitespace-nowrap border-b-4 focus:outline-none transition-colors border-transparent hover:text-white hover:bg-slate-700">Bài 5: Tia số</button>
+            <button onclick="switchMainTab(6)" id="main-tab-6" class="flex-1 py-4 px-6 text-center whitespace-nowrap border-b-4 focus:outline-none transition-colors border-transparent hover:text-white hover:bg-slate-700">Bài 6: Sắp xếp số</button>
         </div>
 
         <!-- ========================================== -->
@@ -325,18 +329,56 @@
             </div>
         </div>
 
-    </div>
+        <!-- ========================================== -->
+        <!-- PANE BT6: Sắp xếp số                       -->
+        <!-- ========================================== -->
+        <div id="pane-bt6" class="bt-pane hidden flex-col flex-grow">
+            <div class="bg-gradient-to-r from-indigo-500 to-violet-600 text-white p-4 md:p-5 text-center shadow-md relative z-10">
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-wide">Bài tập 6: Sắp Xếp Số 🔢</h1>
+            </div>
+            <div class="flex flex-nowrap overflow-x-auto hide-scrollbar bg-slate-100 border-b border-slate-200 shadow-inner z-0">
+                <button onclick="switchSubTabBT6(true)" id="bt6-tab-asc" class="flex-1 py-3 px-4 text-center font-bold text-sm border-b-4 focus:outline-none">Từ bé đến lớn (Tăng dần)</button>
+                <button onclick="switchSubTabBT6(false)" id="bt6-tab-desc" class="flex-1 py-3 px-4 text-center font-bold text-sm border-b-4 focus:outline-none">Từ lớn đến bé (Giảm dần)</button>
+            </div>
 
-    <!-- Modal iPad -->
-    <div id="ipad-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="ipad-modal-content">
-            <div class="text-center">
-                <div class="text-5xl mb-4">📱</div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Mẹo cho iPad</h3>
-                <p class="text-slate-600 mb-6 text-sm">Để chơi toàn màn hình, hãy nhấn <b class="text-blue-600">Chia sẻ</b> và chọn <b class="text-blue-600">Thêm vào MH chính</b> nhé!</p>
-                <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full w-full">Đã hiểu ✔️</button>
+            <div class="flex flex-col lg:flex-row border-b border-slate-100 bg-white flex-grow">
+                <div class="w-full lg:w-3/5 bg-indigo-50/30 p-4 md:p-8 flex flex-col justify-start">
+                    <div class="mb-4 md:mb-6">
+                        <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
+                        <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                            <button id="bt6-btn-hint-1" onclick="useHintBT6(1)" class="btn-press w-full sm:w-auto px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm disabled:opacity-50">1. Quy tắc 🧠</button>
+                            <button id="bt6-btn-hint-2" onclick="useHintBT6(2)" class="btn-press w-full sm:w-auto px-4 py-2 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm disabled:opacity-50">2. Sắp mẫu 2 số 🪄</button>
+                            <button id="bt6-btn-hint-3" onclick="useHintBT6(3)" class="btn-press w-full sm:w-auto px-4 py-2 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm disabled:opacity-50">3. Đáp án 💡</button>
+                        </div>
+                    </div>
+                    <div class="flex-grow w-full flex flex-col min-h-[200px] p-4 bg-white rounded-2xl shadow-inner border border-indigo-100 relative items-center justify-center">
+                        <label class="block text-center text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Các số ban đầu</label>
+                        <div id="bt6-original-nums" class="flex flex-wrap gap-4 items-center justify-center"></div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-2/5 p-6 md:p-8 flex flex-col justify-start space-y-6 bg-white border-l lg:border-t-0 border-t border-slate-100 relative">
+                    <div class="flex justify-end w-full">
+                        <button onclick="generateQuestionBT6()" class="btn-press px-5 py-2 bg-indigo-50 text-indigo-600 font-bold rounded-xl shadow-sm border border-indigo-200 hover:bg-indigo-100 text-sm">🔄 Đổi số</button>
+                    </div>
+                    <div class="bg-violet-50 p-6 rounded-3xl border-2 border-violet-200 shadow-sm flex flex-col items-center flex-grow justify-center mt-0">
+                        <label class="block text-center text-sm font-bold text-indigo-700 uppercase tracking-wider mb-2" id="bt6-instruction-label">Sắp xếp từ Bé đến Lớn</label>
+                        <div class="text-xs text-slate-500 mb-6 font-medium text-center">Kéo thả hoặc chạm vào 2 số để đổi chỗ</div>
+                        
+                        <div id="bt6-sortable-list" class="flex flex-col gap-3 w-full max-w-[250px] mb-6">
+                            <!-- JS gen -->
+                        </div>
+
+                        <button id="bt6-btn-action" onclick="checkAnswerBT6()" class="btn-press px-8 py-3 bg-indigo-500 text-white font-bold rounded-full shadow-md hover:bg-indigo-600 text-lg w-full transition-all duration-300">Kiểm tra đáp án ✔️</button>
+                        <div id="bt6-feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="bt6-formula-section" class="bg-slate-800 py-6 px-6 text-center relative w-full hidden shadow-inner border-t-4 border-indigo-500">
+                <h2 class="text-[10px] md:text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3">Giải thích chi tiết:</h2>
+                <div id="bt6-math-formula" class="text-xl md:text-2xl text-white font-bold flex flex-col space-y-2"></div>
             </div>
         </div>
+
     </div>
 
     <!-- AUDIO -->
@@ -862,14 +904,174 @@
 
 
         // ==========================================
+        // BT6 STATE & LOGIC
+        // ==========================================
+        let bt6_isAsc = true, bt6_numbers = [], bt6_targetOrder = [], bt6_hintLevel = 0, bt6_isCorrect = false, bt6_selectedItem = null;
+
+        function switchSubTabBT6(asc) {
+            bt6_isAsc = asc; const btnA = document.getElementById('bt6-tab-asc'); const btnD = document.getElementById('bt6-tab-desc');
+            if (asc) { btnA.className = "flex-1 py-3 px-4 text-center font-bold text-sm border-b-4 focus:outline-none text-indigo-700 bg-white border-indigo-500"; btnD.className = "flex-1 py-3 px-4 text-center font-bold text-sm border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200"; }
+            else { btnD.className = "flex-1 py-3 px-4 text-center font-bold text-sm border-b-4 focus:outline-none text-indigo-700 bg-white border-indigo-500"; btnA.className = "flex-1 py-3 px-4 text-center font-bold text-sm border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200"; }
+            document.getElementById('bt6-instruction-label').innerText = asc ? 'Sắp xếp từ Bé đến Lớn' : 'Sắp xếp từ Lớn đến Bé';
+            generateQuestionBT6();
+        }
+
+        function generateQuestionBT6() {
+            let nums = new Set();
+            while(nums.size < 4) nums.add(Math.floor(Math.random() * 899) + 100);
+            bt6_numbers = Array.from(nums);
+            bt6_targetOrder = [...bt6_numbers].sort((a,b) => bt6_isAsc ? a - b : b - a);
+            
+            document.getElementById('bt6-original-nums').innerHTML = bt6_numbers.map(n => `<div class="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-xl md:text-2xl font-extrabold text-slate-600 bg-slate-50 border-4 border-slate-200 rounded-2xl shadow-sm">${n}</div>`).join('');
+            
+            renderSortableListBT6(bt6_numbers);
+
+            bt6_hintLevel = 0; bt6_isCorrect = false; bt6_selectedItem = null;
+            const btn = document.getElementById('bt6-btn-action'); btn.innerText = 'Kiểm tra đáp án ✔️'; btn.onclick = checkAnswerBT6; btn.className = 'btn-press px-8 py-3 bg-indigo-500 text-white font-bold rounded-full shadow-md hover:bg-indigo-600 text-lg w-full transition-all duration-300';
+            document.getElementById('bt6-feedback-msg').innerText = '';
+            document.getElementById('bt6-formula-section').classList.add('hidden');
+            updateHintButtonsBT6();
+        }
+
+        function renderSortableListBT6(arr) {
+            const list = document.getElementById('bt6-sortable-list');
+            list.innerHTML = arr.map(n => 
+                `<div class="bt6-sort-item w-full h-14 bg-white border-4 border-indigo-200 rounded-xl flex items-center justify-center text-2xl font-extrabold text-indigo-700 shadow-sm cursor-grab active:cursor-grabbing transition-all touch-manipulation select-none" draggable="true" data-val="${n}">
+                    <span class="mr-auto ml-4 text-indigo-300 text-xl">↕</span>
+                    <span class="mx-auto">${n}</span>
+                    <span class="ml-auto mr-4 text-transparent text-xl">↕</span>
+                </div>`
+            ).join('');
+            setupDragAndDropBT6();
+        }
+
+        function setupDragAndDropBT6() {
+            const list = document.getElementById('bt6-sortable-list');
+            const items = list.querySelectorAll('.bt6-sort-item');
+            let draggedItem = null;
+
+            items.forEach(item => {
+                // HTML5 Drag
+                item.addEventListener('dragstart', function(e) {
+                    if(bt6_isCorrect) { e.preventDefault(); return; }
+                    draggedItem = this; setTimeout(() => this.classList.add('dragging'), 0);
+                });
+                item.addEventListener('dragend', function() { this.classList.remove('dragging'); draggedItem = null; });
+                item.addEventListener('dragover', function(e) { e.preventDefault(); });
+                item.addEventListener('dragenter', function(e) { e.preventDefault(); if(this !== draggedItem && !bt6_isCorrect) this.classList.add('bg-indigo-50', 'scale-[1.02]'); });
+                item.addEventListener('dragleave', function() { this.classList.remove('bg-indigo-50', 'scale-[1.02]'); });
+                item.addEventListener('drop', function() {
+                    this.classList.remove('bg-indigo-50', 'scale-[1.02]');
+                    if (this !== draggedItem && !bt6_isCorrect && draggedItem) {
+                        let allItems = [...list.querySelectorAll('.bt6-sort-item')];
+                        let draggedIdx = allItems.indexOf(draggedItem);
+                        let targetIdx = allItems.indexOf(this);
+                        playSound('snd-pop');
+                        if (draggedIdx < targetIdx) this.parentNode.insertBefore(draggedItem, this.nextSibling);
+                        else this.parentNode.insertBefore(draggedItem, this);
+                    }
+                });
+
+                // Touch / Click to swap (Fallback)
+                item.addEventListener('click', function() {
+                    if(bt6_isCorrect) return;
+                    if(!bt6_selectedItem) {
+                        bt6_selectedItem = this; this.classList.add('ring-4', 'ring-indigo-400', 'scale-[1.02]'); playSound('snd-pop');
+                    } else {
+                        if(bt6_selectedItem !== this) {
+                            const sibling1 = bt6_selectedItem.nextSibling === this ? bt6_selectedItem : bt6_selectedItem.nextSibling;
+                            const sibling2 = this.nextSibling === bt6_selectedItem ? this : this.nextSibling;
+                            list.insertBefore(this, sibling1); list.insertBefore(bt6_selectedItem, sibling2); playSound('snd-pop');
+                        }
+                        bt6_selectedItem.classList.remove('ring-4', 'ring-indigo-400', 'scale-[1.02]'); bt6_selectedItem = null;
+                    }
+                });
+            });
+        }
+
+        function checkAnswerBT6() {
+            if(bt6_isCorrect) { generateQuestionBT6(); return; }
+            const items = document.querySelectorAll('.bt6-sort-item');
+            let currentOrder = Array.from(items).map(el => parseInt(el.getAttribute('data-val')));
+            let isWin = JSON.stringify(currentOrder) === JSON.stringify(bt6_targetOrder);
+
+            const fb = document.getElementById('bt6-feedback-msg');
+            if(isWin) {
+                bt6_isCorrect = true; playSound('snd-correct'); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                let pts = 10; if(bt6_hintLevel===1)pts=8; if(bt6_hintLevel===2)pts=5; if(bt6_hintLevel===3)pts=2;
+                globalScore+=pts; globalStreak++; updateScoreBoard();
+                fb.innerHTML = `Hoan hô! Bé xếp đúng thứ tự rồi <b>+${pts}⭐</b> 🎉`; fb.className = 'mt-4 text-lg font-bold text-indigo-600';
+                
+                items.forEach(el => {
+                    el.classList.remove('border-indigo-200', 'text-indigo-700', 'cursor-grab', 'active:cursor-grabbing');
+                    el.classList.add('border-emerald-400', 'text-emerald-700', 'bg-emerald-50'); el.draggable = false;
+                });
+                
+                const btn = document.getElementById('bt6-btn-action'); btn.innerText = 'Câu tiếp theo ➡️'; btn.className = 'btn-press px-8 py-3 bg-violet-500 text-white font-bold rounded-full shadow-md hover:bg-violet-600 text-lg w-full transition-all duration-300 pulse-btn';
+                if(bt6_hintLevel < 3) { bt6_hintLevel = 3; updateHintButtonsBT6(); updateFormulaBT6(); }
+            } else {
+                playSound('snd-wrong'); globalStreak=0; updateScoreBoard(); fb.innerText = 'Thứ tự chưa đúng, bé kiểm tra lại nhé! 🤔'; fb.className = 'mt-4 text-lg font-bold text-red-500';
+                const list = document.getElementById('bt6-sortable-list'); list.classList.remove('shake'); void list.offsetWidth; list.classList.add('shake');
+            }
+        }
+
+        function useHintBT6(l) {
+            if(bt6_hintLevel>=l || bt6_isCorrect) return; bt6_hintLevel = l; updateHintButtonsBT6(); playSound('snd-pop');
+            updateFormulaBT6();
+            if(bt6_hintLevel === 2) {
+                // Sắp xếp mẫu 2 số đầu tiên, 2 số sau random phần còn lại
+                let currentItems = Array.from(document.querySelectorAll('.bt6-sort-item')).map(el => parseInt(el.getAttribute('data-val')));
+                let rem = currentItems.filter(n => n !== bt6_targetOrder[0] && n !== bt6_targetOrder[1]);
+                renderSortableListBT6([bt6_targetOrder[0], bt6_targetOrder[1], rem[0], rem[1]]);
+                
+                // Highlight 2 số đầu
+                const items = document.querySelectorAll('.bt6-sort-item');
+                items[0].classList.add('border-green-400', 'bg-green-50'); items[1].classList.add('border-green-400', 'bg-green-50');
+            }
+            if(bt6_hintLevel === 3) {
+                renderSortableListBT6(bt6_targetOrder);
+                checkAnswerBT6();
+            }
+        }
+
+        function updateHintButtonsBT6() {
+            for(let i=1;i<=3;i++) {
+                const btn=document.getElementById(`bt6-btn-hint-${i}`); btn.disabled=bt6_hintLevel>=i;
+                btn.className=btn.disabled ? "w-full sm:w-auto px-4 py-2 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed" : `btn-press w-full sm:w-auto px-4 py-2 bg-${i==1?'blue':i==2?'amber':'purple'}-100 text-${i==1?'blue':i==2?'amber':'purple'}-700 font-bold rounded-xl border border-${i==1?'blue':i==2?'amber':'purple'}-200 shadow-sm`;
+            }
+        }
+
+        function updateFormulaBT6() {
+            const sec = document.getElementById('bt6-formula-section'); if(bt6_hintLevel<1) return; sec.classList.remove('hidden');
+            const cont = document.getElementById('bt6-math-formula'); let ht='';
+            if(bt6_hintLevel>=1) {
+                ht += `<div class="text-lg md:text-xl text-indigo-200 mb-2 font-normal text-left max-w-2xl mx-auto space-y-2">
+                    <p><b>Cách so sánh số có 3 chữ số:</b></p>
+                    <ul class="list-disc pl-5">
+                        <li>1. So sánh chữ số hàng <b>Trăm</b> trước. Số nào có hàng Trăm lớn hơn thì lớn hơn.</li>
+                        <li>2. Nếu hàng Trăm bằng nhau, ta tiếp tục so sánh chữ số hàng <b>Chục</b>.</li>
+                        <li>3. Nếu hàng Chục cũng bằng nhau, ta so sánh chữ số hàng <b>Đơn vị</b>.</li>
+                    </ul>
+                </div>`;
+            }
+            if(bt6_hintLevel>=3) {
+                let sign = bt6_isAsc ? '<' : '>';
+                ht += `<div class="mt-4 bg-slate-700/50 p-4 rounded-xl border border-slate-600 inline-block text-left text-2xl font-mono text-emerald-300">
+                    ${bt6_targetOrder.join(` ${sign} `)}
+                </div>`;
+            }
+            cont.innerHTML = ht;
+        }
+
+        // ==========================================
         // MAIN TABS SWITCHER & INITIALIZATION
         // ==========================================
         function switchMainTab(tabNum) {
             // Đóng tất cả panes
-            for(let i=1; i<=5; i++) {
+            for(let i=1; i<=6; i++) {
                 document.getElementById(`pane-bt${i}`).classList.add('hidden');
                 const btn = document.getElementById(`main-tab-${i}`);
-                btn.classList.remove('text-sky-400', 'border-sky-400', 'text-emerald-400', 'border-emerald-400', 'text-fuchsia-400', 'border-fuchsia-400', 'text-orange-400', 'border-orange-400', 'text-teal-400', 'border-teal-400', 'bg-slate-700', 'text-white');
+                btn.classList.remove('text-sky-400', 'border-sky-400', 'text-emerald-400', 'border-emerald-400', 'text-fuchsia-400', 'border-fuchsia-400', 'text-orange-400', 'border-orange-400', 'text-teal-400', 'border-teal-400', 'text-indigo-400', 'border-indigo-400', 'bg-slate-700', 'text-white');
             }
 
             // Mở pane được chọn
@@ -882,6 +1084,7 @@
             else if(tabNum === 3) { activeBtn.classList.add('text-white', 'bg-slate-700', 'border-fuchsia-400'); switchSubTabBT3('find_parts'); }
             else if(tabNum === 4) { activeBtn.classList.add('text-white', 'bg-slate-700', 'border-orange-400'); generateQuestionBT4(); }
             else if(tabNum === 5) { activeBtn.classList.add('text-white', 'bg-slate-700', 'border-teal-400'); switchSubTabBT5(true); }
+            else if(tabNum === 6) { activeBtn.classList.add('text-white', 'bg-slate-700', 'border-indigo-400'); switchSubTabBT6(true); }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
