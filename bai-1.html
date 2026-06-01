@@ -344,10 +344,19 @@
             <div class="flex flex-col lg:flex-row border-b border-slate-100 bg-white flex-grow">
                 <div class="w-full lg:w-1/3 bg-indigo-50/30 p-4 md:p-8 flex flex-col justify-start">
                     <div class="mb-4 md:mb-6">
+                        <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Cài đặt bài tập</h3>
+                        <select id="bt6-num-count" onchange="generateQuestionBT6()" class="w-full p-3 border-2 border-indigo-200 rounded-xl bg-white shadow-sm focus:border-indigo-500 outline-none font-bold text-indigo-700 text-sm mb-6">
+                            <option value="2" selected>Mức 1: Sắp xếp 2 số</option>
+                            <option value="3">Mức 2: Sắp xếp 3 số</option>
+                            <option value="4">Mức 3: Sắp xếp 4 số</option>
+                            <option value="5">Mức 4: Sắp xếp 5 số</option>
+                            <option value="6">Mức 5: Sắp xếp 6 số</option>
+                        </select>
+                        
                         <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
                         <div class="flex flex-col items-center gap-3">
                             <button id="bt6-btn-hint-1" onclick="useHintBT6(1)" class="btn-press w-full px-4 py-2 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm disabled:opacity-50">1. Quy tắc 🧠</button>
-                            <button id="bt6-btn-hint-2" onclick="useHintBT6(2)" class="btn-press w-full px-4 py-2 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm disabled:opacity-50">2. Sắp mẫu 2 số 🪄</button>
+                            <button id="bt6-btn-hint-2" onclick="useHintBT6(2)" class="btn-press w-full px-4 py-2 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm disabled:opacity-50">2. Sắp mẫu 🪄</button>
                             <button id="bt6-btn-hint-3" onclick="useHintBT6(3)" class="btn-press w-full px-4 py-2 bg-purple-100 text-purple-700 font-bold rounded-xl border border-purple-200 hover:bg-purple-200 shadow-sm disabled:opacity-50">3. Đáp án 💡</button>
                         </div>
                     </div>
@@ -366,11 +375,8 @@
                         </div>
 
                         <!-- Ô trống đích -->
-                        <div id="bt6-target-container" class="flex gap-2 md:gap-4 items-center justify-center w-full mb-8">
-                            <div class="bt6-slot w-16 h-16 md:w-20 md:h-20 border-4 border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative"></div>
-                            <div class="bt6-slot w-16 h-16 md:w-20 md:h-20 border-4 border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative"></div>
-                            <div class="bt6-slot w-16 h-16 md:w-20 md:h-20 border-4 border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative"></div>
-                            <div class="bt6-slot w-16 h-16 md:w-20 md:h-20 border-4 border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative"></div>
+                        <div id="bt6-target-container" class="flex flex-wrap gap-2 md:gap-4 items-center justify-center w-full mb-8">
+                            <!-- Slots sinh từ JS -->
                         </div>
 
                         <button id="bt6-btn-action" onclick="checkAnswerBT6()" class="btn-press px-8 py-3 bg-indigo-500 text-white font-bold rounded-full shadow-md hover:bg-indigo-600 text-lg w-full max-w-[300px] transition-all duration-300">Kiểm tra đáp án ✔️</button>
@@ -923,12 +929,18 @@
         }
 
         function generateQuestionBT6() {
+            let numCount = parseInt(document.getElementById('bt6-num-count').value) || 2;
             let nums = new Set();
-            while(nums.size < 4) nums.add(Math.floor(Math.random() * 899) + 100);
+            while(nums.size < numCount) nums.add(Math.floor(Math.random() * 899) + 100);
             bt6_numbers = Array.from(nums);
             bt6_targetOrder = [...bt6_numbers].sort((a,b) => bt6_isAsc ? a - b : b - a);
             
-            renderBT6Cards();
+            // Adjust card size dynamically if there are many cards (5 or 6) to fit smaller screens
+            let cardSizeClass = numCount >= 5 ? 'w-12 h-12 md:w-16 md:h-16 text-lg md:text-xl' : 'w-16 h-16 md:w-20 md:h-20 text-xl md:text-2xl';
+
+            document.getElementById('bt6-original-nums').innerHTML = bt6_numbers.map(n => `<div class="${cardSizeClass} flex items-center justify-center font-extrabold text-slate-600 bg-slate-50 border-4 border-slate-200 rounded-2xl shadow-sm">${n}</div>`).join('');
+            
+            renderBT6Cards(numCount, cardSizeClass);
 
             bt6_hintLevel = 0; bt6_isCorrect = false;
             const btn = document.getElementById('bt6-btn-action'); btn.innerText = 'Kiểm tra đáp án ✔️'; btn.onclick = checkAnswerBT6; btn.className = 'btn-press px-8 py-3 bg-indigo-500 text-white font-bold rounded-full shadow-md hover:bg-indigo-600 text-lg w-full max-w-[300px] transition-all duration-300';
@@ -937,16 +949,19 @@
             updateHintButtonsBT6();
         }
 
-        function renderBT6Cards() {
+        function renderBT6Cards(numCount, cardSizeClass) {
             const source = document.getElementById('bt6-source-container');
             const target = document.getElementById('bt6-target-container');
 
-            // Xóa rỗng các ô đích
-            target.querySelectorAll('.bt6-slot').forEach(slot => slot.innerHTML = '');
+            // Generate slots dynamically
+            target.innerHTML = '';
+            for(let i=0; i<numCount; i++) {
+                target.innerHTML += `<div class="bt6-slot ${cardSizeClass} border-4 border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative"></div>`;
+            }
 
             // Sinh thẻ bài ở khay chứa
             source.innerHTML = bt6_numbers.map(n => 
-                `<div class="bt6-card w-14 h-14 md:w-16 md:h-16 flex items-center justify-center text-xl md:text-2xl font-extrabold text-indigo-700 bg-white border-4 border-indigo-200 rounded-xl shadow-md cursor-grab touch-none select-none transition-transform" data-val="${n}">${n}</div>`
+                `<div class="bt6-card ${cardSizeClass} flex items-center justify-center font-extrabold text-indigo-700 bg-white border-4 border-indigo-200 rounded-xl shadow-md cursor-grab touch-none select-none transition-transform" data-val="${n}">${n}</div>`
             ).join('');
             
             setupDragAndDropBT6();
@@ -1005,7 +1020,7 @@
             const fb = document.getElementById('bt6-feedback-msg');
 
             if (hasEmpty) {
-                fb.innerText = 'Bé kéo đủ 4 số vào ô nhé! 🧐';
+                fb.innerText = 'Bé kéo đủ các số vào ô nhé! 🧐';
                 fb.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
                 playSound('snd-wrong');
                 return;
@@ -1052,13 +1067,20 @@
             updateFormulaBT6();
             
             if(bt6_hintLevel === 2) {
-                // Sắp mẫu 2 thẻ đầu tiên
-                moveCardToSlot(bt6_targetOrder[0], 0);
-                moveCardToSlot(bt6_targetOrder[1], 1);
+                // Sắp mẫu 1 hoặc 2 thẻ đầu tiên tùy theo số lượng
+                let hintCount = bt6_targetOrder.length <= 3 ? 1 : 2;
+                for(let i=0; i<hintCount; i++) {
+                    moveCardToSlot(bt6_targetOrder[i], i);
+                }
                 
                 const cards = document.querySelectorAll('.bt6-card');
                 cards.forEach(c => {
-                    if (parseInt(c.getAttribute('data-val')) === bt6_targetOrder[0] || parseInt(c.getAttribute('data-val')) === bt6_targetOrder[1]) {
+                    let val = parseInt(c.getAttribute('data-val'));
+                    let isHinted = false;
+                    for(let i=0; i<hintCount; i++) {
+                        if(val === bt6_targetOrder[i]) isHinted = true;
+                    }
+                    if (isHinted) {
                         c.classList.add('border-emerald-400', 'bg-emerald-50');
                     }
                 });
