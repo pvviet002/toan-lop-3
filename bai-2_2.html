@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 2.2: Đặt tính rồi tính</title>
+    <title>Bài 3.2: Đặt tính rồi tính</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -218,24 +218,24 @@
     </div>
 
     <!-- Modal Chọn Số -->
-    <div id="digit-picker-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
-        <div class="bg-emerald-800 p-6 md:p-8 rounded-[2rem] border-4 border-amber-600 shadow-2xl transform scale-95 transition-transform duration-300" id="digit-picker-content">
-            <h3 class="text-xl md:text-2xl font-bold text-emerald-100 mb-6 text-center" id="digit-picker-title">Chọn chữ số</h3>
-            <div class="grid grid-cols-3 gap-3 md:gap-4 mb-2">
+    <div id="digit-picker-modal" class="fixed inset-0 z-50 flex items-end justify-center lg:items-center lg:justify-start lg:pl-16 pb-4 lg:pb-0 bg-slate-900/40 hidden opacity-0 transition-opacity duration-300 backdrop-blur-[2px]">
+        <div class="bg-emerald-800 p-5 md:p-6 rounded-[2rem] border-4 border-amber-600 shadow-2xl transform scale-95 transition-transform duration-300 max-w-[340px] w-full mx-2" id="digit-picker-content">
+            <h3 class="text-lg md:text-xl font-bold text-emerald-100 mb-4 text-center" id="digit-picker-title">Chọn chữ số</h3>
+            <div class="grid grid-cols-3 gap-2 md:gap-3 mb-2">
                 <!-- Numbers 1-9 -->
-                <button onclick="selectDigit(1)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">1</button>
-                <button onclick="selectDigit(2)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">2</button>
-                <button onclick="selectDigit(3)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">3</button>
-                <button onclick="selectDigit(4)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">4</button>
-                <button onclick="selectDigit(5)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">5</button>
-                <button onclick="selectDigit(6)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">6</button>
-                <button onclick="selectDigit(7)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">7</button>
-                <button onclick="selectDigit(8)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">8</button>
-                <button onclick="selectDigit(9)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">9</button>
+                <button onclick="selectDigit(1)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">1</button>
+                <button onclick="selectDigit(2)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">2</button>
+                <button onclick="selectDigit(3)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">3</button>
+                <button onclick="selectDigit(4)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">4</button>
+                <button onclick="selectDigit(5)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">5</button>
+                <button onclick="selectDigit(6)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">6</button>
+                <button onclick="selectDigit(7)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">7</button>
+                <button onclick="selectDigit(8)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">8</button>
+                <button onclick="selectDigit(9)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">9</button>
                 
-                <button onclick="selectDigit(null)" class="w-16 h-16 md:w-20 md:h-20 text-xl md:text-2xl font-bold text-rose-200 bg-rose-700 rounded-2xl border-b-4 border-rose-900 active:border-b-0 active:translate-y-1 transition-all">Xóa</button>
-                <button onclick="selectDigit(0)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">0</button>
-                <button onclick="closeDigitPicker()" class="w-16 h-16 md:w-20 md:h-20 text-xl md:text-2xl font-bold text-slate-200 bg-slate-600 rounded-2xl border-b-4 border-slate-800 active:border-b-0 active:translate-y-1 transition-all">Đóng</button>
+                <button onclick="selectDigit(null)" class="w-14 h-14 md:w-16 md:h-16 text-lg md:text-xl font-bold text-rose-200 bg-rose-700 rounded-2xl border-b-4 border-rose-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">Xóa</button>
+                <button onclick="selectDigit(0)" class="w-14 h-14 md:w-16 md:h-16 text-2xl md:text-3xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all mx-auto">0</button>
+                <button onclick="closeDigitPicker()" class="w-14 h-14 md:w-16 md:h-16 text-lg md:text-xl font-bold text-slate-200 bg-slate-600 rounded-2xl border-b-4 border-slate-800 active:border-b-0 active:translate-y-1 transition-all mx-auto">Đóng</button>
             </div>
         </div>
     </div>
