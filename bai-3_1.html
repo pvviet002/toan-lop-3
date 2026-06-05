@@ -13,10 +13,19 @@
             overflow: hidden; /* Ngăn cuộn trang trong lúc chơi game */
         }
         .no-select { user-select: none; -webkit-user-select: none; }
-        .btn-press:active:not(:disabled) { transform: scale(0.95); }
+        
+        /* 3D Game Buttons */
+        .btn-3d {
+            transition: all 0.1s ease-in-out;
+            box-shadow: 0 8px 0 0 rgba(0,0,0,0.15);
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(8px);
+            box-shadow: 0 0px 0 0 rgba(0,0,0,0.15);
+        }
 
-        /* Animation */
-        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+        /* Animations */
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.5); }
         @keyframes bounceIn { 
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; } 
@@ -30,35 +39,66 @@
             40%, 60% { transform: translate3d(6px, 0, 0); } 
         }
 
+        /* Lơ lửng cho bóng bay */
+        .float-anim {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Mây trôi */
+        .cloud-drift {
+            position: absolute;
+            animation: drifting linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes drifting {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(110vw); }
+        }
+
         /* Balloon styles */
         .balloon {
-            transition: all 0.2s ease;
+            transition: filter 0.2s ease;
             position: relative;
         }
         .balloon:hover {
-            transform: translateY(-5px) scale(1.05);
-        }
-        .balloon:active {
-            transform: translateY(2px) scale(0.95);
+            filter: brightness(1.1);
         }
         .balloon::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -12px;
             left: 50%;
             transform: translateX(-50%);
             width: 2px;
-            height: 15px;
+            height: 18px;
             background-color: #cbd5e1;
+            z-index: 0;
         }
         .balloon-knot {
             position: absolute;
-            bottom: -4px;
+            bottom: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 10px;
-            height: 8px;
+            width: 12px;
+            height: 10px;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 10;
+        }
+        /* Vệt sáng 3D trên bóng */
+        .balloon-shine {
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 20%;
+            height: 35%;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: rotate(-30deg);
+            pointer-events: none;
         }
 
         /* Progress bar */
@@ -70,100 +110,115 @@
     <!-- Header / Navigation Global -->
     <div class="max-w-4xl mx-auto w-full mb-4 flex justify-between items-center relative z-10">
         <div class="flex items-center space-x-2 md:space-x-3">
-            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-3d font-semibold text-sm transition-colors">
                 <span class="hidden md:inline">⬅️ Sảnh chính</span><span class="md:hidden">⬅️ Quay lại</span>
             </a>
-            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-3d font-semibold text-sm transition-colors">
                 <span>🔲 Phóng to</span>
             </button>
         </div>
     </div>
 
     <!-- MAIN GAME CONTAINER -->
-    <div class="max-w-4xl mx-auto w-full bg-white rounded-3xl shadow-2xl border border-sky-200 overflow-hidden flex flex-col flex-grow relative">
+    <div class="max-w-4xl mx-auto w-full bg-white rounded-[2rem] shadow-2xl border-4 border-sky-300 overflow-hidden flex flex-col flex-grow relative">
         
         <!-- MÀN HÌNH BẮT ĐẦU (Start Screen) -->
-        <div id="screen-start" class="absolute inset-0 z-20 bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+        <div id="screen-start" class="absolute inset-0 z-30 bg-gradient-to-b from-sky-400 via-blue-500 to-blue-700 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            <!-- Trang trí nền -->
+            <div class="absolute top-10 left-10 text-6xl opacity-30">☁️</div>
+            <div class="absolute bottom-20 right-10 text-7xl opacity-30">☁️</div>
+            
             <div class="text-7xl md:text-8xl mb-6 drop-shadow-lg bounce-in" style="animation-delay: 0.1s">🎈</div>
-            <h1 class="text-3xl md:text-5xl font-black tracking-wide mb-4 text-center drop-shadow-md bounce-in" style="animation-delay: 0.2s">Đua Tốc Độ:<br>Tính Nhẩm Siêu Tốc</h1>
-            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border border-white/30 max-w-lg text-center mb-8 bounce-in" style="animation-delay: 0.3s">
-                <p class="text-lg md:text-xl font-medium mb-3">Mẹo chơi:</p>
-                <p class="text-base md:text-lg mb-2">Hãy nhìn kỹ phép <b>Cộng</b> để tìm nhanh kết quả của phép <b>Trừ</b> nhé!</p>
-                <div class="bg-black/20 rounded-lg p-3 inline-block mt-2 font-mono text-xl">
-                    Biết: 50 + 40 = 90 ➡️ 90 - 50 = ?
+            <h1 class="text-4xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)] bounce-in text-yellow-300" style="animation-delay: 0.2s; text-shadow: 2px 4px 0 #1e3a8a, -2px -2px 0 #1e3a8a, 2px -2px 0 #1e3a8a, -2px 2px 0 #1e3a8a;">ĐUA TỐC ĐỘ<br><span class="text-white text-3xl md:text-5xl">TÍNH NHẨM SIÊU TỐC</span></h1>
+            
+            <div class="bg-white/20 backdrop-blur-md p-6 rounded-3xl border-2 border-white/40 max-w-lg text-center mb-10 bounce-in shadow-xl" style="animation-delay: 0.3s">
+                <p class="text-lg md:text-xl font-bold mb-3 text-yellow-200 uppercase tracking-widest">Mẹo chơi:</p>
+                <p class="text-base md:text-lg mb-4 font-medium">Hãy nhìn kỹ phép <b>Cộng</b> để tìm nhanh kết quả của phép <b>Trừ</b> nhé!</p>
+                <div class="bg-black/30 rounded-xl p-4 inline-block font-mono text-xl md:text-2xl font-bold border border-white/20 shadow-inner">
+                    50 + 40 = 90 ➡️ 90 - 50 = <span class="text-yellow-300 animate-pulse">?</span>
                 </div>
-                <p class="text-sm mt-4 text-sky-100 italic">Bé có 60 giây để ghi thật nhiều điểm!</p>
+                <p class="text-sm md:text-base mt-5 text-sky-100 italic font-medium">Bé có 60 giây để ghi thật nhiều điểm!</p>
             </div>
-            <button onclick="startGame()" class="btn-press px-10 py-4 bg-amber-400 text-amber-900 font-black rounded-full shadow-[0_6px_0_0_#b45309] hover:bg-amber-300 hover:shadow-[0_4px_0_0_#b45309] hover:translate-y-[2px] text-2xl w-full max-w-[300px] transition-all duration-200 bounce-in" style="animation-delay: 0.4s">
-                BẮT ĐẦU CHƠI 🚀
+            
+            <button onclick="startGame()" class="btn-3d px-12 py-5 bg-gradient-to-b from-amber-300 to-amber-500 text-amber-900 font-black rounded-full text-2xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-amber-200" style="animation-delay: 0.4s">
+                BẮT ĐẦU 🚀
             </button>
         </div>
 
         <!-- MÀN HÌNH KẾT THÚC (End Screen) -->
-        <div id="screen-end" class="absolute inset-0 z-20 bg-gradient-to-b from-indigo-500 to-purple-700 flex flex-col items-center justify-center p-6 text-white hidden opacity-0 transition-opacity duration-300">
+        <div id="screen-end" class="absolute inset-0 z-30 bg-gradient-to-b from-indigo-600 to-purple-800 flex flex-col items-center justify-center p-6 text-white hidden opacity-0 transition-opacity duration-300">
             <div class="text-7xl md:text-8xl mb-4 drop-shadow-lg">🏆</div>
-            <h2 class="text-4xl md:text-5xl font-black tracking-wide mb-2 text-center text-yellow-300 drop-shadow-md">HẾT GIỜ!</h2>
-            <p class="text-xl md:text-2xl font-medium mb-8">Bé đã hoàn thành xuất sắc!</p>
+            <h2 class="text-5xl md:text-6xl font-black tracking-wide mb-2 text-center text-yellow-300 drop-shadow-lg">HẾT GIỜ!</h2>
+            <p class="text-xl md:text-2xl font-bold mb-8 text-indigo-200">Bé đã hoàn thành xuất sắc!</p>
             
-            <div class="bg-white/20 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-white/30 text-center mb-8 w-full max-w-sm">
-                <p class="text-lg text-purple-100 uppercase tracking-widest font-bold mb-2">Điểm tổng kết</p>
-                <div class="text-6xl md:text-7xl font-black text-white drop-shadow-md" id="final-score">0</div>
+            <div class="bg-white/20 backdrop-blur-md p-8 rounded-[2rem] border-2 border-white/30 text-center mb-10 w-full max-w-sm shadow-2xl">
+                <p class="text-lg text-purple-200 uppercase tracking-widest font-bold mb-2">Điểm tổng kết</p>
+                <div class="text-7xl md:text-8xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)]" id="final-score">0</div>
             </div>
 
-            <button onclick="showStartScreen()" class="btn-press px-10 py-4 bg-white text-purple-700 font-black rounded-full shadow-[0_6px_0_0_#cbd5e1] hover:bg-slate-50 hover:shadow-[0_4px_0_0_#cbd5e1] hover:translate-y-[2px] text-xl md:text-2xl w-full max-w-[300px] transition-all duration-200">
+            <button onclick="showStartScreen()" class="btn-3d px-10 py-4 bg-white text-purple-700 font-black rounded-full text-xl md:text-2xl w-full max-w-[300px] transition-all duration-200 border-4 border-purple-200">
                 CHƠI LẠI 🔄
             </button>
         </div>
 
         <!-- MÀN HÌNH CHƠI GAME (Game Screen) -->
-        <div id="screen-game" class="flex flex-col h-full w-full bg-[#f0f9ff] relative overflow-hidden">
+        <div id="screen-game" class="flex flex-col h-full w-full bg-gradient-to-b from-sky-300 via-sky-100 to-white relative overflow-hidden">
             
-            <!-- Lớp mây nền trang trí -->
-            <div class="absolute top-10 left-10 text-6xl opacity-40">☁️</div>
-            <div class="absolute top-24 right-20 text-7xl opacity-30">☁️</div>
-            <div class="absolute bottom-40 left-1/4 text-5xl opacity-50">☁️</div>
+            <!-- Mặt trời và mây nền trang trí -->
+            <div class="absolute -top-4 -right-4 text-7xl drop-shadow-lg opacity-90 animate-spin-slow" style="animation: spin 30s linear infinite;">☀️</div>
+            
+            <div class="cloud-drift text-7xl opacity-60" style="top: 15%; animation-duration: 40s;">☁️</div>
+            <div class="cloud-drift text-5xl opacity-40" style="top: 45%; animation-duration: 25s; animation-delay: -10s;">☁️</div>
+            <div class="cloud-drift text-8xl opacity-50" style="bottom: 20%; animation-duration: 35s; animation-delay: -20s;">☁️</div>
 
             <!-- Header Game (Điểm, Combo, Thời gian) -->
-            <div class="bg-white/80 backdrop-blur-md p-4 flex flex-col border-b border-sky-100 z-10 relative shadow-sm">
+            <div class="bg-white/90 backdrop-blur-md p-4 md:p-5 flex flex-col border-b-4 border-sky-200 z-20 relative shadow-sm rounded-b-3xl mx-2 md:mx-4 mt-[-4px]">
                 <div class="flex justify-between items-center mb-3">
-                    <div class="flex items-center gap-2 bg-amber-100 px-4 py-2 rounded-xl border border-amber-200">
-                        <span class="text-2xl">⭐</span>
-                        <span id="game-score" class="text-2xl font-black text-amber-600">0</span>
+                    <div class="flex items-center gap-2 bg-amber-100 px-4 py-2 rounded-2xl border-2 border-amber-300 shadow-inner">
+                        <span class="text-2xl drop-shadow-sm">⭐</span>
+                        <span id="game-score" class="text-2xl md:text-3xl font-black text-amber-600 w-12 text-center">0</span>
                     </div>
-                    <div id="combo-box" class="flex items-center gap-1 bg-orange-100 px-3 py-1.5 rounded-lg border border-orange-200 opacity-0 transition-opacity duration-300 transform scale-90">
+                    
+                    <div id="combo-box" class="flex items-center gap-1 bg-gradient-to-r from-orange-400 to-rose-400 px-4 py-1.5 rounded-full border-2 border-white shadow-md opacity-0 transition-opacity duration-300 transform scale-90 text-white">
                         <span class="text-lg">🔥</span>
-                        <span id="game-combo" class="text-lg font-bold text-orange-600">Combo x2</span>
+                        <span id="game-combo" class="text-lg font-black tracking-wide">Combo x2</span>
                     </div>
-                    <div class="flex items-center gap-2 bg-sky-100 px-4 py-2 rounded-xl border border-sky-200">
-                        <span class="text-xl">⏱️</span>
-                        <span id="game-time" class="text-2xl font-black text-sky-700">60s</span>
+                    
+                    <div class="flex items-center gap-2 bg-sky-100 px-4 py-2 rounded-2xl border-2 border-sky-300 shadow-inner">
+                        <span class="text-xl drop-shadow-sm">⏱️</span>
+                        <span id="game-time" class="text-2xl md:text-3xl font-black text-sky-700 w-12 text-center">60</span>
                     </div>
                 </div>
                 <!-- Thanh thời gian -->
-                <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                    <div id="timer-bar" class="bg-sky-500 h-3 rounded-full" style="width: 100%"></div>
+                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden border border-slate-300 inset-shadow">
+                    <div id="timer-bar" class="bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full shadow-[inset_0_-2px_4px_rgba(0,0,0,0.2)]" style="width: 100%"></div>
                 </div>
             </div>
 
             <!-- Khu vực câu hỏi -->
-            <div class="flex flex-col items-center justify-center p-6 z-10">
-                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border-2 border-sky-100 text-center w-full max-w-lg mb-8 bounce-in relative">
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-sky-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+            <div class="flex flex-col items-center justify-center p-6 z-10 flex-grow">
+                <!-- Bảng câu hỏi -->
+                <div class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2)] border-4 border-sky-200 text-center w-full max-w-lg mb-8 bounce-in relative">
+                    <!-- Khung viền đứt bên trong cho đẹp -->
+                    <div class="absolute inset-2 border-2 border-dashed border-sky-200 rounded-[2rem] pointer-events-none"></div>
+                    
+                    <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-sky-500 text-white text-sm md:text-base font-black px-6 py-1.5 rounded-full uppercase tracking-widest shadow-md border-2 border-white">
                         Phép tính gốc
                     </div>
+                    
                     <!-- Phép cộng đã biết -->
-                    <div class="text-2xl md:text-3xl font-bold text-slate-500 mb-4" id="q-hint">
-                        Biết: <span class="text-sky-600">50 + 40 = 90</span>
+                    <div class="text-2xl md:text-3xl font-bold text-slate-500 mb-6 bg-slate-50 py-3 rounded-2xl border border-slate-100 relative z-10" id="q-hint">
+                        Biết: <span class="text-sky-600 font-black">50 + 40 = 90</span>
                     </div>
-                    <hr class="border-t-2 border-dashed border-slate-200 w-3/4 mx-auto mb-4">
+                    
                     <!-- Phép trừ cần tính -->
-                    <div class="text-4xl md:text-5xl font-black text-slate-800" id="q-main">
-                        90 - 50 = <span class="text-rose-500">?</span>
+                    <div class="text-5xl md:text-6xl font-black text-slate-800 drop-shadow-sm relative z-10" id="q-main">
+                        90 - 50 = <span class="text-rose-500 bg-rose-50 px-4 py-1 rounded-2xl border-b-4 border-rose-200 inline-block transform -translate-y-1">?</span>
                     </div>
                 </div>
 
                 <!-- Khu vực Bóng bay (Đáp án) -->
-                <div class="flex justify-center gap-4 md:gap-8 w-full mt-auto mb-10 z-10" id="answers-container">
+                <div class="flex justify-center gap-6 md:gap-10 w-full mt-auto mb-12 z-10" id="answers-container">
                     <!-- Sinh bằng JS -->
                 </div>
             </div>
@@ -189,10 +244,10 @@
         // Constants
         const GAME_TIME = 60;
         const BALLOON_COLORS = [
-            { bg: 'bg-rose-500', shadow: 'shadow-[0_6px_0_0_#be123c]', knot: 'bg-rose-600' },
-            { bg: 'bg-emerald-500', shadow: 'shadow-[0_6px_0_0_#047857]', knot: 'bg-emerald-600' },
-            { bg: 'bg-amber-500', shadow: 'shadow-[0_6px_0_0_#b45309]', knot: 'bg-amber-600' },
-            { bg: 'bg-purple-500', shadow: 'shadow-[0_6px_0_0_#7e22ce]', knot: 'bg-purple-600' }
+            { bg: 'bg-gradient-to-br from-rose-400 to-rose-600', shadow: 'shadow-[0_8px_0_0_#be123c]', knot: 'bg-rose-700' },
+            { bg: 'bg-gradient-to-br from-emerald-400 to-emerald-600', shadow: 'shadow-[0_8px_0_0_#047857]', knot: 'bg-emerald-700' },
+            { bg: 'bg-gradient-to-br from-amber-400 to-amber-600', shadow: 'shadow-[0_8px_0_0_#b45309]', knot: 'bg-amber-700' },
+            { bg: 'bg-gradient-to-br from-purple-400 to-purple-600', shadow: 'shadow-[0_8px_0_0_#7e22ce]', knot: 'bg-purple-700' }
         ];
 
         function playSound(id) { 
@@ -264,12 +319,15 @@
         }
 
         function updateTimerUI() {
-            document.getElementById('game-time').innerText = timeLeft + 's';
+            document.getElementById('game-time').innerText = timeLeft;
             const pct = (timeLeft / GAME_TIME) * 100;
             const bar = document.getElementById('timer-bar');
             bar.style.width = pct + '%';
-            if (pct < 30) bar.className = 'bg-rose-500 h-3 rounded-full';
-            else bar.className = 'bg-sky-500 h-3 rounded-full';
+            if (pct < 30) {
+                bar.className = 'bg-gradient-to-r from-rose-400 to-red-600 h-full rounded-full shadow-[inset_0_-2px_4px_rgba(0,0,0,0.2)]';
+            } else {
+                bar.className = 'bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full shadow-[inset_0_-2px_4px_rgba(0,0,0,0.2)]';
+            }
         }
 
         function updateScoreUI() {
@@ -312,8 +370,8 @@
             correctAnswer = askNum1 ? num2 : num1;
 
             // Render UI câu hỏi
-            document.getElementById('q-hint').innerHTML = `Biết: <span class="text-sky-600">${num1} + ${num2} = ${sum}</span>`;
-            document.getElementById('q-main').innerHTML = `${sum} - ${subtractNum} = <span class="text-rose-500">?</span>`;
+            document.getElementById('q-hint').innerHTML = `Biết: <span class="text-sky-600 font-black">${num1} + ${num2} = ${sum}</span>`;
+            document.getElementById('q-main').innerHTML = `${sum} - ${subtractNum} = <span class="text-rose-500 bg-rose-50 px-4 py-1 rounded-2xl border-b-4 border-rose-200 inline-block transform -translate-y-1">?</span>`;
 
             // Tạo đáp án (1 đúng, 2 sai)
             let options = new Set([correctAnswer]);
@@ -358,27 +416,47 @@
             options.forEach((opt, index) => {
                 const col = colors[index % colors.length];
                 
+                // Wrap in bounce-in first
+                const outerWrapper = document.createElement('div');
+                outerWrapper.className = `bounce-in no-select`;
+                outerWrapper.style.animationDelay = `${index * 0.1}s`;
+
+                // Inner floating animation
                 const balloonWrapper = document.createElement('div');
-                balloonWrapper.className = `flex flex-col items-center balloon cursor-pointer bounce-in`;
-                balloonWrapper.style.animationDelay = `${index * 0.1}s`;
-                balloonWrapper.onclick = () => handleAnswerClick(opt, balloonWrapper);
+                balloonWrapper.className = `flex flex-col items-center balloon cursor-pointer float-anim`;
+                balloonWrapper.style.animationDelay = `${index * 0.2}s`;
+                balloonWrapper.onclick = () => handleAnswerClick(opt, outerWrapper);
 
                 // Thân bóng bay
                 const balloonBody = document.createElement('div');
-                balloonBody.className = `w-20 h-24 md:w-24 md:h-28 rounded-[50%] ${col.bg} ${col.shadow} flex items-center justify-center text-white font-black text-2xl md:text-3xl border-2 border-white/20`;
-                balloonBody.innerText = opt;
+                balloonBody.className = `w-24 h-28 md:w-28 md:h-32 rounded-[50%] ${col.bg} ${col.shadow} flex items-center justify-center text-white font-black text-3xl md:text-4xl border-2 border-white/30 relative overflow-hidden z-10`;
                 
+                // Vệt sáng 3D
+                balloonBody.innerHTML = `
+                    <div class="balloon-shine"></div>
+                    <span class="relative z-10 drop-shadow-md">${opt}</span>
+                `;
+                
+                // Nút thắt bóng
                 const knot = document.createElement('div');
                 knot.className = `balloon-knot ${col.knot}`;
-                balloonBody.appendChild(knot);
 
                 balloonWrapper.appendChild(balloonBody);
-                container.appendChild(balloonWrapper);
+                balloonWrapper.appendChild(knot);
+                
+                outerWrapper.appendChild(balloonWrapper);
+                container.appendChild(outerWrapper);
             });
         }
 
         function handleAnswerClick(ans, element) {
             if (!isPlaying) return;
+
+            // Xóa animation float để tránh giật khi click
+            const innerBalloon = element.querySelector('.float-anim');
+            if (innerBalloon) {
+                innerBalloon.classList.remove('float-anim');
+            }
 
             if (ans === correctAnswer) {
                 // Đúng
@@ -388,7 +466,7 @@
                 const rect = element.getBoundingClientRect();
                 const x = (rect.left + rect.width / 2) / window.innerWidth;
                 const y = (rect.top + rect.height / 2) / window.innerHeight;
-                confetti({ particleCount: 30, spread: 50, origin: { x, y }, zIndex: 100, colors: ['#fff'] });
+                confetti({ particleCount: 40, spread: 60, origin: { x, y }, zIndex: 100, colors: ['#fff'] });
 
                 combo++;
                 let points = 10 + (combo > 1 ? (combo - 1) * 2 : 0); // Thưởng combo
@@ -406,12 +484,23 @@
                 timeLeft = Math.max(0, timeLeft - 5);
                 updateTimerUI();
 
-                // Hiệu ứng rung bóng
+                // Hiệu ứng rung bóng và làm mờ
                 element.classList.add('shake');
-                element.children[0].classList.add('opacity-50', 'grayscale'); // Làm mờ quả bóng sai
+                const balloonBody = element.querySelector('.rounded-\\[50\\%\\]');
+                if (balloonBody) {
+                    balloonBody.classList.add('opacity-50', 'grayscale');
+                }
+                
                 setTimeout(() => element.classList.remove('shake'), 400);
             }
         }
+
+        // Thêm keyframes CSS động vào trang cho mây
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes spin { 100% { transform: rotate(360deg); } }
+        `;
+        document.head.appendChild(styleSheet);
 
         // --- Chức năng Fullscreen ---
         function toggleFullScreen() {
