@@ -20,10 +20,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
-
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -65,19 +61,6 @@
         .chalk-text {
             color: #f8fafc;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-            letter-spacing: 0.15em;
-        }
-
-        .chalk-input {
-            background: rgba(255,255,255,0.1);
-            border-bottom: 3px dashed #94a3b8;
-            transition: all 0.3s ease;
-        }
-        
-        .chalk-input:focus {
-            background: rgba(255,255,255,0.2);
-            border-bottom: 3px solid #fde047;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .pulse-btn {
@@ -180,26 +163,52 @@
 
                 <div class="flex flex-col items-center flex-grow justify-center mt-0 w-full max-w-sm mx-auto" id="quiz-container">
                     
-                    <!-- Bảng Phấn -->
-                    <div class="chalkboard p-8 md:p-10 w-full flex flex-col items-end text-6xl md:text-7xl font-bold mb-8 bounce-in">
-                        
-                        <!-- Gợi ý có nhớ (Carry/Borrow) -->
-                        <div id="carry-mark" class="absolute top-6 left-1/2 text-rose-300 text-3xl hidden animate-pulse font-sans -translate-x-4">1</div>
+                    <!-- Bảng Phấn Tương Tác -->
+                    <div class="chalkboard p-8 md:p-10 w-max mx-auto flex flex-col items-end text-5xl md:text-6xl font-bold mb-8 bounce-in">
                         
                         <!-- Số thứ nhất -->
-                        <div id="n1-display" class="chalk-text pr-2 tracking-[0.15em]">100</div>
+                        <div class="flex justify-end gap-2 md:gap-4 w-full pr-4">
+                            <div id="n1-h" class="w-10 md:w-12 text-center chalk-text">1</div>
+                            <div id="n1-t" class="w-10 md:w-12 text-center chalk-text relative">
+                                <!-- Gợi ý có nhớ -->
+                                <div id="carry-mark" class="absolute -top-8 left-1/2 -translate-x-1/2 text-rose-300 text-2xl hidden animate-pulse font-sans">1</div>
+                                0
+                            </div>
+                            <div id="n1-u" class="w-10 md:w-12 text-center chalk-text">0</div>
+                        </div>
                         
                         <!-- Dấu phép tính và số thứ hai -->
-                        <div class="flex items-center w-full mt-3 relative">
-                            <span id="op-display" class="text-rose-400 absolute left-6">-</span>
-                            <div id="n2-display" class="w-full text-right chalk-text pr-2 tracking-[0.15em]">26</div>
+                        <div class="flex items-center justify-end gap-2 md:gap-4 w-full mt-4 relative pr-4">
+                            <span id="op-display" class="text-rose-400 absolute left-2">-</span>
+                            <div id="n2-h" class="w-10 md:w-12 text-center chalk-text"></div>
+                            <div id="n2-t" class="w-10 md:w-12 text-center chalk-text">2</div>
+                            <div id="n2-u" class="w-10 md:w-12 text-center chalk-text">6</div>
                         </div>
                         
                         <!-- Đường gạch ngang -->
-                        <hr class="w-full border-b-[6px] border-white my-5 rounded-full opacity-80">
+                        <hr class="w-full border-b-[6px] border-white/70 mt-6 mb-4 rounded-full">
                         
-                        <!-- Ô nhập đáp án -->
-                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="ans-input" class="chalk-input w-full outline-none py-2 pr-2 text-right chalk-text rounded-xl" placeholder="?" onkeypress="handleEnter(event)">
+                        <!-- Ô nhập đáp án bằng nút ấn -->
+                        <div class="flex justify-end gap-2 md:gap-4 w-full pr-4">
+                            <!-- Hàng Trăm -->
+                            <div class="flex flex-col items-center">
+                                <button onclick="changeDigit('h', 1)" class="ans-btn text-3xl text-emerald-400 hover:text-emerald-300 py-1 transition-transform active:scale-90">▲</button>
+                                <div id="ans-h" class="w-10 md:w-12 text-center chalk-text border-b-4 border-dashed border-slate-400/50 pb-2 cursor-pointer select-none" onclick="changeDigit('h', 1)">?</div>
+                                <button onclick="changeDigit('h', -1)" class="ans-btn text-3xl text-emerald-400 hover:text-emerald-300 py-1 transition-transform active:scale-90">▼</button>
+                            </div>
+                            <!-- Hàng Chục -->
+                            <div class="flex flex-col items-center">
+                                <button onclick="changeDigit('t', 1)" class="ans-btn text-3xl text-emerald-400 hover:text-emerald-300 py-1 transition-transform active:scale-90">▲</button>
+                                <div id="ans-t" class="w-10 md:w-12 text-center chalk-text border-b-4 border-dashed border-slate-400/50 pb-2 cursor-pointer select-none" onclick="changeDigit('t', 1)">?</div>
+                                <button onclick="changeDigit('t', -1)" class="ans-btn text-3xl text-emerald-400 hover:text-emerald-300 py-1 transition-transform active:scale-90">▼</button>
+                            </div>
+                            <!-- Hàng Đơn vị -->
+                            <div class="flex flex-col items-center">
+                                <button onclick="changeDigit('u', 1)" class="ans-btn text-3xl text-emerald-400 hover:text-emerald-300 py-1 transition-transform active:scale-90">▲</button>
+                                <div id="ans-u" class="w-10 md:w-12 text-center chalk-text border-b-4 border-dashed border-slate-400/50 pb-2 cursor-pointer select-none" onclick="changeDigit('u', 1)">?</div>
+                                <button onclick="changeDigit('u', -1)" class="ans-btn text-3xl text-emerald-400 hover:text-emerald-300 py-1 transition-transform active:scale-90">▼</button>
+                            </div>
+                        </div>
                     </div>
 
                     <button id="btn-action" onclick="handleAction()" class="btn-press px-8 py-4 bg-amber-500 text-white font-black rounded-full shadow-[0_6px_0_0_#b45309] hover:bg-amber-400 hover:shadow-[0_4px_0_0_#b45309] hover:translate-y-[2px] text-xl w-full transition-all duration-200">
@@ -245,6 +254,11 @@
         
         let currentQuestionIndex = 0;
         
+        // Trạng thái các ô chọn số của người dùng
+        let userAnsH = null;
+        let userAnsT = null;
+        let userAnsU = null;
+        
         // 4 câu hỏi SGK
         const predefinedQuestions = [
             { n1: 48, n2: 52, op: '+' },
@@ -257,12 +271,24 @@
             generateQuestion();
         });
 
+        // Lắng nghe sự kiện Enter
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleAction();
+        });
+
         function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
         function updateScoreBoard() { document.getElementById('score-display').innerText = score; document.getElementById('streak-display').innerText = streak; }
 
-        function formatDisplay(num) {
-            // Thêm khoảng trắng vô hình để căn phải đẹp hơn trên bảng
-            return num.toString();
+        function splitDigits(num) {
+            if (num === 0) return { h: '', t: '', u: 0 };
+            let u = num % 10;
+            let t = Math.floor((num % 100) / 10);
+            let h = Math.floor(num / 100);
+
+            if (num < 100) h = '';
+            if (num < 10 && h === '') t = '';
+            
+            return { h, t, u };
         }
 
         function generateQuestion() {
@@ -285,25 +311,37 @@
             document.getElementById('question-type-badge').innerText = operator === '+' ? 'Phép Cộng (Tổng 100)' : 'Phép Trừ (Từ 100)';
 
             // Render UI
-            document.getElementById('n1-display').innerText = formatDisplay(num1);
-            document.getElementById('n2-display').innerText = formatDisplay(num2);
-            document.getElementById('op-display').innerText = operator;
-            document.getElementById('carry-mark').classList.add('hidden');
+            let d1 = splitDigits(num1);
+            let d2 = splitDigits(num2);
 
-            const input = document.getElementById('ans-input');
-            input.value = '';
-            input.disabled = false;
-            input.classList.remove('text-emerald-300', 'text-rose-400');
-            input.classList.add('chalk-text');
-            input.placeholder = '?';
+            document.getElementById('n1-h').innerText = d1.h;
+            document.getElementById('n1-t').innerHTML = `
+                <div id="carry-mark" class="absolute -top-8 left-1/2 -translate-x-1/2 text-rose-300 text-2xl hidden animate-pulse font-sans">1</div>
+                ${d1.t === '' ? '0' : d1.t}
+            `;
+            if (d1.t === '' && d1.h === '') document.getElementById('n1-t').innerHTML = `<div id="carry-mark" class="absolute -top-8 left-1/2 -translate-x-1/2 text-rose-300 text-2xl hidden animate-pulse font-sans">1</div>`;
+            
+            document.getElementById('n1-u').innerText = d1.u;
+
+            document.getElementById('n2-h').innerText = d2.h;
+            document.getElementById('n2-t').innerText = d2.t;
+            document.getElementById('n2-u').innerText = d2.u;
+
+            document.getElementById('op-display').innerText = operator;
+            
+            // Reset States
+            hintLevel = 0; isCorrect = false;
+            userAnsH = null; userAnsT = null; userAnsU = null;
+            renderAns();
+            
+            // Hiển thị lại nút bấm
+            document.querySelectorAll('.ans-btn').forEach(b => b.classList.remove('invisible'));
 
             // Khôi phục animation bảng
             const chalkboard = document.querySelector('.chalkboard');
             chalkboard.classList.remove('bounce-in');
             void chalkboard.offsetWidth;
             chalkboard.classList.add('bounce-in');
-
-            hintLevel = 0; isCorrect = false;
             
             const btnAction = document.getElementById('btn-action');
             btnAction.innerText = 'Kiểm tra đáp án ✔️';
@@ -316,26 +354,58 @@
             updateHintButtons();
         }
 
+        // Cập nhật giao diện chữ số chọn
+        function renderAns() {
+            ['h', 't', 'u'].forEach(pos => {
+                let el = document.getElementById('ans-' + pos);
+                let val = pos === 'h' ? userAnsH : (pos === 't' ? userAnsT : userAnsU);
+                el.innerText = val !== null ? val : '?';
+                el.classList.remove('text-rose-400', 'text-emerald-300', 'text-yellow-200');
+                el.classList.add('chalk-text');
+            });
+        }
+
+        // Logic thay đổi số khi bấm ▲ / ▼
+        function changeDigit(pos, delta) {
+            if (isCorrect) return;
+            let current = pos === 'h' ? userAnsH : (pos === 't' ? userAnsT : userAnsU);
+            
+            if (current === null) {
+                current = delta > 0 ? 0 : 9;
+            } else {
+                current += delta;
+                if (current > 9) current = null;
+                else if (current < 0) current = null;
+            }
+            
+            if (pos === 'h') userAnsH = current;
+            if (pos === 't') userAnsT = current;
+            if (pos === 'u') userAnsU = current;
+            
+            renderAns();
+            playSound('snd-pop');
+        }
+
         function handleAction() {
             if (!isCorrect) checkAnswer();
             else generateQuestion();
         }
 
-        function handleEnter(e) {
-            if (e.key === 'Enter') handleAction();
-        }
-
         function checkAnswer() {
-            const input = document.getElementById('ans-input');
             const feedback = document.getElementById('feedback-msg');
-            const val = parseInt(input.value);
 
-            if (isNaN(val)) {
-                feedback.innerText = 'Bé chưa nhập kết quả kìa! 🧐';
+            // Cảnh báo nếu chưa chọn số nào cả
+            if (userAnsH === null && userAnsT === null && userAnsU === null) {
+                feedback.innerText = 'Bé hãy chọn số đáp án nhé! 🧐';
                 feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
                 playSound('snd-wrong');
                 return;
             }
+
+            let h = userAnsH || 0;
+            let t = userAnsT || 0;
+            let u = userAnsU || 0;
+            let val = h * 100 + t * 10 + u;
 
             if (val === targetResult) {
                 isCorrect = true; playSound('snd-correct'); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -346,9 +416,13 @@
                 feedback.innerHTML = `Chính xác! Cú được nhận 1 viên gạch <b>+${pts}⭐</b> 🎉`; 
                 feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-emerald-600';
                 
-                input.classList.remove('chalk-text', 'text-rose-400');
-                input.classList.add('text-emerald-300');
-                input.disabled = true;
+                // Tô xanh đáp án và ẩn các nút điều chỉnh
+                ['h', 't', 'u'].forEach(p => {
+                    let el = document.getElementById('ans-' + p);
+                    el.classList.remove('chalk-text', 'text-rose-400');
+                    el.classList.add('text-emerald-300');
+                });
+                document.querySelectorAll('.ans-btn').forEach(b => b.classList.add('invisible'));
 
                 addBrick();
 
@@ -362,8 +436,12 @@
                 feedback.innerText = 'Chưa chính xác, bé kiểm tra lại xem có nhớ không nhé! 🤔'; 
                 feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-red-500';
                 
-                input.classList.remove('chalk-text', 'text-emerald-300');
-                input.classList.add('text-rose-400');
+                // Tô đỏ báo sai
+                ['h', 't', 'u'].forEach(p => {
+                    let el = document.getElementById('ans-' + p);
+                    el.classList.remove('chalk-text', 'text-emerald-300');
+                    el.classList.add('text-rose-400');
+                });
 
                 const board = document.querySelector('.chalkboard');
                 board.classList.remove('shake'); void board.offsetWidth; board.classList.add('shake');
@@ -412,16 +490,25 @@
             hintLevel = level; updateHintButtons(); playSound('snd-pop');
             updateFormula();
 
-            const input = document.getElementById('ans-input');
-            input.classList.remove('text-rose-400');
-            input.classList.add('chalk-text');
-
             if (hintLevel >= 1) {
                 document.getElementById('carry-mark').classList.remove('hidden');
             }
 
-            if (hintLevel === 3) {
-                input.value = targetResult;
+            if (hintLevel === 2) {
+                // Set the units digit to the correct answer
+                userAnsU = targetResult % 10;
+                renderAns();
+                
+                const el = document.getElementById('ans-u');
+                el.classList.add('text-yellow-200');
+                setTimeout(() => { if(!isCorrect) el.classList.remove('text-yellow-200'); }, 1000);
+            } else if (hintLevel === 3) {
+                // Show the complete answer
+                let res = splitDigits(targetResult);
+                userAnsH = res.h === '' ? null : res.h;
+                userAnsT = res.t === '' ? null : res.t;
+                userAnsU = res.u;
+                renderAns();
             }
         }
 
