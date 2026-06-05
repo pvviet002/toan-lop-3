@@ -112,4 +112,531 @@
             <p class="text-emerald-100 text-sm md:text-md mt-2 font-medium">Bé hãy giải toán để giúp bạn Cú xây lâu đài nhé!</p>
         </div>
 
-        <!-- Thân Body
+        <!-- Thân Body chia 2 cột -->
+        <div class="flex flex-col lg:flex-row border-b border-slate-100 bg-emerald-50/30">
+            
+            <!-- Cột Trái (Tiến trình Xây Lâu Đài) -->
+            <div class="w-full lg:w-2/5 p-4 md:p-8 flex flex-col justify-start border-r border-emerald-100">
+                <div class="mb-4 md:mb-6">
+                    <h3 class="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Hỗ trợ giải toán</h3>
+                    <div class="flex flex-col sm:flex-row lg:flex-col justify-center items-center gap-3">
+                        <button id="btn-hint-1" onclick="useHint(1)" class="btn-press w-full px-4 py-3 bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 hover:bg-amber-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            1. Nhắc quy tắc 🧠
+                        </button>
+                        <button id="btn-hint-2" onclick="useHint(2)" class="btn-press w-full px-4 py-3 bg-rose-100 text-rose-700 font-bold rounded-xl border border-rose-200 hover:bg-rose-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            2. Tính chi tiết 📝
+                        </button>
+                        <button id="btn-hint-3" onclick="useHint(3)" class="btn-press w-full px-4 py-3 bg-blue-100 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-200 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            3. Xem đáp án 💡
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Thợ Xây & Lâu đài -->
+                <div class="flex-grow w-full flex flex-col items-center justify-end p-4 min-h-[300px] relative">
+                    <div class="text-center text-4xl mb-4 font-bold text-emerald-700" id="tower-status">
+                        Tiến độ: <span id="brick-count">0</span>/5
+                    </div>
+                    
+                    <!-- Lâu đài -->
+                    <div id="tower-container" class="flex flex-col-reverse items-center gap-1 z-10 min-h-[200px]">
+                        <!-- Gạch được thêm từ JS -->
+                        <div class="text-6xl" id="mascot">🦉</div>
+                    </div>
+                    
+                    <!-- Nền đất -->
+                    <div class="w-full h-4 bg-emerald-600 rounded-full mt-2"></div>
+                </div>
+            </div>
+
+            <!-- Cột Phải (Quiz: Bảng Phấn) -->
+            <div class="w-full lg:w-3/5 p-6 md:p-8 flex flex-col justify-start space-y-6 relative">
+                
+                <div class="flex justify-between items-center w-full mb-2">
+                    <div class="bg-white text-slate-600 px-4 py-2 rounded-xl text-sm font-bold border border-slate-200 shadow-sm" id="question-type-badge">
+                        Phép tính
+                    </div>
+                    <button onclick="generateQuestion()" class="btn-press px-5 py-2.5 bg-white text-emerald-600 font-bold rounded-xl shadow-sm border border-emerald-200 hover:bg-emerald-50 text-sm flex items-center gap-2 transition-colors">
+                        <span>🔄 Đổi số</span>
+                    </button>
+                </div>
+
+                <div class="flex flex-col items-center flex-grow justify-center mt-0 w-full max-w-sm mx-auto" id="quiz-container">
+                    
+                    <!-- Bảng Phấn Tương Tác -->
+                    <div class="chalkboard p-8 md:p-10 w-max mx-auto flex flex-col items-end text-5xl md:text-6xl font-bold mb-8 bounce-in">
+                        
+                        <!-- Số thứ nhất -->
+                        <div class="flex justify-end gap-2 md:gap-4 w-full pr-4">
+                            <div id="n1-h" class="w-10 md:w-12 text-center chalk-text">1</div>
+                            <div id="n1-t" class="w-10 md:w-12 text-center chalk-text relative">
+                                <!-- Gợi ý có nhớ -->
+                                <div id="carry-mark" class="absolute -top-8 left-1/2 -translate-x-1/2 text-rose-300 text-2xl hidden animate-pulse font-sans">1</div>
+                                0
+                            </div>
+                            <div id="n1-u" class="w-10 md:w-12 text-center chalk-text">0</div>
+                        </div>
+                        
+                        <!-- Dấu phép tính và số thứ hai -->
+                        <div class="flex items-center justify-end gap-2 md:gap-4 w-full mt-4 relative pr-4">
+                            <span id="op-display" class="text-rose-400 absolute left-2">-</span>
+                            <div id="n2-h" class="w-10 md:w-12 text-center chalk-text"></div>
+                            <div id="n2-t" class="w-10 md:w-12 text-center chalk-text">2</div>
+                            <div id="n2-u" class="w-10 md:w-12 text-center chalk-text">6</div>
+                        </div>
+                        
+                        <!-- Đường gạch ngang -->
+                        <hr class="w-full border-b-[6px] border-white/70 mt-6 mb-4 rounded-full">
+                        
+                        <!-- Ô nhập đáp án bằng click chọn -->
+                        <div class="flex justify-end gap-2 md:gap-4 w-full pr-4 mt-2">
+                            <!-- Hàng Trăm -->
+                            <div id="ans-h" class="w-10 md:w-12 h-14 md:h-16 text-center chalk-text border-b-4 border-dashed border-slate-400/50 pb-2 cursor-pointer select-none hover:bg-white/10 rounded-lg flex items-center justify-center transition-colors" onclick="openDigitPicker('h')">?</div>
+                            <!-- Hàng Chục -->
+                            <div id="ans-t" class="w-10 md:w-12 h-14 md:h-16 text-center chalk-text border-b-4 border-dashed border-slate-400/50 pb-2 cursor-pointer select-none hover:bg-white/10 rounded-lg flex items-center justify-center transition-colors" onclick="openDigitPicker('t')">?</div>
+                            <!-- Hàng Đơn vị -->
+                            <div id="ans-u" class="w-10 md:w-12 h-14 md:h-16 text-center chalk-text border-b-4 border-dashed border-slate-400/50 pb-2 cursor-pointer select-none hover:bg-white/10 rounded-lg flex items-center justify-center transition-colors" onclick="openDigitPicker('u')">?</div>
+                        </div>
+                    </div>
+
+                    <button id="btn-action" onclick="handleAction()" class="btn-press px-8 py-4 bg-amber-500 text-white font-black rounded-full shadow-[0_6px_0_0_#b45309] hover:bg-amber-400 hover:shadow-[0_4px_0_0_#b45309] hover:translate-y-[2px] text-xl w-full transition-all duration-200">
+                        Kiểm tra đáp án ✔️
+                    </button>
+                    <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung giải chi tiết -->
+        <div id="formula-section" class="bg-emerald-900 py-6 px-6 md:py-8 md:px-10 text-center relative w-full hidden shadow-inner border-t-4 border-emerald-400">
+            <h2 id="formula-title" class="text-center text-[10px] md:text-xs font-bold text-emerald-300 uppercase tracking-widest mb-3">Phân tích các bước:</h2>
+            <div id="math-formula" class="text-lg md:text-xl text-emerald-50 font-medium flex items-center justify-center flex-col leading-relaxed max-w-2xl mx-auto">
+                <!-- Render Text từ JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Chọn Số -->
+    <div id="digit-picker-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+        <div class="bg-emerald-800 p-6 md:p-8 rounded-[2rem] border-4 border-amber-600 shadow-2xl transform scale-95 transition-transform duration-300" id="digit-picker-content">
+            <h3 class="text-xl md:text-2xl font-bold text-emerald-100 mb-6 text-center" id="digit-picker-title">Chọn chữ số</h3>
+            <div class="grid grid-cols-3 gap-3 md:gap-4 mb-2">
+                <!-- Numbers 1-9 -->
+                <button onclick="selectDigit(1)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">1</button>
+                <button onclick="selectDigit(2)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">2</button>
+                <button onclick="selectDigit(3)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">3</button>
+                <button onclick="selectDigit(4)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">4</button>
+                <button onclick="selectDigit(5)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">5</button>
+                <button onclick="selectDigit(6)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">6</button>
+                <button onclick="selectDigit(7)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">7</button>
+                <button onclick="selectDigit(8)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">8</button>
+                <button onclick="selectDigit(9)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">9</button>
+                
+                <button onclick="selectDigit(null)" class="w-16 h-16 md:w-20 md:h-20 text-xl md:text-2xl font-bold text-rose-200 bg-rose-700 rounded-2xl border-b-4 border-rose-900 active:border-b-0 active:translate-y-1 transition-all">Xóa</button>
+                <button onclick="selectDigit(0)" class="w-16 h-16 md:w-20 md:h-20 text-3xl md:text-4xl font-black text-white bg-emerald-600 rounded-2xl border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all">0</button>
+                <button onclick="closeDigitPicker()" class="w-16 h-16 md:w-20 md:h-20 text-xl md:text-2xl font-bold text-slate-200 bg-slate-600 rounded-2xl border-b-4 border-slate-800 active:border-b-0 active:translate-y-1 transition-all">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal iPad -->
+    <div id="ipad-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="ipad-modal-content">
+            <div class="text-center">
+                <div class="text-5xl mb-4">📱</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Mẹo cho iPad/iPhone</h3>
+                <p class="text-slate-600 mb-6 text-sm leading-relaxed">Để chơi toàn màn hình, ba mẹ hãy nhấn nút <b class="text-emerald-600">Chia sẻ (Share)</b> ở viền Safari và chọn <b class="text-emerald-600">Thêm vào MH chính (Add to Home Screen)</b> nhé!</p>
+                <button onclick="closeModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-full w-full transition-colors">Đã hiểu ✔️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // State
+        let num1 = 0, num2 = 0, operator = '+', targetResult = 0;
+        let hintLevel = 0, isCorrect = false;
+        let score = 0, streak = 0, bricks = 0;
+        
+        let currentQuestionIndex = 0;
+        
+        // Trạng thái các ô chọn số của người dùng
+        let userAnsH = null;
+        let userAnsT = null;
+        let userAnsU = null;
+        let currentPickingPos = null;
+        
+        // 4 câu hỏi SGK
+        const predefinedQuestions = [
+            { n1: 48, n2: 52, op: '+' },
+            { n1: 75, n2: 25, op: '+' },
+            { n1: 100, n2: 26, op: '-' },
+            { n1: 100, n2: 45, op: '-' }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            generateQuestion();
+        });
+
+        // Lắng nghe sự kiện Enter
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('digit-picker-modal').classList.contains('hidden')) {
+                    closeDigitPicker();
+                } else {
+                    handleAction();
+                }
+            }
+        });
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+        function updateScoreBoard() { document.getElementById('score-display').innerText = score; document.getElementById('streak-display').innerText = streak; }
+
+        function splitDigits(num) {
+            if (num === 0) return { h: '', t: '', u: 0 };
+            let u = num % 10;
+            let t = Math.floor((num % 100) / 10);
+            let h = Math.floor(num / 100);
+
+            if (num < 100) h = '';
+            if (num < 10 && h === '') t = '';
+            
+            return { h, t, u };
+        }
+
+        function generateQuestion() {
+            if (currentQuestionIndex < predefinedQuestions.length) {
+                let q = predefinedQuestions[currentQuestionIndex];
+                num1 = q.n1; num2 = q.n2; operator = q.op;
+                currentQuestionIndex++;
+            } else {
+                operator = Math.random() > 0.5 ? '+' : '-';
+                if (operator === '+') {
+                    num1 = Math.floor(Math.random() * 89) + 10;
+                    num2 = 100 - num1;
+                } else {
+                    num1 = 100;
+                    num2 = Math.floor(Math.random() * 89) + 10;
+                }
+            }
+
+            targetResult = operator === '+' ? (num1 + num2) : (num1 - num2);
+            document.getElementById('question-type-badge').innerText = operator === '+' ? 'Phép Cộng (Tổng 100)' : 'Phép Trừ (Từ 100)';
+
+            // Render UI
+            let d1 = splitDigits(num1);
+            let d2 = splitDigits(num2);
+
+            document.getElementById('n1-h').innerText = d1.h;
+            document.getElementById('n1-t').innerHTML = `
+                <div id="carry-mark" class="absolute -top-8 left-1/2 -translate-x-1/2 text-rose-300 text-2xl hidden animate-pulse font-sans">1</div>
+                ${d1.t === '' ? '0' : d1.t}
+            `;
+            if (d1.t === '' && d1.h === '') document.getElementById('n1-t').innerHTML = `<div id="carry-mark" class="absolute -top-8 left-1/2 -translate-x-1/2 text-rose-300 text-2xl hidden animate-pulse font-sans">1</div>`;
+            
+            document.getElementById('n1-u').innerText = d1.u;
+
+            document.getElementById('n2-h').innerText = d2.h;
+            document.getElementById('n2-t').innerText = d2.t;
+            document.getElementById('n2-u').innerText = d2.u;
+
+            document.getElementById('op-display').innerText = operator;
+            
+            // Reset States
+            hintLevel = 0; isCorrect = false;
+            userAnsH = null; userAnsT = null; userAnsU = null;
+            
+            // Xóa hiệu ứng class cũ
+            ['h', 't', 'u'].forEach(pos => {
+                let el = document.getElementById('ans-' + pos);
+                el.classList.remove('text-rose-400', 'text-emerald-300', 'text-yellow-200');
+                el.classList.add('chalk-text');
+            });
+            renderAns();
+
+            // Khôi phục animation bảng
+            const chalkboard = document.querySelector('.chalkboard');
+            chalkboard.classList.remove('bounce-in');
+            void chalkboard.offsetWidth;
+            chalkboard.classList.add('bounce-in');
+            
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Kiểm tra đáp án ✔️';
+            btnAction.className = 'btn-press px-8 py-4 bg-amber-500 text-white font-black rounded-full shadow-[0_6px_0_0_#b45309] hover:bg-amber-400 hover:shadow-[0_4px_0_0_#b45309] hover:translate-y-[2px] text-xl w-full transition-all duration-200';
+            
+            const feedback = document.getElementById('feedback-msg');
+            feedback.innerText = '';
+            
+            document.getElementById('formula-section').classList.add('hidden');
+            updateHintButtons();
+        }
+
+        // MỞ/ĐÓNG BẢNG CHỌN SỐ
+        function openDigitPicker(pos) {
+            if (isCorrect) return; // Không cho sửa nếu đã làm đúng
+            currentPickingPos = pos;
+            playSound('snd-pop');
+            
+            const title = document.getElementById('digit-picker-title');
+            if (pos === 'h') title.innerText = 'Chọn số hàng Trăm';
+            else if (pos === 't') title.innerText = 'Chọn số hàng Chục';
+            else title.innerText = 'Chọn số hàng Đơn vị';
+
+            const modal = document.getElementById('digit-picker-modal');
+            const content = document.getElementById('digit-picker-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeDigitPicker() {
+            const modal = document.getElementById('digit-picker-modal');
+            const content = document.getElementById('digit-picker-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            playSound('snd-pop');
+        }
+
+        function selectDigit(digit) {
+            if (currentPickingPos === 'h') userAnsH = digit;
+            else if (currentPickingPos === 't') userAnsT = digit;
+            else if (currentPickingPos === 'u') userAnsU = digit;
+
+            renderAns();
+            closeDigitPicker();
+        }
+
+        // Cập nhật giao diện chữ số hiển thị
+        function renderAns() {
+            ['h', 't', 'u'].forEach(pos => {
+                let el = document.getElementById('ans-' + pos);
+                let val = pos === 'h' ? userAnsH : (pos === 't' ? userAnsT : userAnsU);
+                el.innerText = val !== null ? val : '?';
+            });
+        }
+
+        function handleAction() {
+            if (!isCorrect) checkAnswer();
+            else generateQuestion();
+        }
+
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback-msg');
+
+            // Cảnh báo nếu chưa chọn số nào cả
+            if (userAnsH === null && userAnsT === null && userAnsU === null) {
+                feedback.innerText = 'Bé hãy chọn số đáp án nhé! 🧐';
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-rose-500';
+                playSound('snd-wrong');
+                return;
+            }
+
+            let h = userAnsH || 0;
+            let t = userAnsT || 0;
+            let u = userAnsU || 0;
+            let val = h * 100 + t * 10 + u;
+
+            if (val === targetResult) {
+                isCorrect = true; playSound('snd-correct'); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                
+                let pts = 10; if (hintLevel === 1) pts = 8; if (hintLevel === 2) pts = 5; if (hintLevel === 3) pts = 2;
+                score += pts; streak += 1; updateScoreBoard();
+
+                feedback.innerHTML = `Chính xác! Cú được nhận 1 viên gạch <b>+${pts}⭐</b> 🎉`; 
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-emerald-600';
+                
+                // Tô xanh đáp án
+                ['h', 't', 'u'].forEach(p => {
+                    let el = document.getElementById('ans-' + p);
+                    el.classList.remove('chalk-text', 'text-rose-400', 'cursor-pointer', 'hover:bg-white/10');
+                    el.classList.add('text-emerald-300');
+                });
+
+                addBrick();
+
+                const btnAction = document.getElementById('btn-action');
+                btnAction.innerText = 'Câu tiếp theo ➡️'; 
+                btnAction.className = 'btn-press px-8 py-4 bg-emerald-500 text-white font-black rounded-full shadow-[0_6px_0_0_#047857] hover:bg-emerald-400 hover:shadow-[0_4px_0_0_#047857] hover:translate-y-[2px] text-xl w-full transition-all duration-200 pulse-btn';
+                
+                if (hintLevel < 3) { hintLevel = 3; updateHintButtons(); updateFormula(); }
+            } else {
+                playSound('snd-wrong'); streak = 0; updateScoreBoard();
+                feedback.innerText = 'Chưa chính xác, bé kiểm tra lại xem có nhớ không nhé! 🤔'; 
+                feedback.className = 'mt-4 text-lg font-bold min-h-[28px] text-center text-red-500';
+                
+                // Tô đỏ báo sai
+                ['h', 't', 'u'].forEach(p => {
+                    let el = document.getElementById('ans-' + p);
+                    el.classList.remove('chalk-text', 'text-emerald-300');
+                    el.classList.add('text-rose-400');
+                });
+
+                const board = document.querySelector('.chalkboard');
+                board.classList.remove('shake'); void board.offsetWidth; board.classList.add('shake');
+            }
+        }
+
+        function addBrick() {
+            if (bricks >= 5) {
+                // Đã xây xong, reset lâu đài
+                bricks = 0;
+                document.getElementById('tower-container').innerHTML = '<div class="text-6xl" id="mascot">🦉</div>';
+            }
+            
+            bricks++;
+            document.getElementById('brick-count').innerText = bricks;
+            
+            const tower = document.getElementById('tower-container');
+            const newBrick = document.createElement('div');
+            
+            if (bricks === 5) {
+                newBrick.className = 'text-7xl bounce-in';
+                newBrick.innerText = '🏰';
+                document.getElementById('feedback-msg').innerHTML += '<br><span class="text-rose-600">Lâu đài đã hoàn thành! Cú cảm ơn bé!</span>';
+            } else {
+                newBrick.className = 'text-6xl bounce-in';
+                newBrick.innerText = '🧱';
+            }
+            
+            // Xóa mascot tạm, thêm gạch, thêm mascot lên đỉnh
+            const mascot = document.getElementById('mascot');
+            if(mascot) mascot.remove();
+            
+            tower.appendChild(newBrick);
+            
+            if (bricks < 5) {
+                const newMascot = document.createElement('div');
+                newMascot.className = 'text-6xl bounce-in';
+                newMascot.id = 'mascot';
+                newMascot.innerText = '🦉';
+                tower.appendChild(newMascot);
+            }
+        }
+
+        function useHint(level) {
+            if (hintLevel >= level || isCorrect) return; 
+            hintLevel = level; updateHintButtons(); playSound('snd-pop');
+            updateFormula();
+
+            if (hintLevel >= 1) {
+                document.getElementById('carry-mark').classList.remove('hidden');
+            }
+
+            if (hintLevel === 2) {
+                // Set the units digit to the correct answer
+                userAnsU = targetResult % 10;
+                renderAns();
+                
+                const el = document.getElementById('ans-u');
+                el.classList.add('text-yellow-200');
+                setTimeout(() => { if(!isCorrect) el.classList.remove('text-yellow-200'); }, 1000);
+            } else if (hintLevel === 3) {
+                // Show the complete answer
+                let res = splitDigits(targetResult);
+                userAnsH = res.h === '' ? null : res.h;
+                userAnsT = res.t === '' ? null : res.t;
+                userAnsU = res.u;
+                renderAns();
+            }
+        }
+
+        function updateHintButtons() {
+            for(let i=1; i<=3; i++) {
+                const btn = document.getElementById(`btn-hint-${i}`); btn.disabled = hintLevel >= i;
+                btn.className = btn.disabled ? "w-full px-4 py-3 bg-slate-200 text-slate-400 font-bold rounded-xl border border-slate-300 cursor-not-allowed" : `btn-press w-full px-4 py-3 bg-${i==1?'amber':i==2?'rose':'blue'}-100 text-${i==1?'amber':i==2?'rose':'blue'}-700 font-bold rounded-xl border border-${i==1?'amber':i==2?'rose':'blue'}-200 shadow-sm transition-colors`;
+            }
+        }
+
+        function updateFormula() {
+            const section = document.getElementById('formula-section');
+            if (hintLevel < 1) return;
+            
+            section.classList.remove('hidden'); 
+            const container = document.getElementById('math-formula');
+            let htmlContent = '';
+            
+            let u1 = num1 % 10; let u2 = num2 % 10;
+            let t1 = Math.floor((num1 % 100) / 10); let t2 = Math.floor((num2 % 100) / 10);
+
+            if (hintLevel === 1) {
+                htmlContent = `<div class="bg-emerald-800 p-4 rounded-xl border border-emerald-600">Quy tắc: Tính từ phải sang trái.<br><b>Hàng đơn vị ➡️ Hàng chục</b>. Nhớ cộng thêm phần đã "nhớ" nhé!</div>`;
+            }
+
+            if (hintLevel >= 2) {
+                if (operator === '+') {
+                    let uSum = u1 + u2;
+                    let uRes = uSum % 10;
+                    let uCarry = Math.floor(uSum / 10);
+                    
+                    let tSum = t1 + t2 + uCarry;
+                    
+                    htmlContent = `
+                    <div class="bg-emerald-800 p-6 rounded-2xl border border-emerald-600 text-left space-y-3">
+                        <p>• Hàng đơn vị: <span class="text-amber-300">${u1}</span> cộng <span class="text-amber-300">${u2}</span> bằng <span class="text-white">${uSum}</span>. Viết <span class="text-white font-bold px-2 bg-emerald-700 rounded">${uRes}</span>, nhớ <span class="text-rose-300 font-bold">${uCarry}</span>.</p>
+                        <p>• Hàng chục: <span class="text-sky-300">${t1}</span> cộng <span class="text-sky-300">${t2}</span> bằng <span class="text-white">${t1+t2}</span>. Thêm <span class="text-rose-300">${uCarry}</span> bằng <span class="text-white">${tSum}</span>. Viết <span class="text-white font-bold px-2 bg-emerald-700 rounded">${tSum}</span>.</p>
+                    </div>`;
+                } else {
+                    let uSub = 10 - u2;
+                    let tSub = 9 - t2; // Vì mượn 1, 10 thành 9 chục
+                    
+                    htmlContent = `
+                    <div class="bg-emerald-800 p-6 rounded-2xl border border-emerald-600 text-left space-y-3">
+                        <p>• Hàng đơn vị: <span class="text-amber-300">0</span> không trừ được <span class="text-amber-300">${u2}</span>, lấy <span class="text-white">10</span> trừ <span class="text-amber-300">${u2}</span> bằng <span class="text-white">${uSub}</span>. Viết <span class="text-white font-bold px-2 bg-emerald-700 rounded">${uSub}</span>, nhớ <span class="text-rose-300 font-bold">1</span>.</p>
+                        <p>• Hàng chục: <span class="text-sky-300">${t2}</span> thêm <span class="text-rose-300">1</span> bằng <span class="text-white">${t2+1}</span>. <span class="text-sky-300">0</span> không trừ được <span class="text-white">${t2+1}</span>, lấy <span class="text-white">10</span> trừ <span class="text-white">${t2+1}</span> bằng <span class="text-white">${tSub}</span>. Viết <span class="text-white font-bold px-2 bg-emerald-700 rounded">${tSub}</span>, nhớ <span class="text-rose-300 font-bold">1</span>.</p>
+                        <p>• Hàng trăm: <span class="text-fuchsia-300">1</span> trừ <span class="text-rose-300">1</span> bằng <span class="text-white font-bold px-2 bg-emerald-700 rounded">0</span>.</p>
+                    </div>`;
+                }
+            }
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- Fullscreen ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const requestFullScreen = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const exitFullScreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+            if (!isFullScreen) {
+                if (requestFullScreen) {
+                    try { let promise = requestFullScreen.call(doc); if (promise) promise.catch(err => { showModal(); }); } catch (e) { showModal(); }
+                } else { showModal(); }
+            } else { if (exitFullScreen) exitFullScreen.call(document); }
+        }
+
+        function showModal() {
+            const modal = document.getElementById('ipad-modal');
+            const content = document.getElementById('ipad-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('ipad-modal');
+            const content = document.getElementById('ipad-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+        events.forEach(evt => {
+            document.addEventListener(evt, () => {
+                const btn = document.getElementById('btn-fullscreen');
+                const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+                if (isFullScreen) { btn.innerHTML = '<span>🔳 Thu nhỏ</span>'; } else { btn.innerHTML = '<span>🔲 Phóng to</span>'; }
+            });
+        });
+    </script>
+</body>
+</html>
