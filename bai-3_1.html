@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 3.1: Trò chơi Tính nhẩm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background-color: #e0f2fe; /* sky-100 */
+            overflow: hidden; /* Ngăn cuộn trang trong lúc chơi game */
+        }
+        .no-select { user-select: none; -webkit-user-select: none; }
+        .btn-press:active:not(:disabled) { transform: scale(0.95); }
+
+        /* Animation */
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 
+            10%, 90% { transform: translate3d(-2px, 0, 0); } 
+            20%, 80% { transform: translate3d(4px, 0, 0); } 
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 
+            40%, 60% { transform: translate3d(6px, 0, 0); } 
+        }
+
+        /* Balloon styles */
+        .balloon {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .balloon:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+        .balloon:active {
+            transform: translateY(2px) scale(0.95);
+        }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background-color: #cbd5e1;
+        }
+        .balloon-knot {
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 8px;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        /* Progress bar */
+        #timer-bar { transition: width 1s linear; }
+    </style>
+</head>
+<body class="p-2 md:p-6 lg:p-8 flex flex-col min-h-screen relative h-screen">
+
+    <!-- Header / Navigation Global -->
+    <div class="max-w-4xl mx-auto w-full mb-4 flex justify-between items-center relative z-10">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">⬅️ Sảnh chính</span><span class="md:hidden">⬅️ Quay lại</span>
+            </a>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN GAME CONTAINER -->
+    <div class="max-w-4xl mx-auto w-full bg-white rounded-3xl shadow-2xl border border-sky-200 overflow-hidden flex flex-col flex-grow relative">
+        
+        <!-- MÀN HÌNH BẮT ĐẦU (Start Screen) -->
+        <div id="screen-start" class="absolute inset-0 z-20 bg-gradient-to-b from-sky-400 to-blue-600 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            <div class="text-7xl md:text-8xl mb-6 drop-shadow-lg bounce-in" style="animation-delay: 0.1s">🎈</div>
+            <h1 class="text-3xl md:text-5xl font-black tracking-wide mb-4 text-center drop-shadow-md bounce-in" style="animation-delay: 0.2s">Đua Tốc Độ:<br>Tính Nhẩm Siêu Tốc</h1>
+            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border border-white/30 max-w-lg text-center mb-8 bounce-in" style="animation-delay: 0.3s">
+                <p class="text-lg md:text-xl font-medium mb-3">Mẹo chơi:</p>
+                <p class="text-base md:text-lg mb-2">Hãy nhìn kỹ phép <b>Cộng</b> để tìm nhanh kết quả của phép <b>Trừ</b> nhé!</p>
+                <div class="bg-black/20 rounded-lg p-3 inline-block mt-2 font-mono text-xl">
+                    Biết: 50 + 40 = 90 ➡️ 90 - 50 = ?
+                </div>
+                <p class="text-sm mt-4 text-sky-100 italic">Bé có 60 giây để ghi thật nhiều điểm!</p>
+            </div>
+            <button onclick="startGame()" class="btn-press px-10 py-4 bg-amber-400 text-amber-900 font-black rounded-full shadow-[0_6px_0_0_#b45309] hover:bg-amber-300 hover:shadow-[0_4px_0_0_#b45309] hover:translate-y-[2px] text-2xl w-full max-w-[300px] transition-all duration-200 bounce-in" style="animation-delay: 0.4s">
+                BẮT ĐẦU CHƠI 🚀
+            </button>
+        </div>
+
+        <!-- MÀN HÌNH KẾT THÚC (End Screen) -->
+        <div id="screen-end" class="absolute inset-0 z-20 bg-gradient-to-b from-indigo-500 to-purple-700 flex flex-col items-center justify-center p-6 text-white hidden opacity-0 transition-opacity duration-300">
+            <div class="text-7xl md:text-8xl mb-4 drop-shadow-lg">🏆</div>
+            <h2 class="text-4xl md:text-5xl font-black tracking-wide mb-2 text-center text-yellow-300 drop-shadow-md">HẾT GIỜ!</h2>
+            <p class="text-xl md:text-2xl font-medium mb-8">Bé đã hoàn thành xuất sắc!</p>
+            
+            <div class="bg-white/20 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-white/30 text-center mb-8 w-full max-w-sm">
+                <p class="text-lg text-purple-100 uppercase tracking-widest font-bold mb-2">Điểm tổng kết</p>
+                <div class="text-6xl md:text-7xl font-black text-white drop-shadow-md" id="final-score">0</div>
+            </div>
+
+            <button onclick="showStartScreen()" class="btn-press px-10 py-4 bg-white text-purple-700 font-black rounded-full shadow-[0_6px_0_0_#cbd5e1] hover:bg-slate-50 hover:shadow-[0_4px_0_0_#cbd5e1] hover:translate-y-[2px] text-xl md:text-2xl w-full max-w-[300px] transition-all duration-200">
+                CHƠI LẠI 🔄
+            </button>
+        </div>
+
+        <!-- MÀN HÌNH CHƠI GAME (Game Screen) -->
+        <div id="screen-game" class="flex flex-col h-full w-full bg-[#f0f9ff] relative overflow-hidden">
+            
+            <!-- Lớp mây nền trang trí -->
+            <div class="absolute top-10 left-10 text-6xl opacity-40">☁️</div>
+            <div class="absolute top-24 right-20 text-7xl opacity-30">☁️</div>
+            <div class="absolute bottom-40 left-1/4 text-5xl opacity-50">☁️</div>
+
+            <!-- Header Game (Điểm, Combo, Thời gian) -->
+            <div class="bg-white/80 backdrop-blur-md p-4 flex flex-col border-b border-sky-100 z-10 relative shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2 bg-amber-100 px-4 py-2 rounded-xl border border-amber-200">
+                        <span class="text-2xl">⭐</span>
+                        <span id="game-score" class="text-2xl font-black text-amber-600">0</span>
+                    </div>
+                    <div id="combo-box" class="flex items-center gap-1 bg-orange-100 px-3 py-1.5 rounded-lg border border-orange-200 opacity-0 transition-opacity duration-300 transform scale-90">
+                        <span class="text-lg">🔥</span>
+                        <span id="game-combo" class="text-lg font-bold text-orange-600">Combo x2</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-sky-100 px-4 py-2 rounded-xl border border-sky-200">
+                        <span class="text-xl">⏱️</span>
+                        <span id="game-time" class="text-2xl font-black text-sky-700">60s</span>
+                    </div>
+                </div>
+                <!-- Thanh thời gian -->
+                <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                    <div id="timer-bar" class="bg-sky-500 h-3 rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Khu vực câu hỏi -->
+            <div class="flex flex-col items-center justify-center p-6 z-10">
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border-2 border-sky-100 text-center w-full max-w-lg mb-8 bounce-in relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-sky-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        Phép tính gốc
+                    </div>
+                    <!-- Phép cộng đã biết -->
+                    <div class="text-2xl md:text-3xl font-bold text-slate-500 mb-4" id="q-hint">
+                        Biết: <span class="text-sky-600">50 + 40 = 90</span>
+                    </div>
+                    <hr class="border-t-2 border-dashed border-slate-200 w-3/4 mx-auto mb-4">
+                    <!-- Phép trừ cần tính -->
+                    <div class="text-4xl md:text-5xl font-black text-slate-800" id="q-main">
+                        90 - 50 = <span class="text-rose-500">?</span>
+                    </div>
+                </div>
+
+                <!-- Khu vực Bóng bay (Đáp án) -->
+                <div class="flex justify-center gap-4 md:gap-8 w-full mt-auto mb-10 z-10" id="answers-container">
+                    <!-- Sinh bằng JS -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-start" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // Game State
+        let score = 0;
+        let combo = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let correctAnswer = 0;
+        let isPlaying = false;
+
+        // Constants
+        const GAME_TIME = 60;
+        const BALLOON_COLORS = [
+            { bg: 'bg-rose-500', shadow: 'shadow-[0_6px_0_0_#be123c]', knot: 'bg-rose-600' },
+            { bg: 'bg-emerald-500', shadow: 'shadow-[0_6px_0_0_#047857]', knot: 'bg-emerald-600' },
+            { bg: 'bg-amber-500', shadow: 'shadow-[0_6px_0_0_#b45309]', knot: 'bg-amber-600' },
+            { bg: 'bg-purple-500', shadow: 'shadow-[0_6px_0_0_#7e22ce]', knot: 'bg-purple-600' }
+        ];
+
+        function playSound(id) { 
+            const sound = document.getElementById(id); 
+            if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } 
+        }
+
+        // ĐIỀU KHIỂN MÀN HÌNH
+        function showScreen(id) {
+            ['screen-start', 'screen-game', 'screen-end'].forEach(sid => {
+                const el = document.getElementById(sid);
+                if (sid === id) {
+                    el.classList.remove('hidden');
+                    setTimeout(() => el.classList.remove('opacity-0'), 50);
+                } else {
+                    el.classList.add('opacity-0');
+                    setTimeout(() => el.classList.add('hidden'), 300);
+                }
+            });
+        }
+
+        function showStartScreen() {
+            showScreen('screen-start');
+        }
+
+        function startGame() {
+            playSound('snd-start');
+            score = 0;
+            combo = 0;
+            timeLeft = GAME_TIME;
+            isPlaying = true;
+            
+            updateScoreUI();
+            updateTimerUI();
+            
+            showScreen('screen-game');
+            generateQuestion();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(gameTick, 1000);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            document.getElementById('final-score').innerText = score;
+            showScreen('screen-end');
+            
+            // Pháo hoa lớn khi kết thúc
+            let duration = 3 * 1000;
+            let animationEnd = Date.now() + duration;
+            let defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            let interval = setInterval(function() {
+                let timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                let particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        function gameTick() {
+            if (!isPlaying) return;
+            timeLeft--;
+            updateTimerUI();
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function updateTimerUI() {
+            document.getElementById('game-time').innerText = timeLeft + 's';
+            const pct = (timeLeft / GAME_TIME) * 100;
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = pct + '%';
+            if (pct < 30) bar.className = 'bg-rose-500 h-3 rounded-full';
+            else bar.className = 'bg-sky-500 h-3 rounded-full';
+        }
+
+        function updateScoreUI() {
+            document.getElementById('game-score').innerText = score;
+            const comboBox = document.getElementById('combo-box');
+            const comboText = document.getElementById('game-combo');
+            
+            if (combo >= 2) {
+                comboText.innerText = `Combo x${combo}`;
+                comboBox.classList.remove('opacity-0', 'scale-90');
+                comboBox.classList.add('opacity-100', 'scale-100', 'bounce-in');
+                setTimeout(() => comboBox.classList.remove('bounce-in'), 500);
+            } else {
+                comboBox.classList.add('opacity-0', 'scale-90');
+                comboBox.classList.remove('opacity-100', 'scale-100');
+            }
+        }
+
+        // LOGIC TẠO CÂU HỎI
+        function generateQuestion() {
+            if (!isPlaying) return;
+            
+            // Random tròn chục (10-90) hoặc tròn trăm (100-900)
+            let isHundred = Math.random() > 0.5;
+            let mult = isHundred ? 100 : 10;
+            
+            let a = Math.floor(Math.random() * 9) + 1; // 1-9
+            let b = Math.floor(Math.random() * (10 - a)) + 1; // 1 to (10-a) -> Đảm bảo a+b <= 10
+            
+            // Ép số to lên một chút để tránh toàn 10+10
+            if (a + b < 5 && Math.random() > 0.5) b += 3;
+
+            let num1 = a * mult;
+            let num2 = b * mult;
+            let sum = num1 + num2;
+
+            // Đặt câu hỏi: Trừ num1 hay trừ num2?
+            let askNum1 = Math.random() > 0.5;
+            let subtractNum = askNum1 ? num1 : num2;
+            correctAnswer = askNum1 ? num2 : num1;
+
+            // Render UI câu hỏi
+            document.getElementById('q-hint').innerHTML = `Biết: <span class="text-sky-600">${num1} + ${num2} = ${sum}</span>`;
+            document.getElementById('q-main').innerHTML = `${sum} - ${subtractNum} = <span class="text-rose-500">?</span>`;
+
+            // Tạo đáp án (1 đúng, 2 sai)
+            let options = new Set([correctAnswer]);
+            
+            // Sinh đáp án nhiễu hợp lý
+            while(options.size < 3) {
+                let r = Math.random();
+                let fakeAns = 0;
+                if (r < 0.3) fakeAns = correctAnswer + mult; // Lớn hơn 1 chục/trăm
+                else if (r < 0.6) fakeAns = correctAnswer - mult; // Nhỏ hơn 1 chục/trăm
+                else if (r < 0.8) fakeAns = subtractNum; // Đảo lại số trừ
+                else fakeAns = sum + mult; // Lấy tổng cộng thêm
+
+                if (fakeAns > 0 && fakeAns !== correctAnswer) {
+                    options.add(fakeAns);
+                } else {
+                    // Fallback
+                    options.add((Math.floor(Math.random() * 8) + 1) * mult);
+                }
+            }
+
+            let optionArray = Array.from(options);
+            // Shuffle mảng
+            optionArray.sort(() => Math.random() - 0.5);
+
+            // Xóa hiệu ứng cũ nếu có
+            const qBox = document.getElementById('q-main').parentElement;
+            qBox.classList.remove('bounce-in');
+            void qBox.offsetWidth;
+            qBox.classList.add('bounce-in');
+
+            renderAnswers(optionArray);
+        }
+
+        function renderAnswers(options) {
+            const container = document.getElementById('answers-container');
+            container.innerHTML = '';
+            
+            // Shuffle colors
+            let colors = [...BALLOON_COLORS].sort(() => Math.random() - 0.5);
+
+            options.forEach((opt, index) => {
+                const col = colors[index % colors.length];
+                
+                const balloonWrapper = document.createElement('div');
+                balloonWrapper.className = `flex flex-col items-center balloon cursor-pointer bounce-in`;
+                balloonWrapper.style.animationDelay = `${index * 0.1}s`;
+                balloonWrapper.onclick = () => handleAnswerClick(opt, balloonWrapper);
+
+                // Thân bóng bay
+                const balloonBody = document.createElement('div');
+                balloonBody.className = `w-20 h-24 md:w-24 md:h-28 rounded-[50%] ${col.bg} ${col.shadow} flex items-center justify-center text-white font-black text-2xl md:text-3xl border-2 border-white/20`;
+                balloonBody.innerText = opt;
+                
+                const knot = document.createElement('div');
+                knot.className = `balloon-knot ${col.knot}`;
+                balloonBody.appendChild(knot);
+
+                balloonWrapper.appendChild(balloonBody);
+                container.appendChild(balloonWrapper);
+            });
+        }
+
+        function handleAnswerClick(ans, element) {
+            if (!isPlaying) return;
+
+            if (ans === correctAnswer) {
+                // Đúng
+                playSound('snd-correct');
+                
+                // Hiệu ứng nổ bóng nhỏ
+                const rect = element.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+                confetti({ particleCount: 30, spread: 50, origin: { x, y }, zIndex: 100, colors: ['#fff'] });
+
+                combo++;
+                let points = 10 + (combo > 1 ? (combo - 1) * 2 : 0); // Thưởng combo
+                score += points;
+                updateScoreUI();
+                
+                generateQuestion();
+            } else {
+                // Sai
+                playSound('snd-wrong');
+                combo = 0;
+                updateScoreUI();
+                
+                // Trừ thời gian phạt (5s)
+                timeLeft = Math.max(0, timeLeft - 5);
+                updateTimerUI();
+
+                // Hiệu ứng rung bóng
+                element.classList.add('shake');
+                element.children[0].classList.add('opacity-50', 'grayscale'); // Làm mờ quả bóng sai
+                setTimeout(() => element.classList.remove('shake'), 400);
+            }
+        }
+
+        // --- Chức năng Fullscreen ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const requestFullScreen = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const exitFullScreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+            if (!isFullScreen) {
+                if (requestFullScreen) requestFullScreen.call(doc);
+            } else {
+                if (exitFullScreen) exitFullScreen.call(document);
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('btn-fullscreen');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '<span>🔳 Thu nhỏ</span>';
+            } else {
+                btn.innerHTML = '<span>🔲 Phóng to</span>';
+            }
+        });
+    </script>
+</body>
+</html>
