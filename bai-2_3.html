@@ -1,5 +1,168 @@
-<!-- ... existing code ... -->
-            <!-- Cột Trái: Bảng Điều Khiển / Kỹ năng (Nền trong suốt, dẹp sang bên) -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 2.3: Mèo Đuổi Chuột</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .no-select { user-select: none; -webkit-user-select: none; }
+        .btn-press:active:not(:disabled) { transform: scale(0.95); }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.5); }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* Bảng Phấn Đặt tính */
+        .chalkboard {
+            background-color: #1e293b; /* slate-800 */
+            border: 12px solid #854d0e; /* orange-800 */
+            border-radius: 16px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.2);
+            color: #f8fafc;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .chalk-text {
+            color: #f8fafc;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Highlight ô đang chọn */
+        .ans-active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: #fde047 !important; /* yellow-300 */
+            border-style: solid !important;
+            box-shadow: 0 0 12px rgba(253, 224, 71, 0.5);
+            transform: scale(1.1);
+            color: #fde047 !important;
+        }
+
+        /* Nút của bàn phím số (Numpad) */
+        .numpad-btn {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 900;
+            font-size: 1.25rem;
+            height: 3.5rem;
+            border-radius: 0.75rem;
+            border-bottom: 4px solid #cbd5e1;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            cursor: pointer;
+        }
+        .numpad-btn:active:not(:disabled) {
+            border-bottom-width: 0px;
+            transform: translateY(4px);
+        }
+
+        /* Hiệu ứng đường đua */
+        .track-cell {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .character {
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Nền trong suốt & viền sáng cho lượt active */
+        .active-turn-mouse { 
+            background-color: rgba(59, 130, 246, 0.05); 
+            border-color: rgba(59, 130, 246, 0.3); 
+            backdrop-filter: blur(4px);
+        }
+        .active-turn-cat { 
+            background-color: rgba(249, 115, 22, 0.05); 
+            border-color: rgba(249, 115, 22, 0.3); 
+            backdrop-filter: blur(4px);
+        }
+
+        .powerup-btn { transition: all 0.2s; }
+        .powerup-btn.active { transform: scale(1.05); box-shadow: 0 0 10px currentColor; border-color: currentColor; }
+        .powerup-btn:disabled { opacity: 0.4; filter: grayscale(100%); cursor: not-allowed; }
+    </style>
+</head>
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <div class="max-w-6xl mx-auto w-full mb-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
+            </a>
+            <a href="bai-2.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">⬅️ Quay lại Bài 2</span><span class="md:hidden">⬅️ Bài 2</span>
+            </a>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+        <button onclick="showRules()" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl font-bold border border-indigo-200 shadow-sm btn-press">
+            📜 Luật chơi
+        </button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-6xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col flex-grow">
+        
+        <!-- Banner Lượt Chơi -->
+        <div id="turn-banner" class="text-white p-3 md:p-4 text-center shadow-md relative z-20 transition-colors duration-500 bg-blue-500">
+            <h1 id="turn-text" class="text-2xl md:text-3xl font-black tracking-wide uppercase bounce-in">Lượt của Chuột 🐹</h1>
+            <p id="turn-subtext" class="text-sm md:text-base font-medium opacity-90 mt-1">Tính đúng để tiến lên 1 bước nhé!</p>
+        </div>
+
+        <!-- ĐƯỜNG ĐUA (RACE TRACK) -->
+        <div class="w-full bg-slate-100 p-4 md:p-6 border-b-4 border-slate-200 relative overflow-x-auto hide-scrollbar">
+            <div class="min-w-[800px] flex justify-between items-end h-28 md:h-32 relative mx-auto px-4">
+                <!-- Vạch kẻ đường -->
+                <div class="absolute bottom-0 left-0 right-0 h-4 bg-slate-400 rounded-full"></div>
+                <div class="absolute bottom-1.5 left-0 right-0 h-1 bg-slate-300 border-dashed border-t-2 border-white opacity-50"></div>
+                
+                <!-- Đích đến -->
+                <div class="absolute right-0 bottom-4 w-12 h-24 bg-gradient-to-b from-yellow-300 to-amber-500 rounded-t-xl flex flex-col items-center justify-start pt-2 border-2 border-amber-600 z-0">
+                    <span class="text-2xl">🧀</span>
+                    <span class="font-black text-amber-900 text-xs mt-1">ĐÍCH</span>
+                </div>
+
+                <!-- 11 Ô -->
+                <div id="track-container" class="flex justify-between w-full relative z-10 px-6">
+                    <!-- Sinh từ JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- KHU VỰC CHƠI CHÍNH -->
+        <div class="flex flex-col lg:flex-row flex-grow bg-slate-50/50 bg-gradient-to-b from-transparent to-slate-100/50 relative">
+            
+            <!-- Cột Trái: Bảng Điều Khiển / Kỹ năng -->
             <div class="w-full lg:w-[28%] p-3 md:p-4 border-r border-slate-200/50 flex flex-col gap-4 bg-transparent relative z-10">
                 
                 <!-- Bảng kỹ năng CHUỘT -->
@@ -9,7 +172,18 @@
                         <h3 class="font-bold text-blue-800 text-sm uppercase tracking-wider">Kỹ năng Chuột</h3>
                     </div>
                     <div class="grid grid-cols-3 gap-1.5">
-<!-- ... existing code ... -->
+                        <button id="btn-m-x2" onclick="togglePowerup('mouse', 'x2')" class="powerup-btn btn-press flex flex-col items-center p-1.5 bg-white/70 backdrop-blur-sm rounded-lg border border-sky-300 text-sky-600 hover:bg-white">
+                            <span class="text-xl">⏩</span><span class="text-[9px] font-bold mt-1 text-center leading-none">Tiến<br>x2</span>
+                        </button>
+                        <button id="btn-m-minus1" onclick="togglePowerup('mouse', 'minus1')" class="powerup-btn btn-press flex flex-col items-center p-1.5 bg-white/70 backdrop-blur-sm rounded-lg border border-indigo-300 text-indigo-600 hover:bg-white">
+                            <span class="text-xl">🐾</span><span class="text-[9px] font-bold mt-1 text-center leading-none">Mèo<br>Lùi 1</span>
+                        </button>
+                        <button id="btn-m-freeze" onclick="togglePowerup('mouse', 'freeze')" class="powerup-btn btn-press flex flex-col items-center p-1.5 bg-white/70 backdrop-blur-sm rounded-lg border border-cyan-300 text-cyan-600 hover:bg-white">
+                            <span class="text-xl">🧊</span><span class="text-[9px] font-bold mt-1 text-center leading-none">Đóng<br>băng</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Bảng kỹ năng MÈO -->
                 <div id="panel-cat" class="rounded-2xl p-3 border-2 border-transparent opacity-50 transition-all duration-300">
                     <div class="flex items-center gap-2 mb-2 border-b border-orange-200/50 pb-1.5">
@@ -17,7 +191,121 @@
                         <h3 class="font-bold text-orange-800 text-sm uppercase tracking-wider">Kỹ năng Mèo</h3>
                     </div>
                     <div class="grid grid-cols-3 gap-1.5">
-<!-- ... existing code ... -->
+                        <button id="btn-c-x2" onclick="togglePowerup('cat', 'x2')" class="powerup-btn btn-press flex flex-col items-center p-1.5 bg-white/70 backdrop-blur-sm rounded-lg border border-amber-300 text-amber-600 hover:bg-white">
+                            <span class="text-xl">⏩</span><span class="text-[9px] font-bold mt-1 text-center leading-none">Tiến<br>x2</span>
+                        </button>
+                        <button id="btn-c-minus1" onclick="togglePowerup('cat', 'minus1')" class="powerup-btn btn-press flex flex-col items-center p-1.5 bg-white/70 backdrop-blur-sm rounded-lg border border-rose-300 text-rose-600 hover:bg-white">
+                            <span class="text-xl">🐾</span><span class="text-[9px] font-bold mt-1 text-center leading-none">Chuột<br>Lùi 1</span>
+                        </button>
+                        <button id="btn-c-freeze" onclick="togglePowerup('cat', 'freeze')" class="powerup-btn btn-press flex flex-col items-center p-1.5 bg-white/70 backdrop-blur-sm rounded-lg border border-teal-300 text-teal-600 hover:bg-white">
+                            <span class="text-xl">🧊</span><span class="text-[9px] font-bold mt-1 text-center leading-none">Đóng<br>băng</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="active-skill-info" class="text-center font-medium text-xs text-slate-500 italic mt-auto min-h-[30px] px-2">
+                    Chọn 1 kỹ năng trước khi trả lời. Sai sẽ mất kỹ năng.
+                </div>
+            </div>
+
+            <!-- Cột Phải: Bảng Đặt Tính & Bàn phím số -->
+            <div class="w-full lg:w-[72%] p-4 md:p-6 flex flex-col items-center justify-start relative">
+                
+                <!-- Bảng Phấn -->
+                <div class="chalkboard p-5 md:p-6 w-max mx-auto flex flex-col items-end text-4xl md:text-5xl font-bold mb-4 bounce-in" id="quiz-board">
+                    <!-- Số thứ nhất -->
+                    <div class="flex justify-end gap-2 md:gap-4 w-full pr-4">
+                        <div id="n1-h" class="w-8 md:w-10 text-center chalk-text"></div>
+                        <div id="n1-t" class="w-8 md:w-10 text-center chalk-text">3</div>
+                        <div id="n1-u" class="w-8 md:w-10 text-center chalk-text">5</div>
+                    </div>
+                    
+                    <!-- Dấu phép tính và số thứ hai -->
+                    <div class="flex items-center justify-end gap-2 md:gap-4 w-full mt-3 relative pr-4">
+                        <span id="op-display" class="text-yellow-400 absolute left-2 md:left-4 text-3xl md:text-4xl">+</span>
+                        <div id="n2-h" class="w-8 md:w-10 text-center chalk-text"></div>
+                        <div id="n2-t" class="w-8 md:w-10 text-center chalk-text">4</div>
+                        <div id="n2-u" class="w-8 md:w-10 text-center chalk-text">8</div>
+                    </div>
+                    
+                    <!-- Đường gạch ngang -->
+                    <hr class="w-full border-b-[4px] border-slate-300 mt-4 mb-3 rounded-full">
+                    
+                    <!-- Ô nhập đáp án -->
+                    <div class="flex justify-end gap-2 md:gap-4 w-full pr-4 mt-1">
+                        <!-- Hàng Trăm -->
+                        <div id="ans-h" class="w-8 md:w-10 h-10 md:h-12 text-center chalk-text border-b-2 border-dashed border-slate-400/50 pb-1 cursor-pointer select-none rounded-md flex items-center justify-center transition-all duration-200" onclick="setActiveInput('h')">?</div>
+                        <!-- Hàng Chục -->
+                        <div id="ans-t" class="w-8 md:w-10 h-10 md:h-12 text-center chalk-text border-b-2 border-dashed border-slate-400/50 pb-1 cursor-pointer select-none rounded-md flex items-center justify-center transition-all duration-200" onclick="setActiveInput('t')">?</div>
+                        <!-- Hàng Đơn vị -->
+                        <div id="ans-u" class="w-8 md:w-10 h-10 md:h-12 text-center chalk-text border-b-2 border-dashed border-slate-400/50 pb-1 cursor-pointer select-none rounded-md flex items-center justify-center transition-all duration-200" onclick="setActiveInput('u')">?</div>
+                    </div>
+                </div>
+
+                <!-- Bàn phím số (Numpad) cố định, không che khuất bảng -->
+                <div class="w-full max-w-[320px] mx-auto mb-6 bg-slate-200/50 p-3 rounded-2xl border-2 border-slate-200 shadow-sm backdrop-blur-sm">
+                    <div class="grid grid-cols-5 gap-2 mb-2">
+                        <button onclick="inputDigit(1)" class="numpad-btn">1</button>
+                        <button onclick="inputDigit(2)" class="numpad-btn">2</button>
+                        <button onclick="inputDigit(3)" class="numpad-btn">3</button>
+                        <button onclick="inputDigit(4)" class="numpad-btn">4</button>
+                        <button onclick="inputDigit(5)" class="numpad-btn">5</button>
+                        <button onclick="inputDigit(6)" class="numpad-btn">6</button>
+                        <button onclick="inputDigit(7)" class="numpad-btn">7</button>
+                        <button onclick="inputDigit(8)" class="numpad-btn">8</button>
+                        <button onclick="inputDigit(9)" class="numpad-btn">9</button>
+                        <button onclick="inputDigit(0)" class="numpad-btn">0</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="inputDigit(null)" class="numpad-btn !bg-rose-100 !text-rose-600 !border-rose-300 text-base">⌫ Xóa</button>
+                        <button onclick="moveNext()" class="numpad-btn !bg-blue-100 !text-blue-600 !border-blue-300 text-base">Tiếp ➡️</button>
+                    </div>
+                </div>
+
+                <!-- Nút chốt đáp án -->
+                <button id="btn-action" onclick="checkAnswer()" class="btn-press px-8 py-3 bg-green-500 text-white font-black rounded-full shadow-[0_4px_0_0_#15803d] hover:bg-green-400 hover:shadow-[0_2px_0_0_#15803d] hover:translate-y-[2px] text-lg md:text-xl w-full max-w-[350px] transition-all duration-200">
+                    Chốt Đáp Án ✔️
+                </button>
+                <div id="feedback-msg" class="mt-4 text-lg font-bold min-h-[28px] text-center w-full max-w-lg px-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cảnh Báo Cuối Game -->
+    <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-8 max-w-md mx-4 shadow-2xl transform scale-95 transition-transform duration-300 text-center" id="game-over-content">
+            <div id="go-icon" class="text-7xl mb-4">🏆</div>
+            <h2 id="go-title" class="text-3xl font-black mb-2 text-slate-800">Chuột Chiến Thắng!</h2>
+            <p id="go-desc" class="text-slate-600 mb-8 font-medium">Chuột đã nhanh chân chạy thoát về đích thành công.</p>
+            <button onclick="initGame()" class="btn-press px-8 py-4 bg-indigo-500 text-white font-black rounded-full shadow-[0_6px_0_0_#4338ca] hover:bg-indigo-400 text-xl w-full transition-all">
+                CHƠI LẠI TỪ ĐẦU 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Luật Chơi -->
+    <div id="rules-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="rules-modal-content">
+            <h3 class="text-2xl font-black text-slate-800 mb-4 text-center">📜 Luật chơi</h3>
+            <ul class="text-slate-600 space-y-3 mb-6 font-medium text-sm md:text-base">
+                <li>• <b>Mục tiêu:</b> Chuột phải chạy đến Đích (ô 10). Mèo phải đuổi kịp Chuột (cùng ô hoặc vượt qua).</li>
+                <li>• <b>Cách đi:</b> Trả lời đúng phép tính sẽ được tiến 1 bước.</li>
+                <li>• <b>Tuyệt chiêu:</b> Mỗi nhân vật có 3 quyền trợ giúp. <i>Tuyệt chiêu chỉ có tác dụng nếu trả lời ĐÚNG câu hỏi ở lượt đó. Trả lời sai sẽ mất tuyệt chiêu.</i></li>
+                <li class="pl-4 text-sky-600">⏩ <b>Tiến x2:</b> Trả lời đúng được tiến 2 bước.</li>
+                <li class="pl-4 text-indigo-600">🐾 <b>Lùi 1:</b> Kéo đối thủ lùi lại 1 bước.</li>
+                <li class="pl-4 text-cyan-600">🧊 <b>Đóng băng:</b> Đối thủ bị mất lượt tiếp theo.</li>
+            </ul>
+            <button onclick="closeRules()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-full w-full shadow-md transition-colors btn-press">Đã rõ! Bắt đầu chơi</button>
+        </div>
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+    <audio id="snd-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+    <audio id="snd-lose" src="https://assets.mixkit.co/active_storage/sfx/1434/1434-preview.mp3" preload="auto"></audio>
+
     <script>
         // GAME STATE
         let turn = 'mouse'; // 'mouse' or 'cat'
@@ -27,7 +315,55 @@
         
         let frozen = null; // 'mouse', 'cat', or null
         let activePowerup = null; // 'x2', 'minus1', 'freeze', or null
-<!-- ... existing code ... -->
+        
+        let powerups = {
+            mouse: { x2: false, minus1: false, freeze: false },
+            cat:   { x2: false, minus1: false, freeze: false }
+        };
+
+        // MATH STATE
+        let num1 = 0, num2 = 0, operator = '+', targetResult = 0;
+        let userAnsH = null, userAnsT = null, userAnsU = null;
+        let currentPickingPos = 'u'; // Mặc định bắt đầu từ hàng đơn vị
+        let isCorrect = false;
+        let isWrong = false; // Theo dõi nếu vừa trả lời sai để hiện màu đỏ
+        
+        let currentQuestionIndex = 0;
+        
+        // 4 câu hỏi SGK
+        const predefinedQuestions = [
+            { n1: 48, n2: 52, op: '+' },
+            { n1: 75, n2: 25, op: '+' },
+            { n1: 100, n2: 26, op: '-' },
+            { n1: 100, n2: 45, op: '-' }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initGame();
+        });
+
+        // Hỗ trợ nhập liệu bằng bàn phím vật lý
+        window.addEventListener('keydown', (e) => {
+            if (isCorrect) {
+                if (e.key === 'Enter') handleAction();
+                return;
+            }
+            if (e.key >= '0' && e.key <= '9') {
+                inputDigit(parseInt(e.key));
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                inputDigit(null);
+            } else if (e.key === 'Enter') {
+                handleAction();
+            } else if (e.key === 'ArrowLeft') {
+                if (currentPickingPos === 'u') setActiveInput('t');
+                else if (currentPickingPos === 't') setActiveInput('h');
+            } else if (e.key === 'ArrowRight') {
+                if (currentPickingPos === 'h') setActiveInput('t');
+                else if (currentPickingPos === 't') setActiveInput('u');
+            }
+        });
+
+        // ==========================================
         // GAME LOGIC & UI UPDATES
         // ==========================================
         function initGame() {
@@ -37,25 +373,31 @@
             frozen = null;
             activePowerup = null;
             powerups = {
-<!-- ... existing code ... -->
+                mouse: { x2: false, minus1: false, freeze: false },
+                cat:   { x2: false, minus1: false, freeze: false }
+            };
+            
+            document.getElementById('game-over-modal').classList.add('hidden');
+            renderTrack();
+            updateTurnUI();
+            generateQuestion();
+        }
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+
         function renderTrack() {
             const track = document.getElementById('track-container');
             let html = '';
             for(let i=0; i<=10; i++) {
-                // Vạch số
                 html += `<div class="relative w-8 h-12 flex justify-center track-cell" id="cell-${i}">
                             <div class="absolute bottom-4 w-1 h-3 bg-slate-400"></div>
                             <div class="absolute -bottom-2 text-xs font-bold text-slate-500">${i}</div>`;
-                
-                // Mèo
                 if(posCat === i) {
                     html += `<div class="character text-5xl md:text-6xl drop-shadow-xl z-20 ${turn === 'cat' ? 'animate-bounce' : ''}" style="margin-left: -15px;" id="char-cat">😸</div>`;
                 }
-                // Chuột
                 if(posMouse === i) {
                     html += `<div class="character text-5xl md:text-6xl drop-shadow-xl z-10 ${turn === 'mouse' ? 'animate-bounce' : ''}" style="margin-left: 15px;" id="char-mouse">🐹</div>`;
                 }
-                
                 html += `</div>`;
             }
             track.innerHTML = html;
@@ -72,7 +414,7 @@
             void text.offsetWidth;
             text.classList.add('bounce-in');
 
-            activePowerup = null; // Reset powerup đang chọn khi chuyển lượt
+            activePowerup = null;
 
             if (turn === 'mouse') {
                 banner.classList.add('bg-blue-500');
@@ -87,7 +429,300 @@
             }
 
             renderPowerups();
-<!-- ... existing code ... -->
+            document.getElementById('active-skill-info').innerText = "Chọn 1 kỹ năng trước khi trả lời. Sai sẽ mất kỹ năng.";
+            document.getElementById('active-skill-info').classList.remove('text-indigo-600', 'font-bold');
+        }
+
+        function togglePowerup(player, type) {
+            if (turn !== player) return; 
+            if (powerups[player][type]) return; 
+            playSound('snd-pop');
+
+            if (activePowerup === type) {
+                activePowerup = null;
+                document.getElementById('active-skill-info').innerText = "Chọn 1 kỹ năng trước khi trả lời. Sai sẽ mất kỹ năng.";
+                document.getElementById('active-skill-info').classList.remove('text-indigo-600', 'font-bold');
+            } else {
+                activePowerup = type;
+                let skillName = type === 'x2' ? 'Tiến x2' : (type === 'minus1' ? 'Lùi đối thủ 1 ô' : 'Đóng băng');
+                document.getElementById('active-skill-info').innerText = `🔥 Đang trang bị: ${skillName}. Tính ĐÚNG để kích hoạt!`;
+                document.getElementById('active-skill-info').classList.add('text-indigo-600', 'font-bold');
+            }
+            renderPowerups();
+        }
+
+        function renderPowerups() {
+            const players = ['mouse', 'cat'];
+            const types = ['x2', 'minus1', 'freeze'];
+            players.forEach(p => {
+                let prefix = p === 'mouse' ? 'm' : 'c';
+                types.forEach(t => {
+                    const btn = document.getElementById(`btn-${prefix}-${t}`);
+                    if (powerups[p][t]) {
+                        btn.disabled = true;
+                        btn.classList.remove('active');
+                    } else {
+                        btn.disabled = false;
+                        if (p === turn && activePowerup === t) btn.classList.add('active');
+                        else btn.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        // ==========================================
+        // MATH LOGIC
+        // ==========================================
+        function splitDigits(num) {
+            if (num === 0) return { h: '', t: '', u: 0 };
+            let u = num % 10;
+            let t = Math.floor((num % 100) / 10);
+            let h = Math.floor(num / 100);
+            if (num < 100) h = '';
+            if (num < 10 && h === '') t = '';
+            return { h, t, u };
+        }
+
+        function generateQuestion() {
+            let form = Math.floor(Math.random() * 4);
+            if (currentQuestionIndex < predefinedQuestions.length) {
+                let q = predefinedQuestions[currentQuestionIndex];
+                num1 = q.n1; num2 = q.n2; operator = q.op;
+                currentQuestionIndex++;
+            } else {
+                if (form === 0) {
+                    num1 = Math.floor(Math.random() * 80) + 10;
+                    num2 = Math.floor(Math.random() * 80) + 10;
+                    operator = '+';
+                } else if (form === 1) {
+                    num1 = Math.floor(Math.random() * 800) + 100;
+                    num2 = Math.floor(Math.random() * 80) + 10;
+                    operator = '+';
+                } else if (form === 2) {
+                    num1 = Math.floor(Math.random() * 80) + 20;
+                    num2 = Math.floor(Math.random() * (num1 - 10)) + 10;
+                    operator = '-';
+                } else {
+                    num1 = Math.floor(Math.random() * 800) + 200;
+                    num2 = Math.floor(Math.random() * (num1 - 100)) + 100;
+                    operator = '-';
+                }
+            }
+
+            targetResult = operator === '+' ? (num1 + num2) : (num1 - num2);
+
+            let d1 = splitDigits(num1);
+            let d2 = splitDigits(num2);
+
+            document.getElementById('n1-h').innerText = d1.h;
+            document.getElementById('n1-t').innerText = d1.t === '' ? '0' : d1.t;
+            document.getElementById('n1-u').innerText = d1.u;
+
+            document.getElementById('n2-h').innerText = d2.h;
+            document.getElementById('n2-t').innerText = d2.t === '' && d2.h !== '' ? '0' : d2.t;
+            document.getElementById('n2-u').innerText = d2.u;
+
+            document.getElementById('op-display').innerText = operator;
+            
+            isCorrect = false;
+            isWrong = false;
+            userAnsH = null; userAnsT = null; userAnsU = null;
+            currentPickingPos = 'u'; // Đặt tính tính từ phải qua trái
+
+            updateAnsUI();
+
+            const board = document.getElementById('quiz-board');
+            board.classList.remove('bounce-in'); void board.offsetWidth; board.classList.add('bounce-in');
+            
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Chốt Đáp Án ✔️';
+            btnAction.onclick = checkAnswer;
+            btnAction.className = 'btn-press px-8 py-3 bg-green-500 text-white font-black rounded-full shadow-[0_4px_0_0_#15803d] hover:bg-green-400 hover:shadow-[0_2px_0_0_#15803d] hover:translate-y-[2px] text-lg md:text-xl w-full max-w-[350px] transition-all duration-200';
+            
+            document.getElementById('feedback-msg').innerText = '';
+        }
+
+        // Tương tác Bàn phím số mới
+        function setActiveInput(pos) {
+            if (isCorrect) return;
+            currentPickingPos = pos;
+            updateAnsUI();
+            playSound('snd-pop');
+        }
+
+        function inputDigit(digit) {
+            if (isCorrect) return;
+            playSound('snd-pop');
+            isWrong = false; // Khi user gõ số mới thì xóa trạng thái báo đỏ
+            
+            if (digit === null) {
+                if (currentPickingPos === 'h') userAnsH = null;
+                else if (currentPickingPos === 't') userAnsT = null;
+                else if (currentPickingPos === 'u') userAnsU = null;
+            } else {
+                if (currentPickingPos === 'h') { userAnsH = digit; moveNext(); }
+                else if (currentPickingPos === 't') { userAnsT = digit; moveNext(); }
+                else if (currentPickingPos === 'u') { userAnsU = digit; moveNext(); }
+            }
+            updateAnsUI();
+        }
+
+        function moveNext() {
+            if (currentPickingPos === 'u') currentPickingPos = 't';
+            else if (currentPickingPos === 't') currentPickingPos = 'h';
+            else if (currentPickingPos === 'h') currentPickingPos = 'u';
+        }
+
+        function updateAnsUI() {
+            ['h', 't', 'u'].forEach(pos => {
+                let el = document.getElementById('ans-' + pos);
+                let val = pos === 'h' ? userAnsH : (pos === 't' ? userAnsT : userAnsU);
+                el.innerText = val !== null ? val : '?';
+                
+                // Khôi phục class cơ bản
+                el.className = 'w-8 md:w-10 h-10 md:h-12 text-center border-b-2 border-dashed pb-1 cursor-pointer select-none rounded-md flex items-center justify-center transition-all duration-200';
+                
+                if (isCorrect) {
+                    el.classList.add('text-emerald-300', 'border-transparent');
+                } else if (isWrong) {
+                    el.classList.add('text-rose-400', 'border-rose-400/50');
+                    if (pos === currentPickingPos) el.classList.add('ans-active');
+                } else {
+                    el.classList.add('chalk-text', 'border-slate-400/50');
+                    if (pos === currentPickingPos) el.classList.add('ans-active');
+                    else el.classList.add('hover:bg-white/10');
+                }
+            });
+        }
+
+        function handleAction() {
+            if (!isCorrect) checkAnswer();
+            else generateQuestion();
+        }
+
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback-msg');
+
+            if (userAnsH === null && userAnsT === null && userAnsU === null) {
+                feedback.innerText = 'Chưa điền số nào kìa! 🧐';
+                feedback.className = 'mt-6 text-xl font-bold min-h-[32px] text-center text-rose-500 w-full';
+                playSound('snd-wrong');
+                return;
+            }
+
+            let h = userAnsH || 0;
+            let t = userAnsT || 0;
+            let u = userAnsU || 0;
+            let val = h * 100 + t * 10 + u;
+
+            if (val === targetResult) {
+                isCorrect = true;
+                isWrong = false;
+                playSound('snd-correct'); 
+                currentPickingPos = null; // Xóa con trỏ
+                updateAnsUI();
+                processTurnSuccess();
+            } else {
+                isWrong = true;
+                playSound('snd-wrong'); 
+                updateAnsUI();
+                
+                const board = document.getElementById('quiz-board');
+                board.classList.remove('shake'); void board.offsetWidth; board.classList.add('shake');
+                
+                processTurnFail();
+            }
+        }
+
+        function processTurnSuccess() {
+            const feedback = document.getElementById('feedback-msg');
+            let steps = 1;
+            let msg = 'Tính đúng rồi! ';
+            
+            if (activePowerup) {
+                powerups[turn][activePowerup] = true;
+                if (activePowerup === 'x2') {
+                    steps = 2;
+                    msg += 'Tuyệt chiêu Tiến x2 kích hoạt! ';
+                } else if (activePowerup === 'minus1') {
+                    if (turn === 'mouse') { posCat = Math.max(0, posCat - 1); msg += 'Mèo bị lùi 1 ô! '; }
+                    else { posMouse = Math.max(0, posMouse - 1); msg += 'Chuột bị lùi 1 ô! '; }
+                } else if (activePowerup === 'freeze') {
+                    frozen = turn === 'mouse' ? 'cat' : 'mouse';
+                    msg += 'Đối thủ đã bị đóng băng! 🧊 ';
+                }
+            }
+
+            if (turn === 'mouse') posMouse = Math.min(TARGET, posMouse + steps);
+            else posCat = Math.min(TARGET, posCat + steps);
+
+            feedback.innerText = msg;
+            feedback.className = 'mt-6 text-xl font-bold min-h-[32px] text-center text-emerald-600 w-full';
+            
+            renderTrack();
+            checkWinCondition();
+        }
+
+        function processTurnFail() {
+            const feedback = document.getElementById('feedback-msg');
+            let msg = 'Tính sai rồi! Mất lượt. ';
+            
+            if (activePowerup) {
+                powerups[turn][activePowerup] = true;
+                msg += 'Kỹ năng đã bị hủy bỏ 😭';
+            }
+
+            feedback.innerText = msg;
+            feedback.className = 'mt-6 text-xl font-bold min-h-[32px] text-center text-red-500 w-full';
+            
+            renderTrack();
+            prepareNextTurn(); 
+        }
+
+        function checkWinCondition() {
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Đang di chuyển...';
+            btnAction.className = 'btn-press px-8 py-3 bg-slate-400 text-white font-black rounded-full shadow-lg text-lg md:text-xl w-full max-w-[350px] cursor-not-allowed';
+            btnAction.onclick = null;
+
+            setTimeout(() => {
+                if (posCat >= posMouse) {
+                    showGameOver('cat');
+                } else if (posMouse >= TARGET) {
+                    showGameOver('mouse');
+                } else {
+                    prepareNextTurn();
+                }
+            }, 1000);
+        }
+
+        function prepareNextTurn() {
+            const btnAction = document.getElementById('btn-action');
+            btnAction.innerText = 'Tiếp tục ➡️';
+            btnAction.className = 'btn-press px-8 py-3 bg-indigo-500 text-white font-black rounded-full shadow-[0_4px_0_0_#4338ca] hover:bg-indigo-400 hover:shadow-[0_2px_0_0_#4338ca] hover:translate-y-[2px] text-lg md:text-xl w-full max-w-[350px] transition-all duration-200 pulse-btn';
+            
+            btnAction.onclick = () => {
+                turn = turn === 'mouse' ? 'cat' : 'mouse';
+                if (frozen === turn) {
+                    const fb = document.getElementById('feedback-msg');
+                    fb.innerText = `${turn === 'mouse' ? 'Chuột' : 'Mèo'} bị ĐÓNG BĂNG 🧊 Mất lượt!`;
+                    fb.className = 'mt-6 text-xl font-bold min-h-[32px] text-center text-cyan-600 w-full';
+                    playSound('snd-wrong');
+                    frozen = null;
+                    
+                    btnAction.innerText = 'Bỏ qua lượt ➡️';
+                    btnAction.onclick = () => {
+                        turn = turn === 'mouse' ? 'cat' : 'mouse';
+                        updateTurnUI();
+                        generateQuestion();
+                    };
+                } else {
+                    updateTurnUI();
+                    generateQuestion();
+                }
+            };
+        }
+
         function showGameOver(winner) {
             playSound(winner === 'mouse' ? 'snd-win' : 'snd-lose');
             
@@ -111,4 +746,57 @@
             }
 
             modal.classList.remove('hidden');
-<!-- ... existing code ... -->
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 50);
+        }
+
+        // --- Rules Modal ---
+        function showRules() {
+            const modal = document.getElementById('rules-modal');
+            const content = document.getElementById('rules-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeRules() {
+            const modal = document.getElementById('rules-modal');
+            const content = document.getElementById('rules-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        // --- Fullscreen ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+            if (!isFull) { if (req) { try { let p = req.call(doc); if (p) p.catch(e => showModalIPad()); } catch (e) { showModalIPad(); } } else showModalIPad(); } 
+            else { if (ext) ext.call(document); }
+        }
+
+        function showModalIPad() {
+            const modal = document.getElementById('ipad-modal');
+            const content = document.getElementById('ipad-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('ipad-modal');
+            const content = document.getElementById('ipad-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+        events.forEach(evt => {
+            document.addEventListener(evt, () => {
+                const btn = document.getElementById('btn-fullscreen');
+                const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+                if (isFull) { btn.innerHTML = '<span>🔳 Thu nhỏ</span>'; } else { btn.innerHTML = '<span>🔲 Phóng to</span>'; }
+            });
+        });
+    </script>
+</body>
+</html>
