@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 5.1: Bảng nhân 3 - Ong nhỏ tìm mật</title>
+    <title>Bài 5.1: Bảng nhân, chia 3 - Ong nhỏ tìm mật</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -30,7 +30,10 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
-        /* CẢI TIẾN 1: Nền cỏ có vân caro chìm sinh động hơn */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Nền cỏ có vân caro chìm sinh động hơn */
         .meadow-bg {
             background-color: #86efac;
             background-image: 
@@ -45,7 +48,7 @@
             touch-action: none;
         }
 
-        /* CẢI TIẾN 2: Hoa khẽ đung đưa trong gió */
+        /* Hoa khẽ đung đưa trong gió */
         .flower {
             position: absolute;
             transform: translate(-50%, -50%);
@@ -75,7 +78,7 @@
             text-shadow: 1px 1px 0 #fef9c3;
         }
 
-        /* CẢI TIẾN 3: Chớp sáng rực rỡ khi Ong nhắm trúng hoa */
+        /* Chớp sáng rực rỡ khi Ong nhắm trúng hoa */
         .flower.highlight {
             transform: translate(-50%, -50%) scale(1.2) !important; /* Ghi đè animation sway */
             z-index: 20;
@@ -103,7 +106,7 @@
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         
-        /* CẢI TIẾN 4: Bóng đổ 3D sâu hơn khi nhấc Ong lên */
+        /* Bóng đổ 3D sâu hơn khi nhấc Ong lên */
         .bee.dragging {
             cursor: grabbing;
             transition: none;
@@ -130,6 +133,7 @@
 </head>
 <body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen">
 
+    <!-- Header / Navigation Global -->
     <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
         <div class="flex items-center space-x-2 md:space-x-3">
             <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
@@ -153,17 +157,32 @@
         </div>
     </div>
 
+    <!-- MAIN APP CONTAINER -->
     <div class="max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden flex flex-col flex-grow relative">
         
+        <!-- Header -->
         <div class="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-4 md:p-5 text-center shadow-md relative z-10">
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide drop-shadow-md">Bài 5.1: Ong Nhỏ Tìm Mật 🐝</h1>
             <p class="text-emerald-100 text-sm md:text-base mt-1 font-medium">Bé hãy kéo chú Ong mang phép tính đậu vào bông hoa có kết quả đúng nhé!</p>
         </div>
 
+        <!-- TAB NAV -->
+        <div class="flex flex-nowrap overflow-x-auto hide-scrollbar bg-slate-100 border-b border-slate-200 shadow-inner z-0">
+            <button onclick="switchMode('nhan')" id="tab-nhan" class="flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-emerald-700 bg-white border-emerald-500 transition-colors">
+                Bảng Nhân 3 ✖️
+            </button>
+            <button onclick="switchMode('chia')" id="tab-chia" class="flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors">
+                Bảng Chia 3 ➗
+            </button>
+        </div>
+
+        <!-- Khung Game Chính -->
         <div class="flex-grow flex items-center justify-center p-4 md:p-8 relative bg-slate-50">
             
+            <!-- Vùng Cỏ (Game Board) - Tỉ lệ 1:1 hình vuông -->
             <div id="game-board" class="meadow-bg w-full max-w-[400px] md:max-w-[550px] aspect-square rounded-[3rem] bounce-in">
                 
+                <!-- Bông hoa sẽ được sinh tự động bằng JS -->
                 <div id="flowers-container" class="absolute inset-0 w-full h-full pointer-events-none"></div>
                 
                 <!-- Chú Ong (Draggable) được thiết kế lại -->
@@ -187,6 +206,7 @@
 
         </div>
 
+        <!-- Thanh Trợ Giúp / Tương Tác -->
         <div class="bg-white p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
             <div id="feedback-msg" class="text-lg md:text-xl font-bold text-center flex-grow">
                 <span class="text-slate-500">Giữ và kéo chú Ong di chuyển nào! 👇</span>
@@ -198,19 +218,24 @@
 
     </div>
 
+    <!-- AUDIO -->
     <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
     <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
     <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
 
     <script>
         // Game State
+        let currentMode = 'nhan'; // 'nhan' or 'chia'
         let currentMultiplier = 1;
+        let currentDividend = 3;
         let expectedAnswer = 3;
+        
         let score = 0;
         let streak = 0;
         
-        // Mảng 10 kết quả của bảng nhân 3
-        const answers = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30];
+        // Mảng 10 kết quả của bảng nhân 3 và chia 3
+        const answersNhan = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30];
+        const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         
         // Drag logic variables
         const bee = document.getElementById('bee-dragger');
@@ -229,15 +254,33 @@
         function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
         function updateScore() { document.getElementById('score-display').innerText = score; document.getElementById('streak-display').innerText = streak; }
 
+        function switchMode(mode) {
+            currentMode = mode;
+            const btnNhan = document.getElementById('tab-nhan');
+            const btnChia = document.getElementById('tab-chia');
+            
+            if (mode === 'nhan') {
+                btnNhan.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-emerald-700 bg-white border-emerald-500 transition-colors";
+                btnChia.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors";
+            } else {
+                btnChia.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-emerald-700 bg-white border-emerald-500 transition-colors";
+                btnNhan.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors";
+            }
+            
+            initBoard(); 
+            generateQuestion();
+            playSound('snd-pop');
+        }
+
         function initBoard() {
             const container = document.getElementById('flowers-container');
             container.innerHTML = '';
             
             // Bố trí 10 bông hoa thành vòng tròn bằng CSS %
-            // Công thức: x = 50 + R*cos(a), y = 50 + R*sin(a)
-            const R = 38; // Bán kính vòng tròn = 38% chiều rộng của Game Board
+            const R = 38; 
+            const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
             
-            answers.forEach((ans, index) => {
+            currentAnswers.forEach((ans, index) => {
                 // Tính góc (bắt đầu từ trên cùng -90 độ, chia đều 360/10 = 36 độ)
                 let angleDeg = (index * 36) - 90;
                 let angleRad = angleDeg * Math.PI / 180;
@@ -266,18 +309,24 @@
                 center.innerText = ans;
 
                 flower.appendChild(center);
-                
                 container.appendChild(flower);
             });
         }
 
         function generateQuestion() {
-            // Chọn ngẫu nhiên phép tính từ 1 đến 10
-            currentMultiplier = Math.floor(Math.random() * 10) + 1;
-            expectedAnswer = 3 * currentMultiplier;
-            
             const prob = document.getElementById('math-problem');
-            prob.innerText = `3 x ${currentMultiplier}`;
+
+            if (currentMode === 'nhan') {
+                // Chọn ngẫu nhiên phép tính nhân từ 1 đến 10
+                currentMultiplier = Math.floor(Math.random() * 10) + 1;
+                expectedAnswer = 3 * currentMultiplier;
+                prob.innerText = `3 x ${currentMultiplier}`;
+            } else {
+                // Chọn ngẫu nhiên phép tính chia từ 1 đến 10
+                expectedAnswer = Math.floor(Math.random() * 10) + 1;
+                currentDividend = 3 * expectedAnswer;
+                prob.innerText = `${currentDividend} : 3`;
+            }
             
             // Animation nhẹ cho câu hỏi mới
             prob.parentElement.classList.remove('bounce-in');
@@ -424,7 +473,15 @@
             streak++;
             updateScore();
 
-            document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-600 font-black">Chính xác! 3 x ${currentMultiplier} = ${expectedAnswer} 🎉</span>`;
+            // Hiển thị lời chúc tùy theo chế độ
+            let feedbackText = '';
+            if (currentMode === 'nhan') {
+                feedbackText = `Chính xác! 3 x ${currentMultiplier} = ${expectedAnswer} 🎉`;
+            } else {
+                feedbackText = `Chính xác! ${currentDividend} : 3 = ${expectedAnswer} 🎉`;
+            }
+            
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-600 font-black">${feedbackText}</span>`;
             
             // Đậu lại một chút rồi bay về giữa và ra câu mới
             setTimeout(() => {
