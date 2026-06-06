@@ -16,7 +16,7 @@
         .no-select { user-select: none; -webkit-user-select: none; }
         .btn-press:active:not(:disabled) { transform: scale(0.95); }
 
-        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.5); }
+        .bounce-in { animation: bounceIn 0.5s caubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.5); }
         @keyframes bounceIn { 
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; } 
@@ -66,6 +66,7 @@
             100% { transform: translate(-50%, -50%) rotate(3deg) scale(1.02); }
         }
 
+        /* HOA CHO PHÉP NHÂN (MẶC ĐỊNH - MÀU HỒNG/VÀNG) */
         .flower-petal {
             background: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
@@ -77,10 +78,8 @@
             color: #78350f;
             text-shadow: 1px 1px 0 #fef9c3;
         }
-
-        /* Chớp sáng rực rỡ khi Ong nhắm trúng hoa */
         .flower.highlight {
-            transform: translate(-50%, -50%) scale(1.2) !important; /* Ghi đè animation sway */
+            transform: translate(-50%, -50%) scale(1.2) !important;
             z-index: 20;
             animation: none; /* Dừng lắc khi đang được chọn */
         }
@@ -89,10 +88,26 @@
             border-color: #f472b6;
             animation: pulseGlow 0.6s infinite alternate;
         }
-
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 10px #f472b6, inset 0 0 5px #f472b6; }
             100% { box-shadow: 0 0 25px #ec4899, inset 0 0 15px #ec4899; }
+        }
+
+        /* HOA CHO PHÉP CHIA (MÀU XANH DƯƠNG/CYAN) */
+        .mode-chia .flower-center {
+            background: radial-gradient(circle at 30% 30%, #67e8f9, #0369a1);
+            border-color: #bae6fd;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .mode-chia .flower.highlight .flower-petal {
+            background: #f0f9ff;
+            border-color: #38bdf8;
+            animation: pulseGlowChia 0.6s infinite alternate;
+        }
+        @keyframes pulseGlowChia {
+            0% { box-shadow: 0 0 10px #38bdf8, inset 0 0 5px #38bdf8; }
+            100% { box-shadow: 0 0 25px #0284c7, inset 0 0 15px #0284c7; }
         }
 
         /* Chú ong (Draggable) */
@@ -233,6 +248,9 @@
         let score = 0;
         let streak = 0;
         
+        // Mảng chứa 5 câu hỏi gần nhất để tránh lặp lại
+        let recentQuestions = [];
+
         // Mảng 10 kết quả của bảng nhân 3 và chia 3
         const answersNhan = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30];
         const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -256,15 +274,20 @@
 
         function switchMode(mode) {
             currentMode = mode;
+            recentQuestions = []; // Làm mới lịch sử khi đổi chế độ
+            
             const btnNhan = document.getElementById('tab-nhan');
             const btnChia = document.getElementById('tab-chia');
+            const board = document.getElementById('game-board');
             
             if (mode === 'nhan') {
                 btnNhan.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-emerald-700 bg-white border-emerald-500 transition-colors";
                 btnChia.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors";
+                board.classList.remove('mode-chia');
             } else {
                 btnChia.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-emerald-700 bg-white border-emerald-500 transition-colors";
                 btnNhan.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors";
+                board.classList.add('mode-chia');
             }
             
             initBoard(); 
@@ -315,15 +338,25 @@
 
         function generateQuestion() {
             const prob = document.getElementById('math-problem');
+            let randomFactor;
+            
+            // Lọc các số đã xuất hiện trong 5 lần gần nhất để tránh lặp lại
+            do {
+                randomFactor = Math.floor(Math.random() * 10) + 1; // 1 đến 10
+            } while (recentQuestions.includes(randomFactor));
+
+            // Lưu vào lịch sử và chỉ giữ lại 5 phần tử mới nhất
+            recentQuestions.push(randomFactor);
+            if (recentQuestions.length > 5) {
+                recentQuestions.shift();
+            }
 
             if (currentMode === 'nhan') {
-                // Chọn ngẫu nhiên phép tính nhân từ 1 đến 10
-                currentMultiplier = Math.floor(Math.random() * 10) + 1;
+                currentMultiplier = randomFactor;
                 expectedAnswer = 3 * currentMultiplier;
                 prob.innerText = `3 x ${currentMultiplier}`;
             } else {
-                // Chọn ngẫu nhiên phép tính chia từ 1 đến 10
-                expectedAnswer = Math.floor(Math.random() * 10) + 1;
+                expectedAnswer = randomFactor;
                 currentDividend = 3 * expectedAnswer;
                 prob.innerText = `${currentDividend} : 3`;
             }
