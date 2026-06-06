@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 5.1: Bảng nhân 3 - Ong nhỏ tìm mật</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0fdf4; /* emerald-50 */
+            overscroll-behavior-y: none; /* Tránh pull-to-refresh trên mobile */
+        }
+        
+        .no-select { user-select: none; -webkit-user-select: none; }
+        .btn-press:active:not(:disabled) { transform: scale(0.95); }
+
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.5); }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* Nền cỏ xanh mướt */
+        .meadow-bg {
+            background: linear-gradient(180deg, #bbf7d0 0%, #86efac 100%);
+            border: 8px solid #4ade80;
+            box-shadow: inset 0 0 40px rgba(21, 128, 61, 0.2);
+            position: relative;
+            overflow: hidden;
+            touch-action: none; /* Khóa cuộn trang khi vuốt trên khu vực này */
+        }
+
+        /* Bông hoa (Target) */
+        .flower {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+        }
+        .flower-petal {
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            border: 2px solid #f1f5f9;
+        }
+        .flower-center {
+            background: radial-gradient(circle at 30% 30%, #fde047, #d97706);
+            border: 2px solid #fef08a;
+            color: #78350f;
+            text-shadow: 1px 1px 0 #fef9c3;
+        }
+        .flower.highlight {
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 20;
+        }
+        .flower.highlight .flower-petal {
+            background: #fdf2f8;
+            border-color: #f472b6;
+            box-shadow: 0 0 10px #f472b6;
+        }
+
+        /* Chú ong (Draggable) */
+        .bee {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            cursor: grab;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .bee.dragging {
+            cursor: grabbing;
+            transition: none; /* Tắt transition để kéo mượt theo tay */
+            transform: translate(-50%, -50%) scale(1.15) rotate(-5deg);
+            z-index: 100;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3));
+        }
+
+        .bee-content {
+            animation: floatBee 2s ease-in-out infinite;
+        }
+        @keyframes floatBee {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+    </style>
+</head>
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen">
+
+    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
+            </a>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+        
+        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-emerald-200 flex items-center space-x-4">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🍯</span>
+                <span id="score-display" class="font-black text-amber-600 text-lg">0</span>
+            </div>
+            <div class="w-px h-6 bg-slate-200"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-lg">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden flex flex-col flex-grow relative">
+        
+        <div class="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-4 md:p-5 text-center shadow-md relative z-10">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide drop-shadow-md">Bài 5.1: Ong Nhỏ Tìm Mật 🐝</h1>
+            <p class="text-emerald-100 text-sm md:text-base mt-1 font-medium">Bé hãy kéo chú Ong mang phép tính đậu vào bông hoa có kết quả đúng nhé!</p>
+        </div>
+
+        <div class="flex-grow flex items-center justify-center p-4 md:p-8 relative bg-slate-50">
+            
+            <div id="game-board" class="meadow-bg w-full max-w-[400px] md:max-w-[550px] aspect-square rounded-[3rem] bounce-in">
+                
+                <div id="flowers-container" class="absolute inset-0 w-full h-full pointer-events-none"></div>
+                
+                <!-- Chú Ong (Draggable) được thiết kế lại -->
+                <div id="bee-dragger" class="bee touch-none">
+                    <div class="bee-content flex flex-col items-center justify-center pointer-events-none">
+                        <!-- Hình ảnh ong dễ thương -->
+                        <div id="bee-visual" class="text-[60px] md:text-[75px] leading-none drop-shadow-xl relative z-10">🐝</div>
+                        
+                        <!-- Bảng phép tính dạng biển treo -->
+                        <div class="bg-white/95 px-4 py-2 rounded-2xl border-4 border-amber-500 shadow-[0_4px_10px_rgba(0,0,0,0.2)] mt-1 relative flex items-center justify-center min-w-[100px] z-20">
+                            <!-- Sợi dây treo -->
+                            <div class="absolute -top-2 left-[20%] w-1.5 h-3 bg-amber-700 rounded-full z-[-1]"></div>
+                            <div class="absolute -top-2 right-[20%] w-1.5 h-3 bg-amber-700 rounded-full z-[-1]"></div>
+                            
+                            <span id="math-problem" class="font-black text-amber-900 text-2xl md:text-3xl tracking-wider whitespace-nowrap">3 x ?</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="bg-white p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
+            <div id="feedback-msg" class="text-lg md:text-xl font-bold text-center flex-grow">
+                <span class="text-slate-500">Giữ và kéo chú Ong di chuyển nào! 👇</span>
+            </div>
+            <button onclick="skipQuestion()" class="btn-press px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl shadow-sm border border-slate-200 hover:bg-slate-200 text-sm flex-shrink-0 transition-colors">
+                Đổi phép tính 🔄
+            </button>
+        </div>
+
+    </div>
+
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // Game State
+        let currentMultiplier = 1;
+        let expectedAnswer = 3;
+        let score = 0;
+        let streak = 0;
+        
+        // Mảng 10 kết quả của bảng nhân 3
+        const answers = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30];
+        
+        // Drag logic variables
+        const bee = document.getElementById('bee-dragger');
+        const gameBoard = document.getElementById('game-board');
+        let isDragging = false;
+        let startX, startY;
+        let initialLeft, initialTop;
+        let hoveredFlower = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initBoard();
+            generateQuestion();
+            setupDragAndDrop();
+        });
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+        function updateScore() { document.getElementById('score-display').innerText = score; document.getElementById('streak-display').innerText = streak; }
+
+        function initBoard() {
+            const container = document.getElementById('flowers-container');
+            container.innerHTML = '';
+            
+            // Bố trí 10 bông hoa thành vòng tròn bằng CSS %
+            // Công thức: x = 50 + R*cos(a), y = 50 + R*sin(a)
+            const R = 38; // Bán kính vòng tròn = 38% chiều rộng của Game Board
+            
+            answers.forEach((ans, index) => {
+                // Tính góc (bắt đầu từ trên cùng -90 độ, chia đều 360/10 = 36 độ)
+                let angleDeg = (index * 36) - 90;
+                let angleRad = angleDeg * Math.PI / 180;
+                
+                let x = 50 + R * Math.cos(angleRad);
+                let y = 50 + R * Math.sin(angleRad);
+
+                // Tạo bông hoa
+                const flower = document.createElement('div');
+                flower.className = 'flower flex items-center justify-center w-16 h-16 md:w-20 md:h-20';
+                flower.style.left = `${x}%`;
+                flower.style.top = `${y}%`;
+                flower.dataset.val = ans;
+
+                // Các cánh hoa màu trắng (Tạo 4 thẻ div xoay chéo nhau để tạo 8 cánh rõ rệt)
+                for(let i=0; i<4; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'flower-petal absolute w-[35%] h-[120%] rounded-[50%]';
+                    petal.style.transform = `rotate(${i * 45}deg)`;
+                    flower.appendChild(petal);
+                }
+                
+                // Nhụy hoa (Chứa số)
+                const center = document.createElement('div');
+                center.className = 'flower-center absolute w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-black text-xl md:text-2xl z-10';
+                center.innerText = ans;
+
+                flower.appendChild(center);
+                
+                container.appendChild(flower);
+            });
+        }
+
+        function generateQuestion() {
+            // Chọn ngẫu nhiên phép tính từ 1 đến 10
+            currentMultiplier = Math.floor(Math.random() * 10) + 1;
+            expectedAnswer = 3 * currentMultiplier;
+            
+            const prob = document.getElementById('math-problem');
+            prob.innerText = `3 x ${currentMultiplier}`;
+            
+            // Animation nhẹ cho câu hỏi mới
+            prob.parentElement.classList.remove('bounce-in');
+            void prob.parentElement.offsetWidth;
+            prob.parentElement.classList.add('bounce-in');
+
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Giữ và kéo chú Ong di chuyển nào! 👇</span>`;
+        }
+
+        function skipQuestion() {
+            playSound('snd-pop');
+            streak = 0;
+            updateScore();
+            generateQuestion();
+        }
+
+        // --- HỆ THỐNG KÉO THẢ TỐI ƯU CHO IPAD (Pointer Events) ---
+        function setupDragAndDrop() {
+            bee.addEventListener('pointerdown', handleDragStart);
+            document.addEventListener('pointermove', handleDragMove);
+            document.addEventListener('pointerup', handleDragEnd);
+            document.addEventListener('pointercancel', handleDragEnd); // Hỗ trợ khi bị gián đoạn thao tác
+        }
+
+        function handleDragStart(e) {
+            isDragging = true;
+            bee.classList.add('dragging');
+            playSound('snd-pop');
+            
+            // Khóa pointer vào chú Ong để không bị mất tiêu điểm khi vuốt nhanh
+            bee.setPointerCapture(e.pointerId);
+            
+            // Lưu lại vị trí ngón tay lúc chạm
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            // Tọa độ % ban đầu (50, 50)
+            initialLeft = 50; 
+            initialTop = 50;
+            
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-sky-500">Đang tìm mật... 🐝</span>`;
+        }
+
+        function handleDragMove(e) {
+            if (!isDragging) return;
+
+            // Tính toán khoảng cách vuốt theo pixel
+            let dx = e.clientX - startX;
+            let dy = e.clientY - startY;
+
+            // Chuyển đổi khoảng cách pixel sang phần trăm (%) của khung Game Board
+            let boardRect = gameBoard.getBoundingClientRect();
+            let percentX = (dx / boardRect.width) * 100;
+            let percentY = (dy / boardRect.height) * 100;
+
+            let newLeft = initialLeft + percentX;
+            let newTop = initialTop + percentY;
+
+            // Giới hạn không cho ong bay ra khỏi bảng (giới hạn từ 10% đến 90%)
+            newLeft = Math.max(10, Math.min(90, newLeft));
+            newTop = Math.max(10, Math.min(90, newTop));
+
+            bee.style.left = `${newLeft}%`;
+            bee.style.top = `${newTop}%`;
+
+            checkHoverCollision();
+        }
+
+        function checkHoverCollision() {
+            // Lấy tọa độ tâm của riêng phần hình ảnh chú ong (bỏ qua cái bảng treo)
+            const beeVis = document.getElementById('bee-visual');
+            const beeRect = beeVis.getBoundingClientRect();
+            const beeCx = beeRect.left + beeRect.width / 2;
+            const beeCy = beeRect.top + beeRect.height / 2;
+
+            let foundHover = null;
+            const flowers = document.querySelectorAll('.flower');
+            
+            // Ngưỡng va chạm an toàn (px)
+            const threshold = 40; 
+
+            flowers.forEach(flower => {
+                const fRect = flower.getBoundingClientRect();
+                const fCx = fRect.left + fRect.width / 2;
+                const fCy = fRect.top + fRect.height / 2;
+                
+                const dist = Math.hypot(beeCx - fCx, beeCy - fCy);
+                
+                if (dist < threshold) {
+                    foundHover = flower;
+                }
+            });
+
+            // Gỡ highlight cũ
+            if (hoveredFlower && hoveredFlower !== foundHover) {
+                hoveredFlower.classList.remove('highlight');
+            }
+            
+            // Thêm highlight mới
+            if (foundHover) {
+                foundHover.classList.add('highlight');
+                hoveredFlower = foundHover;
+            } else {
+                hoveredFlower = null;
+            }
+        }
+
+        function handleDragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            bee.releasePointerCapture(e.pointerId);
+            bee.classList.remove('dragging');
+
+            if (hoveredFlower) {
+                hoveredFlower.classList.remove('highlight');
+                let selectedVal = parseInt(hoveredFlower.dataset.val);
+                
+                if (selectedVal === expectedAnswer) {
+                    // Trả lời đúng
+                    handleCorrect(hoveredFlower);
+                } else {
+                    // Trả lời sai
+                    handleWrong(hoveredFlower);
+                }
+                hoveredFlower = null;
+            } else {
+                // Không thả vào hoa nào, bay về giữa
+                snapBeeToCenter();
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Giữ và kéo chú Ong di chuyển nào! 👇</span>`;
+            }
+        }
+
+        function handleCorrect(flower) {
+            playSound('snd-correct');
+            
+            // Hiệu ứng pháo hoa ngay tại vị trí bông hoa
+            const rect = flower.getBoundingClientRect();
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+            confetti({ particleCount: 60, spread: 60, origin: { x, y }, zIndex: 100 });
+
+            // Điểm số
+            score += 10;
+            streak++;
+            updateScore();
+
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-600 font-black">Chính xác! 3 x ${currentMultiplier} = ${expectedAnswer} 🎉</span>`;
+            
+            // Đậu lại một chút rồi bay về giữa và ra câu mới
+            setTimeout(() => {
+                snapBeeToCenter();
+                setTimeout(generateQuestion, 300);
+            }, 800);
+        }
+
+        function handleWrong(flower) {
+            playSound('snd-wrong');
+            streak = 0;
+            updateScore();
+
+            // Hiệu ứng rung bông hoa sai
+            flower.classList.add('shake');
+            setTimeout(() => flower.classList.remove('shake'), 400);
+
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Chưa đúng rồi! Bé thử lại nhé 🤔</span>`;
+            snapBeeToCenter();
+        }
+
+        function snapBeeToCenter() {
+            bee.style.left = '50%';
+            bee.style.top = '50%';
+        }
+
+        // --- Fullscreen ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+            if (!isFull) { if (req) { try { req.call(doc); } catch(e){} } } 
+            else { if (ext) ext.call(document); }
+        }
+
+        const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+        events.forEach(evt => {
+            document.addEventListener(evt, () => {
+                const btn = document.getElementById('btn-fullscreen');
+                const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+                if (isFull) { btn.innerHTML = '<span>🔳 Thu nhỏ</span>'; } else { btn.innerHTML = '<span>🔲 Phóng to</span>'; }
+            });
+        });
+    </script>
+</body>
+</html>
