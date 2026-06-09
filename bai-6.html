@@ -378,13 +378,16 @@
                             audio.onerror = () => resolve();
                             audio.play().catch(()=> resolve());
                         });
+                    } else {
+                        // Sửa lỗi kẹt vòng lặp vô tận: Nếu không có data, ném lỗi để nhảy vào catch
+                        throw new Error("Không có dữ liệu âm thanh trả về");
                     }
                 } catch (e) {
                     if (retries < 5) {
                         await new Promise(r => setTimeout(r, delays[retries]));
                         retries++;
                     } else {
-                        return new Promise(resolve => setTimeout(resolve, 1500)); // Fallback delay if failed
+                        return new Promise(resolve => setTimeout(resolve, 1000)); // Fallback delay if failed
                     }
                 }
             }
