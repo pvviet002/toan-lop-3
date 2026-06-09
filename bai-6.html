@@ -8,18 +8,27 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
             background-color: #e0f2fe; /* sky-100 */
             overscroll-behavior-y: none; 
             overflow-x: hidden;
         }
         
         .no-select { user-select: none; -webkit-user-select: none; }
-        .btn-press:active:not(:disabled) { transform: scale(0.95); }
+        
+        /* Hiệu ứng Nút bấm 3D chuyên nghiệp */
+        .btn-press {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        .btn-press:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
+        }
 
-        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.5); }
+        .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
         @keyframes bounceIn { 
-            0% { transform: scale(0.5); opacity: 0; }
+            0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; } 
         }
 
@@ -37,55 +46,74 @@
         /* Bối cảnh Đại Dương */
         .ocean-container {
             position: relative;
-            background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 20%, #0284c7 60%, #1e3a8a 100%);
+            /* Phân chia ranh giới Trời (0-35%) và Biển (35-100%) với dải chuyển màu mượt */
+            background: linear-gradient(180deg, #bae6fd 0%, #7dd3fc 32%, #0284c7 38%, #1e3a8a 100%);
             border: 8px solid #0369a1;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.4), 0 10px 25px rgba(0,0,0,0.1);
             overflow: hidden;
+        }
+
+        /* Ông mặt trời và mây */
+        @keyframes spin-slow { 100% { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 40s linear infinite; }
+        
+        @keyframes cloudDrift {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(800px); }
+        }
+        .cloud {
+            position: absolute;
+            white-space: nowrap;
+            animation: cloudDrift 35s linear infinite;
+            z-index: 5;
+            filter: drop-shadow(0 4px 6px rgba(255,255,255,0.5));
         }
 
         /* Lượn sóng mặt nước */
         .wave {
             position: absolute;
-            top: 25%;
+            top: 34%; /* Cắt ngang ranh giới trời và biển */
             left: -50%;
             width: 200%;
-            height: 10px;
+            height: 18px;
             background: rgba(255,255,255,0.3);
             border-radius: 50%;
-            animation: waveFlow 4s ease-in-out infinite alternate;
-            filter: blur(2px);
+            animation: waveFlow 5s ease-in-out infinite alternate;
+            filter: blur(3px);
+            z-index: 15;
         }
-        .wave2 { top: 28%; animation-duration: 5s; animation-direction: alternate-reverse; opacity: 0.5; }
+        .wave2 { top: 36%; animation-duration: 6s; animation-direction: alternate-reverse; opacity: 0.2; z-index: 16; }
         
         @keyframes waveFlow {
-            0% { transform: translateX(0) translateY(-2px); }
-            100% { transform: translateX(10%) translateY(2px); }
+            0% { transform: translateX(0) translateY(-3px); }
+            100% { transform: translateX(10%) translateY(3px); }
         }
 
-        /* Thuyền bập bềnh */
+        /* Thuyền bập bềnh - Nổi trên mặt nước */
         .boat-wrapper {
             position: absolute;
-            top: 5%;
+            bottom: 58%; /* Tinh chỉnh lại để mép dưới thuyền chạm đúng sóng */
             left: 50%;
             transform: translateX(-50%);
-            animation: floatBoat 3s ease-in-out infinite alternate;
+            animation: floatBoat 4s ease-in-out infinite alternate;
             z-index: 20;
         }
 
         @keyframes floatBoat {
-            0% { transform: translateX(-50%) translateY(0px) rotate(-2deg); }
-            100% { transform: translateX(-50%) translateY(10px) rotate(2deg); }
+            0% { transform: translateX(-50%) translateY(0px) rotate(-1.5deg); }
+            100% { transform: translateX(-50%) translateY(12px) rotate(1.5deg); }
         }
 
         /* Biển gỗ trên thuyền */
         .wooden-sign {
             background-color: #854d0e;
-            background-image: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.15) 4px, rgba(0,0,0,0.15) 8px);
             border: 4px solid #451a03;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 8px 15px rgba(0,0,0,0.4);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Đàn cá bơi nhấp nhô (Không lật ngược) */
+        /* Đàn cá bơi nhấp nhô */
         .fish-wrapper {
             position: absolute;
             cursor: pointer;
@@ -93,19 +121,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: filter 0.2s;
+        }
+        .fish-wrapper:hover {
+            filter: brightness(1.15) drop-shadow(0 0 10px rgba(255,255,255,0.3));
         }
 
         .fish-bob {
-            animation: bobbing 3s ease-in-out infinite alternate;
+            animation: bobbing 3.5s ease-in-out infinite alternate;
         }
         
         @keyframes bobbing {
-            0% { transform: translateY(-8px) translateX(-5px) rotate(-3deg); }
-            100% { transform: translateY(8px) translateX(5px) rotate(3deg); }
+            0% { transform: translateY(-10px) translateX(-5px) rotate(-4deg); }
+            100% { transform: translateY(10px) translateX(5px) rotate(4deg); }
         }
 
-        .bob-slow { animation-duration: 4s; }
-        .bob-fast { animation-duration: 2.5s; animation-direction: alternate-reverse; }
+        .bob-slow { animation-duration: 4.5s; }
+        .bob-fast { animation-duration: 2.8s; animation-direction: alternate-reverse; }
 
         /* Animation thuyền giật khi câu cá */
         .boat-catch {
@@ -113,37 +145,34 @@
         }
         @keyframes boatJerk {
             0% { transform: translateY(0) rotate(0deg); }
-            20% { transform: translateY(-30px) rotate(15deg); } /* Giật mạnh cần câu lên */
-            50% { transform: translateY(5px) rotate(-5deg); }
+            15% { transform: translateY(-35px) rotate(12deg); } /* Giật mạnh cần câu lên */
+            45% { transform: translateY(8px) rotate(-6deg); }
             100% { transform: translateY(0) rotate(0deg); }
         }
 
-        /* Dây cước câu cá */
-        .fishing-line {
-            stroke: #cbd5e1; /* slate-300 */
-            stroke-width: 2;
-            stroke-dasharray: 6 3;
-            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
-        }
-
-        /* Lưỡi câu / Phao */
-        .fishing-hook {
-            fill: #ef4444; /* red-500 */
-            stroke: #7f1d1d;
-            stroke-width: 1;
+        /* SVG Lưỡi câu / Phao */
+        .fishing-hook-path {
+            fill: none;
+            stroke: #94a3b8; /* slate-400 */
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.6));
         }
 
         /* Bong bóng nước */
         .bubble {
             position: absolute;
-            background: rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
             border-radius: 50%;
-            animation: rise 4s infinite ease-in;
+            animation: rise 5s infinite ease-in;
+            z-index: 10;
+            box-shadow: inset 0 0 5px rgba(255,255,255,0.5);
         }
         @keyframes rise {
-            0% { transform: translateY(100%) scale(0.5); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-500px) scale(1.2); opacity: 0; }
+            0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-400px) scale(1.5); opacity: 0; }
         }
     </style>
 </head>
@@ -152,89 +181,95 @@
     <!-- Header -->
     <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
         <div class="flex items-center space-x-2 md:space-x-3">
-            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#e2e8f0] border-2 border-slate-200 hover:bg-slate-50 btn-press font-bold text-sm transition-colors">
                 <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
             </a>
-            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm transition-colors">
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#e2e8f0] border-2 border-slate-200 hover:bg-slate-50 btn-press font-bold text-sm transition-colors">
                 <span>🔲 Phóng to</span>
             </button>
+        </div>
+        
+        <div class="bg-white px-5 py-2.5 rounded-xl shadow-[0_4px_0_0_#bae6fd] border-2 border-sky-200 flex items-center space-x-5">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🐟</span>
+                <span id="score-display" class="font-black text-sky-600 text-xl">0</span>
+            </div>
+            <div class="w-1 h-6 bg-slate-200 rounded-full"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-xl">0</span>
+            </div>
         </div>
     </div>
 
     <!-- MAIN APP CONTAINER -->
-    <div class="max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-sky-200 overflow-hidden flex flex-col flex-grow relative">
+    <div class="max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-2xl border border-sky-100 overflow-hidden flex flex-col flex-grow relative">
         
         <!-- Header Bài học -->
-        <div class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 md:p-5 text-center shadow-md relative z-10">
-            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide drop-shadow-md">Bài 6.1: Vui Câu Cá 🎣</h1>
-            <p id="game-subtitle" class="text-cyan-100 text-sm md:text-base mt-1 font-medium transition-colors duration-300">Đang khởi tạo...</p>
+        <div class="bg-gradient-to-b from-cyan-400 to-blue-600 text-white p-5 md:p-6 text-center shadow-md relative z-10">
+            <h1 class="text-2xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1">Vui Câu Cá 🎣</h1>
+            <p id="game-subtitle" class="text-cyan-100 text-sm md:text-base font-medium transition-colors duration-300">Đang khởi tạo...</p>
         </div>
 
         <!-- Khung Game Chính -->
-        <div class="flex-grow flex items-center justify-center p-4 md:p-8 relative bg-slate-50">
+        <div class="flex-grow flex items-center justify-center p-3 md:p-6 relative bg-slate-50">
             
             <!-- Đại dương (Game Board) -->
-            <div id="game-board" class="ocean-container w-full max-w-[450px] md:max-w-[600px] aspect-[4/5] md:aspect-square rounded-[3rem] bounce-in">
+            <div id="game-board" class="ocean-container w-full max-w-[500px] md:max-w-[700px] aspect-[3/4] md:aspect-[4/3.5] rounded-[2.5rem] bounce-in relative">
                 
+                <!-- Bầu trời: Mây & Mặt trời -->
+                <div class="absolute top-4 right-8 text-6xl md:text-8xl animate-spin-slow z-0 drop-shadow-[0_0_20px_rgba(253,224,71,0.9)]">☀️</div>
+                <div class="cloud text-5xl md:text-7xl opacity-90" style="top: 8%; animation-duration: 45s; animation-delay: -10s;">☁️</div>
+                <div class="cloud text-4xl md:text-5xl opacity-70" style="top: 20%; animation-duration: 30s; animation-delay: -25s;">☁️</div>
+
                 <!-- Sóng nước -->
                 <div class="wave"></div>
                 <div class="wave wave2"></div>
                 
-                <!-- Bong bóng trang trí -->
-                <div class="bubble w-4 h-4 left-[20%]" style="animation-duration: 3s; animation-delay: 1s;"></div>
-                <div class="bubble w-6 h-6 left-[70%]" style="animation-duration: 4s; animation-delay: 2s;"></div>
-                <div class="bubble w-3 h-3 left-[40%]" style="animation-duration: 2.5s; animation-delay: 0s;"></div>
+                <!-- Bong bóng trang trí dưới biển -->
+                <div class="bubble w-4 h-4 left-[15%] bottom-[10%]" style="animation-duration: 3.5s; animation-delay: 0.5s;"></div>
+                <div class="bubble w-8 h-8 left-[80%] bottom-[15%]" style="animation-duration: 4.5s; animation-delay: 2s;"></div>
+                <div class="bubble w-5 h-5 left-[45%] bottom-[5%]" style="animation-duration: 2.8s; animation-delay: 1.2s;"></div>
+                <div class="bubble w-3 h-3 left-[30%] bottom-[25%]" style="animation-duration: 3.2s; animation-delay: 0s;"></div>
 
-                <!-- SVG Lưỡi câu & Dây cước (Đào vàng effect) -->
+                <!-- SVG Lưỡi câu & Dây cước (Đào vàng effect 60FPS) -->
                 <svg id="fishing-svg" class="absolute inset-0 w-full h-full pointer-events-none z-30 hidden">
-                    <line id="fishing-line" x1="0" y1="0" x2="0" y2="0" class="fishing-line" />
-                    <circle id="fishing-hook" cx="0" cy="0" r="6" class="fishing-hook" />
+                    <line id="fishing-line" x1="0" y1="0" x2="0" y2="0" stroke="#f8fafc" stroke-width="2" stroke-dasharray="6 3" filter="drop-shadow(1px 2px 2px rgba(0,0,0,0.6))" />
+                    <!-- Lưỡi câu vẽ chi tiết hơn -->
+                    <g id="fishing-hook-group">
+                        <path class="fishing-hook-path" d="M 0 0 L 0 15 A 8 8 0 0 0 16 15 L 16 10 L 12 13" />
+                    </g>
                 </svg>
 
-                <!-- Thuyền & Người câu cá -->
+                <!-- Thuyền & Người câu cá (Nổi trên mặt sóng) -->
                 <div id="boat-element" class="boat-wrapper flex flex-col items-center">
                     <div id="boat-inner" class="relative origin-bottom transition-transform">
                         <!-- Tấm biển gỗ hiển thị phép tính -->
-                        <div class="wooden-sign px-6 py-3 rounded-xl flex items-center justify-center relative z-20 top-6">
-                            <div class="absolute -top-4 left-4 w-1.5 h-5 bg-amber-900 rounded-full"></div>
-                            <div class="absolute -top-4 right-4 w-1.5 h-5 bg-amber-900 rounded-full"></div>
-                            <span id="math-problem" class="font-black text-white text-3xl md:text-4xl tracking-wider whitespace-nowrap drop-shadow-md">4 x ?</span>
+                        <div class="wooden-sign px-6 py-3 rounded-xl flex items-center justify-center relative z-20 top-8">
+                            <div class="absolute -top-4 left-4 w-1.5 h-6 bg-amber-900 rounded-full shadow-sm"></div>
+                            <div class="absolute -top-4 right-4 w-1.5 h-6 bg-amber-900 rounded-full shadow-sm"></div>
+                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest whitespace-nowrap">4 x ?</span>
                         </div>
                         
                         <!-- Cụm emoji thuyền và người -->
-                        <div class="text-[100px] md:text-[130px] leading-none drop-shadow-2xl relative z-10 mt-[-10px] pl-4">
-                            🚣‍♂️<span id="rod-tip" class="absolute top-4 -right-6 text-[50px] md:text-[70px] transform rotate-45 drop-shadow-md">🎣</span>
+                        <div class="text-[110px] md:text-[140px] leading-none drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] relative z-10 mt-[-15px] pl-6">
+                            🚣‍♂️<span id="rod-tip" class="absolute top-6 -right-5 text-[60px] md:text-[80px] transform rotate-45 drop-shadow-md">🎣</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Đàn cá -->
-                <div id="fishes-container" class="absolute inset-0 w-full h-full pt-[35%] pb-[10%] px-[10%]">
-                    <!-- Sinh bằng JS -->
+                <div id="fishes-container" class="absolute inset-0 w-full h-full pointer-events-none">
+                    <!-- Sinh bằng JS - Cá sẽ được thả vào vùng dưới nước -->
                 </div>
             </div>
 
         </div>
 
-        <!-- Thanh Trợ Giúp / Tương Tác -->
-        <div class="bg-white p-4 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 z-10 rounded-b-3xl">
-            <div id="feedback-msg" class="text-lg md:text-xl font-bold text-center md:text-left flex-grow">
-                <span class="text-slate-500">Nhấp vào cá để câu nhé! 👆</span>
-            </div>
-            
-            <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-center">
-                <!-- Bảng Điểm & Chuỗi -->
-                <div class="bg-sky-50 px-4 py-2 rounded-xl shadow-sm border border-sky-200 flex items-center space-x-4">
-                    <div class="flex items-center space-x-1">
-                        <span class="text-xl">🐟</span>
-                        <span id="score-display" class="font-black text-sky-600 text-lg">0</span>
-                    </div>
-                    <div class="w-px h-6 bg-sky-200"></div>
-                    <div class="flex items-center space-x-1">
-                        <span class="text-xl">🔥</span>
-                        <span id="streak-display" class="font-black text-orange-500 text-lg">0</span>
-                    </div>
-                </div>
+        <!-- Thanh Tương Tác Cố Định Dưới Cùng -->
+        <div class="bg-white p-5 border-t border-slate-100 flex items-center justify-center z-10 rounded-b-3xl">
+            <div id="feedback-msg" class="text-xl md:text-2xl font-black text-center flex-grow text-slate-500 tracking-wide drop-shadow-sm">
+                Nhấp vào cá để câu nhé! 👆
             </div>
         </div>
 
@@ -244,23 +279,20 @@
     <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
     <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
     <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
-    <audio id="snd-splash" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio> <!-- Âm thanh bắt được cá -->
+    <audio id="snd-splash" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio>
 
     <script>
         // Game State
-        let currentMode = 'nhan'; // 'nhan' or 'chia'
+        let currentMode = 'nhan'; 
         let currentMultiplier = 1;
         let currentDividend = 4;
         let expectedAnswer = 4;
         
         let score = 0;
         let streak = 0;
-        let isFishing = false; // Khóa click khi đang câu cá
-        
-        // Tránh lặp lại câu hỏi
+        let isFishing = false; 
         let recentQuestions = [];
 
-        // Mảng 10 kết quả của bảng nhân 4 và chia 4
         const answersNhan = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40];
         const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         const fishEmojis = ['🐟', '🐠', '🐡'];
@@ -271,61 +303,58 @@
         });
 
         function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
-        function updateScore() { document.getElementById('score-display').innerText = score; document.getElementById('streak-display').innerText = streak; }
-
-        // Kích thước cá theo giá trị số
-        function getFishScale(val, mode) {
-            let maxVal = mode === 'nhan' ? 40 : 10;
-            // Tỉ lệ scale từ 0.75 (nhỏ nhất) đến 1.3 (to nhất)
-            let scale = 0.75 + (val / maxVal) * 0.55;
-            return scale;
+        function updateScore() { 
+            document.getElementById('score-display').innerText = score; 
+            document.getElementById('streak-display').innerText = streak; 
         }
 
-        // Tạo bầy cá phân bổ theo lưới cố định (Tránh đè nhau)
+        function getFishScale(val, mode) {
+            let maxVal = mode === 'nhan' ? 40 : 10;
+            // Scale từ 0.75 (bé nhất) đến 1.35 (to nhất)
+            return 0.75 + (val / maxVal) * 0.6;
+        }
+
         function initFishes() {
             const container = document.getElementById('fishes-container');
             container.innerHTML = '';
             
             const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
             
-            // Chia màn hình thành 10 ô lưới cố định để thả cá không đè lên nhau
-            // Hàng 1 (Top): 3 ô, Hàng 2 (Mid): 4 ô, Hàng 3 (Bot): 3 ô
+            // Lưới thả cá: Đảm bảo không đè lên phần thuyền (mốc 0-45% độ cao)
+            // Hàng 1 (Vừa dưới thuyền): Y ~55%
+            // Hàng 2 (Giữa): Y ~72%
+            // Hàng 3 (Đáy): Y ~88%
             const basePositions = [
-                { top: 40, left: 15 }, { top: 40, left: 45 }, { top: 40, left: 75 }, // Hàng 1
-                { top: 60, left: 10 }, { top: 60, left: 35 }, { top: 60, left: 60 }, { top: 60, left: 85 }, // Hàng 2
-                { top: 80, left: 15 }, { top: 80, left: 45 }, { top: 80, left: 75 } // Hàng 3
+                { top: 55, left: 15 }, { top: 55, left: 50 }, { top: 55, left: 85 },
+                { top: 72, left: 12 }, { top: 72, left: 38 }, { top: 72, left: 62 }, { top: 72, left: 88 },
+                { top: 88, left: 20 }, { top: 88, left: 50 }, { top: 88, left: 80 }
             ];
 
-            // Xáo trộn vị trí để mỗi lần chơi cá nằm vị trí khác nhau
             const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
 
             currentAnswers.forEach((ans, index) => {
                 const pos = shuffledPositions[index];
                 
-                // Thêm một chút dao động (jitter) để cá không xếp quá thẳng hàng, 
-                // nhưng vẫn đảm bảo trong ô của mình để không đè
-                let topPercent = pos.top + (Math.random() * 6 - 3);
-                let leftPercent = pos.left + (Math.random() * 6 - 3);
+                // Xê dịch nhẹ để trông tự nhiên nhưng không làm mất vị trí an toàn
+                let topPercent = pos.top + (Math.random() * 4 - 2); 
+                let leftPercent = pos.left + (Math.random() * 4 - 2);
                 
                 const fishType = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
                 const animClass = Math.random() > 0.5 ? 'bob-fast' : 'bob-slow';
-                
                 const scale = getFishScale(ans, currentMode);
 
                 const fishWrap = document.createElement('div');
-                fishWrap.className = `fish-wrapper no-select transform -translate-x-1/2 -translate-y-1/2`;
+                fishWrap.className = `fish-wrapper no-select transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto`;
                 fishWrap.style.left = `${leftPercent}%`;
                 fishWrap.style.top = `${topPercent}%`;
                 fishWrap.dataset.val = ans;
                 
-                // Thêm sự kiện click
                 fishWrap.onclick = function() { checkAnswer(this); };
 
-                // Nội dung con cá (Emoji + Số) được áp scale dựa theo giá trị
                 fishWrap.innerHTML = `
                     <div class="relative flex items-center justify-center fish-bob ${animClass}" style="transform: scale(${scale}); transform-origin: center;">
-                        <div class="text-[50px] md:text-[60px] drop-shadow-md leading-none z-0">${fishType}</div>
-                        <div class="absolute z-10 bg-white/90 backdrop-blur-sm rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center font-black text-sm md:text-base border-2 border-slate-300 shadow-sm text-sky-800" style="transform: translateX(-5px);">
+                        <div class="text-[55px] md:text-[70px] drop-shadow-xl leading-none z-0">${fishType}</div>
+                        <div class="absolute z-10 bg-white/95 backdrop-blur-md rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-base md:text-lg border-2 border-sky-200 shadow-md text-sky-800" style="transform: translateX(-5px);">
                             ${ans}
                         </div>
                     </div>
@@ -339,33 +368,27 @@
             const prob = document.getElementById('math-problem');
             let isSwitchingMode = false;
             
-            // Lấy danh sách các con cá chưa bị câu (không có class fish-caught)
             let availableFishes = Array.from(document.querySelectorAll('.fish-wrapper:not(.fish-caught)'));
             
-            // TỰ ĐỘNG CHUYỂN CHẾ ĐỘ: Nếu đã câu hết cá
             if (availableFishes.length === 0) {
                 currentMode = currentMode === 'nhan' ? 'chia' : 'nhan';
                 isSwitchingMode = true;
                 
                 initFishes();
                 availableFishes = Array.from(document.querySelectorAll('.fish-wrapper:not(.fish-caught)'));
-                recentQuestions = []; // Reset lịch sử tránh bị kẹt số
+                recentQuestions = [];
             }
 
-            // Cập nhật Subtitle hiển thị chế độ hiện tại
             document.getElementById('game-subtitle').innerHTML = currentMode === 'nhan' 
-                ? "Đang luyện tập: <b class='text-white text-lg'>Bảng Nhân 4 ✖️</b>" 
-                : "Đang luyện tập: <b class='text-white text-lg'>Bảng Chia 4 ➗</b>";
+                ? "Đang luyện tập: <b class='text-yellow-300 text-lg md:text-xl drop-shadow-md'>Bảng Nhân 4 ✖️</b>" 
+                : "Đang luyện tập: <b class='text-yellow-300 text-lg md:text-xl drop-shadow-md'>Bảng Chia 4 ➗</b>";
 
-            // Map từ các con cá khả dụng ra các giá trị Factor (1-10) tương ứng
             const availableFactors = availableFishes.map(fish => {
                 let ans = parseInt(fish.dataset.val);
                 return currentMode === 'nhan' ? ans / 4 : ans;
             });
 
             let randomFactor;
-            
-            // Ưu tiên chọn những số chưa hỏi gần đây
             if (availableFactors.length > 1) {
                 let validFactors = availableFactors.filter(f => !recentQuestions.includes(f));
                 if (validFactors.length > 0) {
@@ -377,11 +400,8 @@
                 randomFactor = availableFactors[0];
             }
 
-            // Cập nhật lịch sử các câu hỏi gần nhất
             recentQuestions.push(randomFactor);
-            if (recentQuestions.length > 5) {
-                recentQuestions.shift();
-            }
+            if (recentQuestions.length > 5) recentQuestions.shift();
 
             if (currentMode === 'nhan') {
                 currentMultiplier = randomFactor;
@@ -393,23 +413,21 @@
                 prob.innerText = `${currentDividend} : 4`;
             }
             
-            // Animation nhẹ cho bảng câu hỏi
             const sign = prob.parentElement;
             sign.classList.remove('shake', 'bounce-in');
             void sign.offsetWidth;
             sign.classList.add('bounce-in');
 
-            // Cập nhật Lời nhắc
             if (isSwitchingMode) {
                 let modeName = currentMode === 'nhan' ? 'Bảng Nhân 4' : 'Bảng Chia 4';
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-blue-600 font-bold">Tuyệt vời! Đàn cá <b class="text-blue-800">${modeName}</b> đã xuất hiện! 👇</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-blue-500">Đàn cá <b class="text-blue-700">${modeName}</b> đã tới! 👇</span>`;
                 playSound('snd-pop');
             } else {
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bé hãy nhấp vào con cá có số <b class="text-sky-600">đáp án</b> nhé! 👇</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bé hãy nhấp vào cá có số <b class="text-sky-500">đáp án</b> nhé! 👇</span>`;
             }
         }
 
-        // HIỆU ỨNG ĐÀO VÀNG - KÉO CÁ LÊN THUYỀN
+        // TỐI ƯU HÓA ANIMATION VỚI requestAnimationFrame (60FPS Smooth)
         function pullFishGoldMinerStyle(fishElement) {
             isFishing = true;
             playSound('snd-splash');
@@ -418,145 +436,148 @@
             const boardRect = board.getBoundingClientRect();
             
             const boatInner = document.getElementById('boat-inner');
-            const rodTip = document.getElementById('rod-tip'); // Mũi cần câu
+            const rodTip = document.getElementById('rod-tip');
             const rodRect = rodTip.getBoundingClientRect();
             
-            const fishInner = fishElement.children[0]; // Thẻ div chứa hiệu ứng bobbing và scale
+            const fishInner = fishElement.children[0];
             const fishRect = fishInner.getBoundingClientRect();
 
-            // Tính tọa độ đích (mũi cần câu) tương đối với Game Board
+            // Tính toán tọa độ Đích (Đầu cần câu) và Nguồn (Con cá)
+            // Lấy offset an toàn so với Board
             const targetX = (rodRect.right - 20) - boardRect.left;
             const targetY = (rodRect.top + 20) - boardRect.top;
 
-            // Tính tọa độ hiện tại của cá tương đối với Game Board
-            let currentX = (fishRect.left + fishRect.width/2) - boardRect.left;
-            let currentY = (fishRect.top + fishRect.height/2) - boardRect.top;
+            let startX = (fishRect.left + fishRect.width/2) - boardRect.left;
+            let startY = (fishRect.top + fishRect.height/2) - boardRect.top;
 
-            // Chuyển vị trí cá từ Relative/Container sang Absolute của Game Board để dễ JS Animate
+            // Đưa cá ra hệ trục tuyệt đối của Board để JS xử lý dễ dàng
             board.appendChild(fishElement); 
-            fishElement.style.left = (currentX) + 'px';
-            fishElement.style.top = (currentY) + 'px';
+            fishElement.style.left = startX + 'px';
+            fishElement.style.top = startY + 'px';
             
-            // Tắt CSS Animation nhấp nhô để kéo mượt
+            // Dừng hoạt ảnh bơi của cá
             fishInner.style.animation = 'none';
 
-            // Kích hoạt SVG Dây cước
+            // Hiện dây cước và móc câu
             const svg = document.getElementById('fishing-svg');
             const line = document.getElementById('fishing-line');
-            const hook = document.getElementById('fishing-hook');
+            const hookGroup = document.getElementById('fishing-hook-group');
             
             svg.classList.remove('hidden');
             
-            // Gốc dây luôn ở mũi cần câu
+            // Đầu dây nối chặt vào cần câu
             line.setAttribute('x1', targetX);
             line.setAttribute('y1', targetY);
             
-            // GIAI ĐOẠN 1: PHÓNG DÂY XUỐNG CÁ (Shoot Hook)
-            let shootFrames = 15; // Phóng nhanh (Khoảng 250ms)
-            let sFrame = 0;
-            let hx = targetX;
-            let hy = targetY;
-            let dxShoot = (currentX - targetX) / shootFrames;
-            let dyShoot = (currentY - targetY) / shootFrames;
+            // Cài đặt thời gian cho 2 pha
+            const shootDuration = 300; // Phóng dây xuống (ms)
+            const pullDuration = 650;  // Kéo lên (ms)
+            let animationStartTime = null;
 
-            const shootInterval = setInterval(() => {
-                sFrame++;
-                hx += dxShoot;
-                hy += dyShoot;
+            // PHA 1: PHÓNG DÂY XUỐNG
+            function animateShoot(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / shootDuration, 1);
                 
-                line.setAttribute('x2', hx);
-                line.setAttribute('y2', hy);
-                hook.setAttribute('cx', hx);
-                hook.setAttribute('cy', hy);
+                // Ease out cubic
+                let easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                let currentX = targetX + (startX - targetX) * easeProgress;
+                let currentY = targetY + (startY - targetY) * easeProgress;
+                
+                // Cập nhật đường dây
+                line.setAttribute('x2', currentX);
+                line.setAttribute('y2', currentY);
+                // Cập nhật lưỡi câu
+                hookGroup.setAttribute('transform', `translate(${currentX - 8}, ${currentY})`);
 
-                if (sFrame >= shootFrames) {
-                    clearInterval(shootInterval);
-                    
-                    // GIAI ĐOẠN 2: KÉO CÁ LÊN (Pull Fish)
-                    // Thêm hiệu ứng giật thuyền
+                if (progress < 1) {
+                    requestAnimationFrame(animateShoot);
+                } else {
+                    // Chuyển sang pha 2
                     boatInner.classList.remove('boat-catch');
                     void boatInner.offsetWidth;
                     boatInner.classList.add('boat-catch');
-
-                    let pullFrames = 35; // Kéo lên chậm hơn (Khoảng 600ms)
-                    let pFrame = 0;
-                    let dxPull = (targetX - currentX) / pullFrames;
-                    let dyPull = (targetY - currentY) / pullFrames;
-
-                    const pullInterval = setInterval(() => {
-                        pFrame++;
-                        currentX += dxPull;
-                        currentY += dyPull;
-
-                        // Cập nhật Dây & Phao
-                        line.setAttribute('x2', currentX);
-                        line.setAttribute('y2', currentY);
-                        hook.setAttribute('cx', currentX);
-                        hook.setAttribute('cy', currentY);
-
-                        // Cập nhật vị trí Cá đi theo dây
-                        fishElement.style.left = (currentX) + 'px';
-                        fishElement.style.top = (currentY) + 'px';
-                        
-                        // Lắc nhẹ cá khi bị kéo
-                        fishInner.style.transform = `scale(${getFishScale(parseInt(fishElement.dataset.val), currentMode)}) rotate(${Math.sin(pFrame) * 15}deg)`;
-
-                        if (pFrame >= pullFrames) {
-                            clearInterval(pullInterval);
-                            
-                            // HOÀN THÀNH: Cá vào giỏ
-                            svg.classList.add('hidden');
-                            fishElement.style.display = 'none'; // Xóa cá khỏi biển
-                            fishElement.classList.add('fish-caught'); // Đánh dấu đã câu để lọc ở câu tiếp theo
-                            
-                            playSound('snd-correct');
-                            confetti({ particleCount: 50, spread: 50, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100 });
-                            
-                            score += 10;
-                            streak++;
-                            updateScore();
-
-                            let feedbackText = currentMode === 'nhan' ? `Chính xác! 4 x ${currentMultiplier} = ${expectedAnswer} 🎉` : `Chính xác! ${currentDividend} : 4 = ${expectedAnswer} 🎉`;
-                            document.getElementById('feedback-msg').innerHTML = `<span class="text-sky-600 font-black">${feedbackText}</span>`;
-                            
-                            // Nghỉ 1 nhịp rồi ra câu mới
-                            setTimeout(() => {
-                                generateQuestion();
-                                isFishing = false;
-                            }, 800);
-                        }
-                    }, 16); // 60fps
+                    
+                    animationStartTime = null;
+                    requestAnimationFrame(animatePull);
                 }
-            }, 16); // 60fps
+            }
+
+            // PHA 2: KÉO CÁ LÊN
+            function animatePull(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / pullDuration, 1);
+                
+                // Ease in out cubic
+                let easeProgress = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                
+                let currentX = startX + (targetX - startX) * easeProgress;
+                let currentY = startY + (targetY - startY) * easeProgress;
+                
+                // Kéo dây
+                line.setAttribute('x2', currentX);
+                line.setAttribute('y2', currentY);
+                hookGroup.setAttribute('transform', `translate(${currentX - 8}, ${currentY})`);
+
+                // Kéo cá
+                fishElement.style.left = currentX + 'px';
+                fishElement.style.top = currentY + 'px';
+                
+                // Xoay cá lộn vòng như bị câu dính
+                let scale = getFishScale(parseInt(fishElement.dataset.val), currentMode);
+                fishInner.style.transform = `scale(${scale}) rotate(${progress * 720}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animatePull);
+                } else {
+                    // HOÀN TẤT
+                    svg.classList.add('hidden');
+                    fishElement.style.display = 'none';
+                    fishElement.classList.add('fish-caught'); // Ẩn khỏi pool
+                    
+                    playSound('snd-correct');
+                    confetti({ particleCount: 50, spread: 50, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100 });
+                    
+                    score += 10;
+                    streak++;
+                    updateScore();
+
+                    let feedbackText = currentMode === 'nhan' ? `Chính xác! 4 x ${currentMultiplier} = ${expectedAnswer} 🎉` : `Chính xác! ${currentDividend} : 4 = ${expectedAnswer} 🎉`;
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-sky-500">${feedbackText}</span>`;
+                    
+                    // Chuyển câu
+                    setTimeout(() => {
+                        generateQuestion();
+                        isFishing = false;
+                    }, 700);
+                }
+            }
+
+            // Khởi động Animation Phase 1
+            requestAnimationFrame(animateShoot);
         }
 
         function checkAnswer(fishElement) {
-            if (isFishing) return; // Đang chạy animation thì cấm bấm
-            // Ngăn click lại cá đã câu
-            if (fishElement.classList.contains('fish-caught')) return;
+            if (isFishing || fishElement.classList.contains('fish-caught')) return;
 
             let selectedVal = parseInt(fishElement.dataset.val);
 
             if (selectedVal === expectedAnswer) {
-                // ĐÚNG - Chạy hiệu ứng kéo cá Đào Vàng
                 pullFishGoldMinerStyle(fishElement);
             } else {
-                // SAI - Đổi phép tính lập tức
                 playSound('snd-wrong');
                 streak = 0;
                 updateScore();
 
-                // Lắc tấm bảng câu hỏi báo sai
                 const sign = document.getElementById('math-problem').parentElement;
-                sign.classList.remove('bounce-in');
-                sign.classList.remove('shake');
+                sign.classList.remove('bounce-in', 'shake');
                 void sign.offsetWidth;
                 sign.classList.add('shake');
 
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Úi chà sai rồi! Phép tính đã đổi, bé tìm lại nhé 🔄</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500">Úi chà sai rồi! Phép tính đã đổi 🔄</span>`;
                 
-                isFishing = true; // Khóa click tạm thời
-                // Sinh câu hỏi mới ngay lập tức
+                isFishing = true;
                 setTimeout(() => {
                     generateQuestion();
                     isFishing = false;
@@ -564,25 +585,17 @@
             }
         }
 
-        // --- Fullscreen ---
+        // --- FULLSCREEN ---
         function toggleFullScreen() {
             const doc = document.documentElement;
             const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
             const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-
-            if (!isFull) { if (req) { try { req.call(doc); } catch(e){} } } 
-            else { if (ext) ext.call(document); }
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
+                if (req) { try { req.call(doc); } catch(e){} } 
+            } else { 
+                if (ext) ext.call(document); 
+            }
         }
-
-        const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
-        events.forEach(evt => {
-            document.addEventListener(evt, () => {
-                const btn = document.getElementById('btn-fullscreen');
-                const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-                if (isFull) { btn.innerHTML = '<span>🔳 Thu nhỏ</span>'; } else { btn.innerHTML = '<span>🔲 Phóng to</span>'; }
-            });
-        });
     </script>
 </body>
 </html>
