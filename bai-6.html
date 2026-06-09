@@ -313,23 +313,31 @@
             return scale;
         }
 
-        // Tạo bầy cá phân bổ ngẫu nhiên
+        // Tạo bầy cá phân bổ theo lưới cố định (Tránh đè nhau)
         function initFishes() {
             const container = document.getElementById('fishes-container');
             container.innerHTML = '';
             
             const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
             
-            // Lưới 3 hàng để rải cá cho đều (row 1: top, row 2: mid, row 3: bottom)
-            const rows = [0, 0, 0, 1, 1, 1, 1, 2, 2, 2].sort(() => Math.random() - 0.5);
+            // Chia màn hình thành 10 ô lưới cố định để thả cá không đè lên nhau
+            // Hàng 1 (Top): 3 ô, Hàng 2 (Mid): 4 ô, Hàng 3 (Bot): 3 ô
+            const basePositions = [
+                { top: 40, left: 15 }, { top: 40, left: 45 }, { top: 40, left: 75 }, // Hàng 1
+                { top: 60, left: 10 }, { top: 60, left: 35 }, { top: 60, left: 60 }, { top: 60, left: 85 }, // Hàng 2
+                { top: 80, left: 15 }, { top: 80, left: 45 }, { top: 80, left: 75 } // Hàng 3
+            ];
+
+            // Xáo trộn vị trí để mỗi lần chơi cá nằm vị trí khác nhau
+            const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
 
             currentAnswers.forEach((ans, index) => {
-                let row = rows[index];
+                const pos = shuffledPositions[index];
                 
-                // Random vị trí Y theo hàng
-                let topPercent = 35 + (row * 20) + (Math.random() * 10 - 5);
-                // Random vị trí X (10% to 90%)
-                let leftPercent = 10 + (Math.random() * 80);
+                // Thêm một chút dao động (jitter) để cá không xếp quá thẳng hàng, 
+                // nhưng vẫn đảm bảo trong ô của mình để không đè
+                let topPercent = pos.top + (Math.random() * 6 - 3);
+                let leftPercent = pos.left + (Math.random() * 6 - 3);
                 
                 const fishType = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
                 const animClass = Math.random() > 0.5 ? 'bob-fast' : 'bob-slow';
@@ -337,7 +345,7 @@
                 const scale = getFishScale(ans, currentMode);
 
                 const fishWrap = document.createElement('div');
-                fishWrap.className = `fish-wrapper no-select`;
+                fishWrap.className = `fish-wrapper no-select transform -translate-x-1/2 -translate-y-1/2`;
                 fishWrap.style.left = `${leftPercent}%`;
                 fishWrap.style.top = `${topPercent}%`;
                 fishWrap.dataset.val = ans;
@@ -416,8 +424,8 @@
 
             // Chuyển vị trí cá từ Relative/Container sang Absolute của Game Board để dễ JS Animate
             board.appendChild(fishElement); 
-            fishElement.style.left = (currentX - fishRect.width/2) + 'px';
-            fishElement.style.top = (currentY - fishRect.height/2) + 'px';
+            fishElement.style.left = (currentX) + 'px';
+            fishElement.style.top = (currentY) + 'px';
             
             // Tắt CSS Animation nhấp nhô để kéo mượt
             fishInner.style.animation = 'none';
@@ -477,8 +485,8 @@
                         hook.setAttribute('cy', currentY);
 
                         // Cập nhật vị trí Cá đi theo dây
-                        fishElement.style.left = (currentX - fishRect.width/2) + 'px';
-                        fishElement.style.top = (currentY - fishRect.height/2) + 'px';
+                        fishElement.style.left = (currentX) + 'px';
+                        fishElement.style.top = (currentY) + 'px';
                         
                         // Lắc nhẹ cá khi bị kéo
                         fishInner.style.transform = `scale(${getFishScale(parseInt(fishElement.dataset.val), currentMode)}) rotate(${Math.sin(pFrame) * 15}deg)`;
