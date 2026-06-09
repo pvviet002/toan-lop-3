@@ -167,17 +167,7 @@
         <!-- Header Bài học -->
         <div class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 md:p-5 text-center shadow-md relative z-10">
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide drop-shadow-md">Bài 6.1: Vui Câu Cá 🎣</h1>
-            <p class="text-cyan-100 text-sm md:text-base mt-1 font-medium">Bé hãy chọn con cá có đáp án đúng để câu lên thuyền nhé!</p>
-        </div>
-
-        <!-- TAB NAV -->
-        <div class="flex flex-nowrap overflow-x-auto hide-scrollbar bg-slate-100 border-b border-slate-200 shadow-inner z-0">
-            <button onclick="switchMode('nhan')" id="tab-nhan" class="flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-sky-700 bg-white border-sky-500 transition-colors">
-                Bảng Nhân 4 ✖️
-            </button>
-            <button onclick="switchMode('chia')" id="tab-chia" class="flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors">
-                Bảng Chia 4 ➗
-            </button>
+            <p id="game-subtitle" class="text-cyan-100 text-sm md:text-base mt-1 font-medium transition-colors duration-300">Đang khởi tạo...</p>
         </div>
 
         <!-- Khung Game Chính -->
@@ -283,28 +273,6 @@
         function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
         function updateScore() { document.getElementById('score-display').innerText = score; document.getElementById('streak-display').innerText = streak; }
 
-        function switchMode(mode) {
-            if (isFishing) return; // Không cho đổi khi đang câu
-
-            currentMode = mode;
-            recentQuestions = [];
-            
-            const btnNhan = document.getElementById('tab-nhan');
-            const btnChia = document.getElementById('tab-chia');
-            
-            if (mode === 'nhan') {
-                btnNhan.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-sky-700 bg-white border-sky-500 transition-colors";
-                btnChia.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors";
-            } else {
-                btnChia.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-sky-700 bg-white border-sky-500 transition-colors";
-                btnNhan.className = "flex-1 py-3 px-4 text-center font-bold text-sm md:text-base border-b-4 focus:outline-none text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200 hover:text-slate-600 transition-colors";
-            }
-            
-            initFishes(); 
-            generateQuestion();
-            playSound('snd-pop');
-        }
-
         // Kích thước cá theo giá trị số
         function getFishScale(val, mode) {
             let maxVal = mode === 'nhan' ? 40 : 10;
@@ -369,16 +337,25 @@
 
         function generateQuestion() {
             const prob = document.getElementById('math-problem');
+            let isSwitchingMode = false;
             
             // Lấy danh sách các con cá chưa bị câu (không có class fish-caught)
             let availableFishes = Array.from(document.querySelectorAll('.fish-wrapper:not(.fish-caught)'));
             
-            // Nếu đã câu hết cá, gọi bầy cá mới ra
+            // TỰ ĐỘNG CHUYỂN CHẾ ĐỘ: Nếu đã câu hết cá
             if (availableFishes.length === 0) {
+                currentMode = currentMode === 'nhan' ? 'chia' : 'nhan';
+                isSwitchingMode = true;
+                
                 initFishes();
                 availableFishes = Array.from(document.querySelectorAll('.fish-wrapper:not(.fish-caught)'));
-                recentQuestions = []; // Reset lịch sử
+                recentQuestions = []; // Reset lịch sử tránh bị kẹt số
             }
+
+            // Cập nhật Subtitle hiển thị chế độ hiện tại
+            document.getElementById('game-subtitle').innerHTML = currentMode === 'nhan' 
+                ? "Đang luyện tập: <b class='text-white text-lg'>Bảng Nhân 4 ✖️</b>" 
+                : "Đang luyện tập: <b class='text-white text-lg'>Bảng Chia 4 ➗</b>";
 
             // Map từ các con cá khả dụng ra các giá trị Factor (1-10) tương ứng
             const availableFactors = availableFishes.map(fish => {
@@ -422,7 +399,14 @@
             void sign.offsetWidth;
             sign.classList.add('bounce-in');
 
-            document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bé hãy nhấp vào con cá có số <b class="text-sky-600">đáp án</b> nhé! 👇</span>`;
+            // Cập nhật Lời nhắc
+            if (isSwitchingMode) {
+                let modeName = currentMode === 'nhan' ? 'Bảng Nhân 4' : 'Bảng Chia 4';
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-blue-600 font-bold">Tuyệt vời! Đàn cá <b class="text-blue-800">${modeName}</b> đã xuất hiện! 👇</span>`;
+                playSound('snd-pop');
+            } else {
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bé hãy nhấp vào con cá có số <b class="text-sky-600">đáp án</b> nhé! 👇</span>`;
+            }
         }
 
         // HIỆU ỨNG ĐÀO VÀNG - KÉO CÁ LÊN THUYỀN
