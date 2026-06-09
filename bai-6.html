@@ -305,7 +305,7 @@
             playSound('snd-pop');
         }
 
-        // Cập nhật: Kích thước cá theo giá trị số
+        // Kích thước cá theo giá trị số
         function getFishScale(val, mode) {
             let maxVal = mode === 'nhan' ? 40 : 10;
             // Tỉ lệ scale từ 0.75 (nhỏ nhất) đến 1.3 (to nhất)
@@ -369,12 +369,38 @@
 
         function generateQuestion() {
             const prob = document.getElementById('math-problem');
+            
+            // Lấy danh sách các con cá chưa bị câu (không có class fish-caught)
+            let availableFishes = Array.from(document.querySelectorAll('.fish-wrapper:not(.fish-caught)'));
+            
+            // Nếu đã câu hết cá, gọi bầy cá mới ra
+            if (availableFishes.length === 0) {
+                initFishes();
+                availableFishes = Array.from(document.querySelectorAll('.fish-wrapper:not(.fish-caught)'));
+                recentQuestions = []; // Reset lịch sử
+            }
+
+            // Map từ các con cá khả dụng ra các giá trị Factor (1-10) tương ứng
+            const availableFactors = availableFishes.map(fish => {
+                let ans = parseInt(fish.dataset.val);
+                return currentMode === 'nhan' ? ans / 4 : ans;
+            });
+
             let randomFactor;
             
-            do {
-                randomFactor = Math.floor(Math.random() * 10) + 1; // 1 đến 10
-            } while (recentQuestions.includes(randomFactor));
+            // Ưu tiên chọn những số chưa hỏi gần đây
+            if (availableFactors.length > 1) {
+                let validFactors = availableFactors.filter(f => !recentQuestions.includes(f));
+                if (validFactors.length > 0) {
+                    randomFactor = validFactors[Math.floor(Math.random() * validFactors.length)];
+                } else {
+                    randomFactor = availableFactors[Math.floor(Math.random() * availableFactors.length)];
+                }
+            } else {
+                randomFactor = availableFactors[0];
+            }
 
+            // Cập nhật lịch sử các câu hỏi gần nhất
             recentQuestions.push(randomFactor);
             if (recentQuestions.length > 5) {
                 recentQuestions.shift();
@@ -497,6 +523,7 @@
                             // HOÀN THÀNH: Cá vào giỏ
                             svg.classList.add('hidden');
                             fishElement.style.display = 'none'; // Xóa cá khỏi biển
+                            fishElement.classList.add('fish-caught'); // Đánh dấu đã câu để lọc ở câu tiếp theo
                             
                             playSound('snd-correct');
                             confetti({ particleCount: 50, spread: 50, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100 });
@@ -521,6 +548,8 @@
 
         function checkAnswer(fishElement) {
             if (isFishing) return; // Đang chạy animation thì cấm bấm
+            // Ngăn click lại cá đã câu
+            if (fishElement.classList.contains('fish-caught')) return;
 
             let selectedVal = parseInt(fishElement.dataset.val);
 
