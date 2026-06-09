@@ -46,7 +46,6 @@
         /* Bối cảnh Bầu trời & Đồi cỏ 3D */
         .field-container {
             position: relative;
-            /* Chuyển sắc từ xanh trời sang vàng hoàng hôn nhẹ */
             background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 30%, #fef08a 65%, #86efac 100%);
             border: 8px solid #064e3b; 
             box-shadow: inset 0 0 50px rgba(0,0,0,0.2), 0 20px 40px rgba(0,0,0,0.2);
@@ -54,10 +53,10 @@
             border-radius: 2.5rem;
         }
 
-        /* Mây bay */
+        /* Mây bay (Sử dụng hardware acceleration cho mượt) */
         @keyframes cloudDrift {
-            0% { transform: translateX(-200px); }
-            100% { transform: translateX(1000px); }
+            0% { transform: translate3d(-200px, 0, 0); }
+            100% { transform: translate3d(1000px, 0, 0); }
         }
         .cloud {
             position: absolute;
@@ -65,6 +64,7 @@
             animation: cloudDrift linear infinite;
             z-index: 5;
             filter: drop-shadow(0 8px 12px rgba(255,255,255,0.8));
+            will-change: transform;
         }
 
         /* Lớp đồi cỏ (Parallax Hills) */
@@ -100,32 +100,34 @@
                 repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px),
                 linear-gradient(90deg, #713f12, #a16207, #713f12);
             border: 4px solid #451a03;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 15px 25px rgba(0,0,0,0.4);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 10px 15px rgba(0,0,0,0.4);
             position: relative;
-            border-radius: 12px;
+            border-radius: 10px;
         }
 
         .nail {
-            width: 12px; height: 12px;
+            width: 8px; height: 8px;
             background: #94a3b8;
             border-radius: 50%;
-            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.5), 1px 1px 2px rgba(255,255,255,0.4);
+            box-shadow: inset -1px -1px 3px rgba(0,0,0,0.5), 1px 1px 2px rgba(255,255,255,0.4);
             position: absolute;
         }
 
         /* BÓNG BAY 3D SIÊU THỰC - Hình tròn */
         .balloon-float {
             animation: floating ease-in-out infinite alternate;
+            will-change: transform;
         }
         @keyframes floating {
-            0% { transform: translateY(-10px) rotate(-4deg); }
-            100% { transform: translateY(10px) rotate(4deg); }
+            0% { transform: translateY(-8px) rotate(-3deg); }
+            100% { transform: translateY(8px) rotate(3deg); }
         }
 
         .balloon-shape {
-            border-radius: 50%; /* Chỉnh thành hình tròn hoàn hảo */
+            border-radius: 50%;
             box-shadow: inset -8px -8px 20px rgba(0,0,0,0.4), inset 5px 5px 15px rgba(255,255,255,0.4), 0 10px 20px rgba(0,0,0,0.3);
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
         }
         
         .balloon-wrapper:hover .balloon-shape {
@@ -146,7 +148,7 @@
 
         .balloon-string {
             position: absolute;
-            bottom: -35px; /* Giảm độ dài dây do bóng tròn lại */
+            bottom: -35px; 
             left: 50%;
             width: 2px;
             height: 35px;
@@ -156,8 +158,8 @@
             z-index: 0;
         }
         @keyframes stringWiggle {
-            0% { transform: translateX(-50%) rotate(-12deg); }
-            100% { transform: translateX(-50%) rotate(12deg); }
+            0% { transform: translateX(-50%) rotate(-10deg); }
+            100% { transform: translateX(-50%) rotate(10deg); }
         }
 
         .bow-recoil {
@@ -165,8 +167,12 @@
         }
         @keyframes recoil {
             0% { transform: translateX(0); }
-            50% { transform: translateX(-15px); }
+            50% { transform: translateX(-10px); }
             100% { transform: translateX(0); }
+        }
+
+        #flying-arrow {
+            will-change: transform;
         }
     </style>
 </head>
@@ -249,33 +255,33 @@
                 <div class="hill-layer-2"></div>
                 <div class="hill-layer-3"></div>
 
-                <!-- Cung thủ & Bảng phép tính (Bên trái) -->
+                <!-- Cung thủ & Bảng phép tính (Bên trái) - Đã được làm gọn -->
                 <div class="absolute bottom-[10%] left-[2%] md:left-[5%] flex flex-col items-center z-20">
                     
                     <!-- Bảng gỗ treo lơ lửng trên đám mây -->
-                    <div class="relative flex flex-col items-center mb-6 mt-10">
-                        <!-- Đám mây -->
-                        <div class="absolute -top-16 z-30 text-[80px] md:text-[100px] drop-shadow-md pointer-events-none" style="line-height: 1;">☁️</div>
-                        <!-- Dây thừng (SVG) -->
-                        <svg class="absolute -top-8 left-0 w-full h-10 pointer-events-none z-10">
-                            <line x1="30%" y1="0" x2="20%" y2="100%" stroke="#78350f" stroke-width="4" stroke-dasharray="2 1"/>
-                            <line x1="70%" y1="0" x2="80%" y2="100%" stroke="#78350f" stroke-width="4" stroke-dasharray="2 1"/>
+                    <div class="relative flex flex-col items-center mb-4 mt-6">
+                        <!-- Đám mây nhỏ hơn -->
+                        <div class="absolute -top-12 z-30 text-[60px] md:text-[80px] drop-shadow-md pointer-events-none" style="line-height: 1;">☁️</div>
+                        <!-- Dây thừng (SVG) gọn hơn -->
+                        <svg class="absolute -top-6 left-0 w-full h-8 pointer-events-none z-10">
+                            <line x1="25%" y1="0" x2="20%" y2="100%" stroke="#78350f" stroke-width="3" stroke-dasharray="2 1"/>
+                            <line x1="75%" y1="0" x2="80%" y2="100%" stroke="#78350f" stroke-width="3" stroke-dasharray="2 1"/>
                         </svg>
                         
-                        <!-- Bảng chính -->
-                        <div class="wood-board w-40 md:w-48 h-16 md:h-20 flex items-center justify-center relative z-20 mt-1">
+                        <!-- Bảng chính nhỏ hơn -->
+                        <div class="wood-board w-32 md:w-40 h-12 md:h-14 flex items-center justify-center relative z-20 mt-1">
                             <!-- Đinh tán -->
-                            <div class="nail top-1.5 left-1.5"></div>
-                            <div class="nail top-1.5 right-1.5"></div>
-                            <div class="nail bottom-1.5 left-1.5"></div>
-                            <div class="nail bottom-1.5 right-1.5"></div>
+                            <div class="nail w-2 h-2 top-1 left-1"></div>
+                            <div class="nail w-2 h-2 top-1 right-1"></div>
+                            <div class="nail w-2 h-2 bottom-1 left-1"></div>
+                            <div class="nail w-2 h-2 bottom-1 right-1"></div>
                             
-                            <span id="math-problem" class="font-black text-white text-2xl md:text-4xl tracking-widest drop-shadow-lg z-10 relative">6 x ?</span>
+                            <span id="math-problem" class="font-black text-white text-xl md:text-2xl tracking-widest drop-shadow-lg z-10 relative">6 x ?</span>
                         </div>
                     </div>
                     
-                    <!-- Cung thủ SVG (Robin Hood tí hon) -->
-                    <div class="relative w-36 h-36 md:w-44 md:h-44 drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)] z-10" id="archer-container">
+                    <!-- Cung thủ SVG (Thu nhỏ lại) -->
+                    <div class="relative w-24 h-24 md:w-32 md:h-32 drop-shadow-[0_10px_10px_rgba(0,0,0,0.4)] z-10" id="archer-container">
                         <svg viewBox="0 0 200 200" class="w-full h-full" id="archer-svg">
                             <!-- Chân -->
                             <path d="M 85 140 L 85 180" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
@@ -336,14 +342,14 @@
                     </div>
                 </div>
 
-                <!-- SVG Mũi tên bay độc lập (Giống hệt Mũi tên đang lắp) -->
-                <svg id="flying-arrow" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 80px; height: 16px; transform-origin: left center;">
+                <!-- SVG Mũi tên bay độc lập (Dùng translate3d cho mượt) -->
+                <svg id="flying-arrow" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 80px; height: 16px; top: 0; left: 0;">
                     <line x1="0" y1="10" x2="85" y2="10" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
                     <polygon points="85,5 98,10 85,15" fill="#94a3b8" />
                     <polygon points="0,5 -12,10 0,15" fill="#ef4444" />
                 </svg>
 
-                <!-- Vùng chứa Bóng bay, đặt z-index cao để luôn ở trên các yếu tố khác, không bị che khuất -->
+                <!-- Vùng chứa Bóng bay -->
                 <div id="balloons-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
                     <!-- Sinh bóng bay bằng JS -->
                 </div>
@@ -363,7 +369,7 @@
     <!-- AUDIO -->
     <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
     <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
-    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio> <!-- Tiếng bóng bay nổ -->
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio>
     <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio>
 
     <script>
@@ -412,18 +418,18 @@
         const answersNhan = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60];
         const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         
-        // 10 MÀU SẮC ĐỘC LẬP CHO BÓNG BAY (Tránh trùng màu)
+        // 10 MÀU SẮC ĐỘC LẬP CHO BÓNG BAY
         const balloonColors = [
-            { bg: 'background: radial-gradient(circle at 30% 30%, #fca5a5, #ef4444)', knot: 'border-bottom-color: #b91c1c' }, // Red
-            { bg: 'background: radial-gradient(circle at 30% 30%, #93c5fd, #3b82f6)', knot: 'border-bottom-color: #1d4ed8' }, // Blue
-            { bg: 'background: radial-gradient(circle at 30% 30%, #fde047, #eab308)', knot: 'border-bottom-color: #a16207' }, // Yellow
-            { bg: 'background: radial-gradient(circle at 30% 30%, #d8b4fe, #a855f7)', knot: 'border-bottom-color: #7e22ce' }, // Purple
-            { bg: 'background: radial-gradient(circle at 30% 30%, #f9a8d4, #ec4899)', knot: 'border-bottom-color: #be185d' }, // Pink
-            { bg: 'background: radial-gradient(circle at 30% 30%, #fb923c, #f97316)', knot: 'border-bottom-color: #c2410c' }, // Orange
-            { bg: 'background: radial-gradient(circle at 30% 30%, #6ee7b7, #10b981)', knot: 'border-bottom-color: #047857' }, // Emerald
-            { bg: 'background: radial-gradient(circle at 30% 30%, #67e8f9, #06b6d4)', knot: 'border-bottom-color: #0e7490' }, // Cyan
-            { bg: 'background: radial-gradient(circle at 30% 30%, #bef264, #84cc16)', knot: 'border-bottom-color: #4d7c0f' }, // Lime
-            { bg: 'background: radial-gradient(circle at 30% 30%, #a5b4fc, #6366f1)', knot: 'border-bottom-color: #4338ca' }  // Indigo
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fca5a5, #ef4444)', knot: 'border-bottom-color: #b91c1c' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #93c5fd, #3b82f6)', knot: 'border-bottom-color: #1d4ed8' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fde047, #eab308)', knot: 'border-bottom-color: #a16207' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #d8b4fe, #a855f7)', knot: 'border-bottom-color: #7e22ce' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #f9a8d4, #ec4899)', knot: 'border-bottom-color: #be185d' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fb923c, #f97316)', knot: 'border-bottom-color: #c2410c' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #6ee7b7, #10b981)', knot: 'border-bottom-color: #047857' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #67e8f9, #06b6d4)', knot: 'border-bottom-color: #0e7490' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #bef264, #84cc16)', knot: 'border-bottom-color: #4d7c0f' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #a5b4fc, #6366f1)', knot: 'border-bottom-color: #4338ca' }
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -438,7 +444,6 @@
         }
 
         function startGame() {
-            // Sound trigger to bypass autoplay policies
             playSound('snd-pop');
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
@@ -461,7 +466,6 @@
 
         function getFishScale(val, mode) {
             let maxVal = mode === 'nhan' ? 40 : 10;
-            // Scale từ 0.75 (bé nhất) đến 1.35 (to nhất)
             return 0.75 + (val / maxVal) * 0.6;
         }
 
@@ -470,12 +474,8 @@
             container.innerHTML = '';
             
             const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
-            
-            // Xáo trộn màu để mỗi quả bóng có một màu riêng biệt (trùng số lượng bóng 10 = 10 màu)
             const shuffledColors = [...balloonColors].sort(() => Math.random() - 0.5);
             
-            // Lưới phân bổ 10 bóng bay ở khu vực bên phải (x: 45-90%, y: 15-80%)
-            // Tránh khu vực bên trái (Cung thủ) hoàn toàn
             const basePositions = [
                 { top: 15, left: 45 }, { top: 20, left: 65 }, { top: 15, left: 85 },
                 { top: 38, left: 55 }, { top: 42, left: 80 },
@@ -487,14 +487,10 @@
 
             currentAnswers.forEach((ans, index) => {
                 const pos = shuffledPositions[index];
-                
-                // Xê dịch nhẹ (Giữ lại tính ngẫu nhiên nhưng vẫn đảm bảo trong phạm vi an toàn)
                 let topPercent = pos.top + (Math.random() * 4 - 2); 
                 let leftPercent = pos.left + (Math.random() * 4 - 2);
                 
-                // Gán màu độc lập cho quả bóng này
                 const color = shuffledColors[index];
-                
                 const wrap = document.createElement('div');
                 wrap.className = `balloon-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30`;
                 wrap.style.left = `${leftPercent}%`;
@@ -503,12 +499,10 @@
                 
                 wrap.onclick = function() { checkAnswer(this); };
 
-                // Random delay và hướng nổi để bóng bay đung đưa đa dạng hơn
                 let animDelay = Math.random() * 2;
                 let animDur = 2.5 + Math.random() * 1.5;
                 const scale = getFishScale(ans, currentMode);
 
-                // Bóng bay đổi thành hình tròn h-14 w-14 -> h-16 w-16
                 wrap.innerHTML = `
                     <div class="relative flex flex-col items-center balloon-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
                         <div class="balloon-shape w-14 h-14 md:w-16 md:h-16 flex items-center justify-center text-white font-black text-2xl md:text-3xl relative z-10" style="${color.bg};">
@@ -587,19 +581,17 @@
             }
         }
 
-        // TỐI ƯU HÓA ANIMATION BẮN CUNG VỚI requestAnimationFrame (60FPS)
+        // TỐI ƯU HÓA ANIMATION BẮN CUNG (Dùng translate3d)
         function shootArrow(balloonElement) {
             isShooting = true;
             playSound('snd-shoot'); 
             
-            // Hiệu ứng giật cung (Recoil animation trên container)
             const archerContainer = document.getElementById('archer-container');
             archerContainer.classList.remove('bow-recoil');
             void archerContainer.offsetWidth;
             archerContainer.classList.add('bow-recoil');
 
             document.getElementById('loaded-arrow').classList.add('hidden');
-            // Dây cung bật thẳng
             document.getElementById('bow-string').setAttribute('d', 'M 150 25 L 150 100 L 150 175'); 
 
             const board = document.getElementById('game-board');
@@ -608,11 +600,9 @@
             const startPt = document.getElementById('arrow-start-point');
             const startRect = startPt.getBoundingClientRect();
             
-            // Tìm tâm quả bóng
             const balloonBody = balloonElement.querySelector('.balloon-shape');
             const targetRect = balloonBody.getBoundingClientRect();
 
-            // Tọa độ tương đối với Game Board
             const startX = (startRect.left + startRect.width/2) - boardRect.left;
             const startY = (startRect.top + startRect.height/2) - boardRect.top;
 
@@ -621,40 +611,38 @@
 
             const arrow = document.getElementById('flying-arrow');
             arrow.classList.remove('hidden');
-            arrow.style.left = startX + 'px';
-            arrow.style.top = startY + 'px';
-
-            // Xoay mũi tên hướng về quả bóng
+            
+            // Xoay hướng và reset vị trí về 0 để dùng translate3d
             const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
-            arrow.style.transform = `translate(0, -50%) rotate(${angle}deg)`;
+            arrow.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle}deg)`;
 
-            const duration = 200; // Bay rất nhanh (200ms)
+            const duration = 250; 
             let animationStartTime = null;
 
             function animateFly(timestamp) {
                 if (!animationStartTime) animationStartTime = timestamp;
                 let progress = Math.min((timestamp - animationStartTime) / duration, 1);
                 
-                let currentX = startX + (targetX - startX) * progress;
-                let currentY = startY + (targetY - startY) * progress;
+                // Mượt mà hơn với Ease Out Quad
+                let easeProgress = progress * (2 - progress);
                 
-                arrow.style.left = currentX + 'px';
-                arrow.style.top = currentY + 'px';
+                let currentX = startX + (targetX - startX) * easeProgress;
+                let currentY = startY + (targetY - startY) * easeProgress;
+                
+                arrow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle}deg)`;
 
                 if (progress < 1) {
                     requestAnimationFrame(animateFly);
                 } else {
-                    // Trúng đích
                     arrow.classList.add('hidden');
                     
-                    // Phục hồi mũi tên trên cung
                     document.getElementById('loaded-arrow').classList.remove('hidden');
                     document.getElementById('bow-string').setAttribute('d', 'M 150 25 L 120 100 L 150 175');
                     
                     balloonElement.style.display = 'none';
                     balloonElement.classList.add('popped');
                     
-                    playSound('snd-pop'); // Phát tiếng nổ bóng
+                    playSound('snd-pop'); 
                     confetti({ particleCount: 80, spread: 100, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100 });
                     
                     score += 10;
@@ -693,7 +681,7 @@
 
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Úi chà trượt rồi! Lắng nghe kết quả nhé 🎧</span>`;
                 
-                isShooting = true; // Khóa màn hình
+                isShooting = true;
                 
                 const numWords = {
                     1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 6: 'sáu', 7: 'bảy', 8: 'tám', 9: 'chín', 10: 'mười',
@@ -707,7 +695,6 @@
                 
                 let ttsPrompt = "Đáp án đúng là: " + readText; 
                 
-                // Đọc TTS
                 await playTTS(ttsPrompt);
                 
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500 font-bold">Phép tính đã đổi, bé ngắm bắn lại nhé 🔄</span>`;
