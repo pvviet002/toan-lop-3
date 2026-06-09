@@ -243,16 +243,17 @@
 
                 <!-- Thuyền & Người câu cá (Nổi trên mặt sóng) -->
                 <div id="boat-element" class="boat-wrapper flex flex-col items-center">
-                    <div id="boat-inner" class="relative origin-bottom transition-transform">
+                    <!-- Sửa lỗi đè layout: Dùng flex-col để xếp biển gỗ lên trên thuyền -->
+                    <div id="boat-inner" class="relative origin-bottom transition-transform flex flex-col items-center gap-2 md:gap-4">
                         <!-- Tấm biển gỗ hiển thị phép tính -->
-                        <div class="wooden-sign px-6 py-3 rounded-xl flex items-center justify-center relative z-20 top-8">
+                        <div class="wooden-sign px-6 py-3 rounded-xl flex items-center justify-center relative z-20">
                             <div class="absolute -top-4 left-4 w-1.5 h-6 bg-amber-900 rounded-full shadow-sm"></div>
                             <div class="absolute -top-4 right-4 w-1.5 h-6 bg-amber-900 rounded-full shadow-sm"></div>
-                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest whitespace-nowrap">4 x ?</span>
+                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest whitespace-nowrap drop-shadow-md">4 x ?</span>
                         </div>
                         
                         <!-- Cụm emoji thuyền và người -->
-                        <div class="text-[110px] md:text-[140px] leading-none drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] relative z-10 mt-[-15px] pl-6">
+                        <div class="text-[110px] md:text-[140px] leading-none drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] relative z-10 pl-6">
                             🚣‍♂️<span id="rod-tip" class="absolute top-6 -right-5 text-[60px] md:text-[80px] transform rotate-45 drop-shadow-md">🎣</span>
                         </div>
                     </div>
