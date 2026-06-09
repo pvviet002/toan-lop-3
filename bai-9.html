@@ -343,8 +343,8 @@
                     <polygon points="0,5 -12,10 0,15" fill="#ef4444" />
                 </svg>
 
-                <!-- Vùng chứa Bóng bay -->
-                <div id="balloons-container" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+                <!-- Vùng chứa Bóng bay, đặt z-index cao để luôn ở trên các yếu tố khác, không bị che khuất -->
+                <div id="balloons-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
                     <!-- Sinh bóng bay bằng JS -->
                 </div>
             </div>
@@ -412,16 +412,18 @@
         const answersNhan = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60];
         const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         
-        // Bảng màu bóng bay CSS 3D
+        // 10 MÀU SẮC ĐỘC LẬP CHO BÓNG BAY (Tránh trùng màu)
         const balloonColors = [
-            { bg: 'background: radial-gradient(circle at 30% 30%, #fca5a5, #ef4444)', knot: 'border-bottom-color: #b91c1c' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #93c5fd, #3b82f6)', knot: 'border-bottom-color: #1d4ed8' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #fde047, #eab308)', knot: 'border-bottom-color: #a16207' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #d8b4fe, #a855f7)', knot: 'border-bottom-color: #7e22ce' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #f9a8d4, #ec4899)', knot: 'border-bottom-color: #be185d' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #fb923c, #f97316)', knot: 'border-bottom-color: #c2410c' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #6ee7b7, #10b981)', knot: 'border-bottom-color: #047857' },
-            { bg: 'background: radial-gradient(circle at 30% 30%, #67e8f9, #06b6d4)', knot: 'border-bottom-color: #0e7490' }
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fca5a5, #ef4444)', knot: 'border-bottom-color: #b91c1c' }, // Red
+            { bg: 'background: radial-gradient(circle at 30% 30%, #93c5fd, #3b82f6)', knot: 'border-bottom-color: #1d4ed8' }, // Blue
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fde047, #eab308)', knot: 'border-bottom-color: #a16207' }, // Yellow
+            { bg: 'background: radial-gradient(circle at 30% 30%, #d8b4fe, #a855f7)', knot: 'border-bottom-color: #7e22ce' }, // Purple
+            { bg: 'background: radial-gradient(circle at 30% 30%, #f9a8d4, #ec4899)', knot: 'border-bottom-color: #be185d' }, // Pink
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fb923c, #f97316)', knot: 'border-bottom-color: #c2410c' }, // Orange
+            { bg: 'background: radial-gradient(circle at 30% 30%, #6ee7b7, #10b981)', knot: 'border-bottom-color: #047857' }, // Emerald
+            { bg: 'background: radial-gradient(circle at 30% 30%, #67e8f9, #06b6d4)', knot: 'border-bottom-color: #0e7490' }, // Cyan
+            { bg: 'background: radial-gradient(circle at 30% 30%, #bef264, #84cc16)', knot: 'border-bottom-color: #4d7c0f' }, // Lime
+            { bg: 'background: radial-gradient(circle at 30% 30%, #a5b4fc, #6366f1)', knot: 'border-bottom-color: #4338ca' }  // Indigo
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -469,12 +471,16 @@
             
             const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
             
-            // Lưới phân bổ 10 bóng bay ở khu vực bên phải (x: 40-90%, y: 15-80%)
+            // Xáo trộn màu để mỗi quả bóng có một màu riêng biệt (trùng số lượng bóng 10 = 10 màu)
+            const shuffledColors = [...balloonColors].sort(() => Math.random() - 0.5);
+            
+            // Lưới phân bổ 10 bóng bay ở khu vực bên phải (x: 45-90%, y: 15-80%)
+            // Tránh khu vực bên trái (Cung thủ) hoàn toàn
             const basePositions = [
-                { top: 15, left: 45 }, { top: 20, left: 70 }, { top: 15, left: 90 },
-                { top: 38, left: 55 }, { top: 42, left: 82 },
-                { top: 60, left: 40 }, { top: 65, left: 65 }, { top: 60, left: 90 },
-                { top: 82, left: 50 }, { top: 82, left: 78 }
+                { top: 15, left: 45 }, { top: 20, left: 65 }, { top: 15, left: 85 },
+                { top: 38, left: 55 }, { top: 42, left: 80 },
+                { top: 60, left: 45 }, { top: 65, left: 68 }, { top: 60, left: 90 },
+                { top: 82, left: 55 }, { top: 82, left: 78 }
             ];
 
             const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
@@ -482,11 +488,12 @@
             currentAnswers.forEach((ans, index) => {
                 const pos = shuffledPositions[index];
                 
-                // Xê dịch nhẹ
+                // Xê dịch nhẹ (Giữ lại tính ngẫu nhiên nhưng vẫn đảm bảo trong phạm vi an toàn)
                 let topPercent = pos.top + (Math.random() * 4 - 2); 
                 let leftPercent = pos.left + (Math.random() * 4 - 2);
                 
-                const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+                // Gán màu độc lập cho quả bóng này
+                const color = shuffledColors[index];
                 
                 const wrap = document.createElement('div');
                 wrap.className = `balloon-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30`;
@@ -574,6 +581,7 @@
             if (isSwitchingMode) {
                 let modeName = currentMode === 'nhan' ? 'Bảng Nhân 6' : 'Bảng Chia 6';
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-blue-600 font-bold">Tuyệt vời! Bóng bay <b class="text-blue-800">${modeName}</b> đã xuất hiện! 👇</span>`;
+                playSound('snd-pop');
             } else {
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bé hãy nhấp vào bóng mang số <b class="text-emerald-600">đáp án</b> nhé! 👇</span>`;
             }
