@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 9: Bảng nhân, chia 6 - Bắn bóng bay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: #ecfdf5; /* emerald-50 */
+            overscroll-behavior-y: none; 
+            overflow-x: hidden;
+        }
+        
+        .no-select { user-select: none; -webkit-user-select: none; }
+        
+        /* Hiệu ứng Nút bấm 3D chuyên nghiệp */
+        .btn-press {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        .btn-press:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
+        }
+
+        .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Bối cảnh Sân cỏ & Bầu trời (Chuyên nghiệp hơn) */
+        .field-container {
+            position: relative;
+            background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 45%, #bae6fd 60%);
+            border: 8px solid #047857; /* emerald-700 */
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.2), 0 15px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        /* Mây bay */
+        @keyframes cloudDrift {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(800px); }
+        }
+        .cloud {
+            position: absolute;
+            white-space: nowrap;
+            animation: cloudDrift 35s linear infinite;
+            z-index: 5;
+            filter: drop-shadow(0 4px 6px rgba(255,255,255,0.5));
+        }
+
+        /* Biển gỗ */
+        .wooden-sign {
+            background-color: #854d0e;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.15) 4px, rgba(0,0,0,0.15) 8px);
+            border: 4px solid #451a03;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 8px 15px rgba(0,0,0,0.4);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* BÓNG BAY 3D SIÊU THỰC */
+        .balloon-float {
+            animation: floating 3s ease-in-out infinite alternate;
+        }
+        @keyframes floating {
+            0% { transform: translateY(-8px); }
+            100% { transform: translateY(8px); }
+        }
+
+        .balloon-shape {
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3), 0 8px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .balloon-wrapper:hover .balloon-shape {
+            transform: scale(1.08);
+        }
+
+        .balloon-shine {
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 30%;
+            height: 40%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 50%;
+            transform: rotate(-30deg);
+            pointer-events: none;
+        }
+
+        .balloon-string {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            width: 2px;
+            height: 35px;
+            background: rgba(255,255,255,0.6);
+            transform-origin: top center;
+            animation: stringWiggle 2s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+        @keyframes stringWiggle {
+            0% { transform: translateX(-50%) rotate(-8deg); }
+            100% { transform: translateX(-50%) rotate(8deg); }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative">
+
+    <!-- Header Global -->
+    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#e2e8f0] border-2 border-slate-200 hover:bg-slate-50 btn-press font-bold text-sm transition-colors">
+                <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
+            </a>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-white text-slate-600 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#e2e8f0] border-2 border-slate-200 hover:bg-slate-50 btn-press font-bold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+        
+        <div class="bg-white px-5 py-2.5 rounded-xl shadow-[0_4px_0_0_#a7f3d0] border-2 border-emerald-200 flex items-center space-x-5">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🎯</span>
+                <span id="score-display" class="font-black text-emerald-600 text-xl">0</span>
+            </div>
+            <div class="w-1 h-6 bg-slate-200 rounded-full"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-500 text-xl">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-2xl border border-emerald-100 overflow-hidden flex flex-col flex-grow relative">
+        
+        <!-- MÀN HÌNH BẮT ĐẦU -->
+        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-emerald-400 via-teal-500 to-teal-700 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            <div class="absolute top-10 right-10 text-6xl opacity-30">☁️</div>
+            <div class="absolute bottom-20 left-10 text-7xl opacity-30">☁️</div>
+            
+            <!-- Icon Bắn Cung Lớn -->
+            <div class="w-32 h-32 md:w-40 md:h-40 mb-6 drop-shadow-lg bounce-in flex items-center justify-center bg-white/20 rounded-full border-4 border-white/40" style="animation-delay: 0.1s">
+                <span class="text-7xl md:text-8xl transform translate-x-2 -translate-y-1">🏹</span>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)] bounce-in text-yellow-300" style="animation-delay: 0.2s; text-shadow: 2px 4px 0 #064e3b, -2px -2px 0 #064e3b, 2px -2px 0 #064e3b, -2px 2px 0 #064e3b;">
+                CUNG THỦ TÀI BA
+            </h1>
+            
+            <div class="bg-white/20 backdrop-blur-md p-6 md:p-8 rounded-3xl border-2 border-white/40 max-w-lg text-center mb-10 bounce-in shadow-xl" style="animation-delay: 0.3s">
+                <p class="text-lg md:text-xl font-bold mb-3 text-yellow-200 uppercase tracking-widest">Cách chơi:</p>
+                <p class="text-base md:text-lg mb-4 font-medium leading-relaxed">Bé hãy nhấp vào quả bóng bay chứa số là <b class="text-white bg-teal-600/50 px-2 py-1 rounded">đáp án đúng</b> để cung thủ bắn vỡ nó nhé!</p>
+                <div class="inline-flex items-center gap-2 bg-black/30 rounded-xl p-3 font-medium text-sm md:text-base border border-white/20 shadow-inner mt-2 text-emerald-100">
+                    <span>🔊 Bật âm thanh để nghe đọc kết quả khi lỡ chọn sai nha!</span>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="btn-press px-12 py-5 bg-gradient-to-b from-amber-300 to-amber-500 text-amber-900 font-black rounded-full text-2xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-amber-200 shadow-xl" style="animation-delay: 0.4s">
+                BẮT ĐẦU 🚀
+            </button>
+        </div>
+
+        <!-- Header Bài học -->
+        <div class="bg-gradient-to-b from-teal-400 to-emerald-600 text-white p-5 md:p-6 text-center shadow-md relative z-10">
+            <h1 class="text-2xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1">Cung Thủ Tài Ba 🏹</h1>
+            <p id="game-subtitle" class="text-emerald-100 text-sm md:text-base font-medium transition-colors duration-300">Đang chuẩn bị...</p>
+        </div>
+
+        <!-- Khung Game Chính -->
+        <div class="flex-grow flex items-center justify-center p-3 md:p-6 relative bg-slate-50">
+            
+            <!-- Khu vực Bắn Cung (Game Board) -->
+            <div id="game-board" class="field-container w-full max-w-[500px] md:max-w-[800px] aspect-[3/4] md:aspect-[16/11] rounded-[2.5rem] relative bounce-in">
+                
+                <!-- Bầu trời: Mây & Mặt trời -->
+                <div class="absolute top-6 right-10 w-16 h-16 md:w-20 md:h-20 bg-yellow-300 rounded-full shadow-[0_0_40px_rgba(253,224,71,0.9)] animate-pulse z-0"></div>
+                <div class="cloud text-5xl md:text-7xl opacity-90" style="top: 8%; animation-duration: 45s; animation-delay: -10s;">☁️</div>
+                <div class="cloud text-4xl md:text-5xl opacity-70" style="top: 25%; animation-duration: 30s; animation-delay: -25s;">☁️</div>
+
+                <!-- Đồi cỏ Parallax -->
+                <div class="absolute bottom-0 w-[150%] h-[35%] bg-emerald-500 rounded-t-[100%] left-[-25%] shadow-[0_-10px_20px_rgba(0,0,0,0.15)] z-10"></div>
+                <div class="absolute bottom-0 w-[120%] h-[25%] bg-green-600 rounded-t-[100%] left-[-10%] shadow-[0_-5px_15px_rgba(0,0,0,0.15)] z-10"></div>
+
+                <!-- Cung thủ & Bảng phép tính (Bên trái) -->
+                <div class="absolute bottom-[8%] left-[2%] md:left-[5%] flex flex-col items-center z-20">
+                    
+                    <!-- Bảng gỗ treo lơ lửng -->
+                    <div class="relative flex flex-col items-center mb-2">
+                        <div class="flex justify-between w-20 px-2 absolute -top-4 z-0">
+                            <div class="w-1.5 h-6 bg-amber-900 rounded-full shadow-sm"></div>
+                            <div class="w-1.5 h-6 bg-amber-900 rounded-full shadow-sm"></div>
+                        </div>
+                        <div class="wooden-sign px-5 py-2 md:px-6 md:py-3 rounded-xl flex items-center justify-center relative z-20">
+                            <span id="math-problem" class="font-black text-white text-2xl md:text-4xl tracking-widest whitespace-nowrap drop-shadow-md">6 x ?</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG Cung thủ Chuyên nghiệp -->
+                    <div class="relative w-28 h-28 md:w-36 md:h-36 drop-shadow-2xl z-10">
+                        <svg viewBox="0 0 200 200" class="w-full h-full" id="archer-svg">
+                            <!-- Chân -->
+                            <rect x="85" y="140" width="14" height="40" rx="6" fill="#0f172a" />
+                            <rect x="110" y="140" width="14" height="40" rx="6" fill="#0f172a" />
+                            <!-- Thân -->
+                            <rect x="75" y="80" width="55" height="70" rx="15" fill="#0ea5e9" />
+                            <rect x="75" y="130" width="55" height="10" fill="#1e293b" /> <!-- Thắt lưng -->
+                            <!-- Đầu -->
+                            <circle cx="102" cy="50" r="28" fill="#fde047" />
+                            <!-- Băng rôn ninja -->
+                            <path d="M 75 40 Q 102 50 129 40" fill="none" stroke="#ef4444" stroke-width="8" stroke-linecap="round"/>
+                            <path d="M 75 40 L 45 25 L 55 55 Z" fill="#ef4444" />
+                            <!-- Mắt -->
+                            <circle cx="115" cy="46" r="4" fill="#000" />
+                            <!-- Cánh tay cầm cung -->
+                            <path d="M 90 100 L 150 90" fill="none" stroke="#fde047" stroke-width="12" stroke-linecap="round" />
+                            <!-- Cánh tay kéo dây -->
+                            <path d="M 100 100 L 120 100" fill="none" stroke="#fde047" stroke-width="12" stroke-linecap="round" />
+                            
+                            <!-- Cây cung -->
+                            <path id="bow-arc" d="M 150 30 Q 190 90 150 150" fill="none" stroke="#78350f" stroke-width="8" stroke-linecap="round" />
+                            <!-- Dây cung -->
+                            <path id="bow-string" d="M 150 30 L 120 90 L 150 150" fill="none" stroke="#f8fafc" stroke-width="3" />
+                            
+                            <!-- Mũi tên (Đang lắp) -->
+                            <g id="loaded-arrow">
+                                <line x1="120" y1="90" x2="175" y2="90" stroke="#451a03" stroke-width="4" stroke-linecap="round" />
+                                <polygon points="175,85 185,90 175,95" fill="#cbd5e1" />
+                                <polygon points="120,85 110,90 120,95" fill="#ef4444" />
+                            </g>
+                        </svg>
+                        
+                        <!-- Điểm mỏ neo để xuất phát mũi tên bay -->
+                        <div id="arrow-start-point" class="absolute w-1 h-1" style="top: 45%; right: 5%;"></div>
+                    </div>
+                </div>
+
+                <!-- SVG Mũi tên bay độc lập -->
+                <svg id="flying-arrow" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 80px; height: 16px; transform-origin: left center;">
+                    <line x1="0" y1="10" x2="90" y2="10" stroke="#451a03" stroke-width="4" stroke-linecap="round"/>
+                    <polygon points="90,4 100,10 90,16" fill="#cbd5e1" />
+                    <polygon points="0,4 15,10 0,16" fill="#ef4444" />
+                </svg>
+
+                <!-- Vùng chứa Bóng bay -->
+                <div id="balloons-container" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+                    <!-- Sinh bóng bay bằng JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Thanh Tương Tác Cố Định Dưới Cùng -->
+        <div class="bg-white p-5 border-t border-slate-100 flex items-center justify-center z-10 rounded-b-3xl">
+            <div id="feedback-msg" class="text-xl md:text-2xl font-black text-center flex-grow text-slate-500 tracking-wide drop-shadow-sm">
+                Nhấp vào bóng bay để bắn nhé! 👆
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/110/110-preview.mp3" preload="auto"></audio>
+    <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // --- HÀM HỖ TRỢ ĐỌC TTS GỐC CỦA TRÌNH DUYỆT (TỐI ƯU VERCEL) ---
+        function playTTS(text) {
+            return new Promise(resolve => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = 0.95; 
+                    utterance.pitch = 1.1; 
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
+                    if (viVoice) utterance.voice = viVoice;
+
+                    utterance.onend = resolve;
+                    utterance.onerror = resolve;
+                    
+                    window.speechSynthesis.speak(utterance);
+                    setTimeout(resolve, 5000); // Fallback timeout
+                } else {
+                    setTimeout(resolve, 1000);
+                }
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        }
+
+        // Game State
+        let currentMode = 'nhan'; 
+        let currentMultiplier = 1;
+        let currentDividend = 6;
+        let expectedAnswer = 6;
+        
+        let score = 0;
+        let streak = 0;
+        let isShooting = false; 
+        let recentQuestions = [];
+
+        // Bảng nhân 6, chia 6
+        const answersNhan = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60];
+        const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        
+        // Bảng màu bóng bay CSS 3D
+        const balloonColors = [
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fca5a5, #dc2626)', knot: 'border-bottom-color: #991b1b' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb)', knot: 'border-bottom-color: #1e40af' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fde047, #ca8a04)', knot: 'border-bottom-color: #854d0e' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #d8b4fe, #9333ea)', knot: 'border-bottom-color: #6b21a8' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #f9a8d4, #db2777)', knot: 'border-bottom-color: #9d174d' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #fb923c, #ea580c)', knot: 'border-bottom-color: #9a3412' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669)', knot: 'border-bottom-color: #064e3b' },
+            { bg: 'background: radial-gradient(circle at 30% 30%, #67e8f9, #0891b2)', knot: 'border-bottom-color: #164e63' }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initBalloons();
+            generateQuestion();
+        });
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+        function updateScore() { 
+            document.getElementById('score-display').innerText = score; 
+            document.getElementById('streak-display').innerText = streak; 
+        }
+
+        function startGame() {
+            playSound('snd-pop');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            }
+
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                const gameBoard = document.getElementById('game-board');
+                gameBoard.classList.remove('bounce-in');
+                void gameBoard.offsetWidth;
+                gameBoard.classList.add('bounce-in');
+
+                initBalloons();
+                generateQuestion();
+            }, 300);
+        }
+
+        function initBalloons() {
+            const container = document.getElementById('balloons-container');
+            container.innerHTML = '';
+            
+            const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
+            
+            // Lưới phân bổ 10 bóng bay ở khu vực bên phải (x: 40-90%, y: 15-80%)
+            const basePositions = [
+                { top: 15, left: 45 }, { top: 20, left: 70 }, { top: 15, left: 90 },
+                { top: 38, left: 55 }, { top: 42, left: 82 },
+                { top: 60, left: 40 }, { top: 65, left: 65 }, { top: 60, left: 90 },
+                { top: 82, left: 50 }, { top: 82, left: 78 }
+            ];
+
+            const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
+
+            currentAnswers.forEach((ans, index) => {
+                const pos = shuffledPositions[index];
+                
+                // Xê dịch nhẹ
+                let topPercent = pos.top + (Math.random() * 4 - 2); 
+                let leftPercent = pos.left + (Math.random() * 4 - 2);
+                
+                const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+                
+                const wrap = document.createElement('div');
+                wrap.className = `balloon-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30`;
+                wrap.style.left = `${leftPercent}%`;
+                wrap.style.top = `${topPercent}%`;
+                wrap.dataset.val = ans;
+                
+                wrap.onclick = function() { checkAnswer(this); };
+
+                wrap.innerHTML = `
+                    <div class="relative flex flex-col items-center balloon-float" style="animation-delay: ${Math.random()*2}s">
+                        <div class="balloon-shape w-14 h-20 md:w-16 md:h-24 flex items-center justify-center text-white font-black text-2xl md:text-3xl relative z-10" style="${color.bg};">
+                            <div class="balloon-shine"></div>
+                            <span class="relative z-10 drop-shadow-md">${ans}</span>
+                        </div>
+                        <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent relative -top-1.5 z-10" style="${color.knot}"></div>
+                        <div class="balloon-string"></div>
+                    </div>
+                `;
+
+                container.appendChild(wrap);
+            });
+        }
+
+        function generateQuestion() {
+            const prob = document.getElementById('math-problem');
+            let isSwitchingMode = false;
+            
+            let availableBalloons = Array.from(document.querySelectorAll('.balloon-wrapper:not(.popped)'));
+            
+            if (availableBalloons.length === 0) {
+                currentMode = currentMode === 'nhan' ? 'chia' : 'nhan';
+                isSwitchingMode = true;
+                
+                initBalloons();
+                availableBalloons = Array.from(document.querySelectorAll('.balloon-wrapper:not(.popped)'));
+                recentQuestions = [];
+            }
+
+            document.getElementById('game-subtitle').innerHTML = currentMode === 'nhan' 
+                ? "Đang luyện tập: <b class='text-yellow-300 text-lg md:text-xl drop-shadow-md'>Bảng Nhân 6 ✖️</b>" 
+                : "Đang luyện tập: <b class='text-yellow-300 text-lg md:text-xl drop-shadow-md'>Bảng Chia 6 ➗</b>";
+
+            const availableFactors = availableBalloons.map(b => {
+                let ans = parseInt(b.dataset.val);
+                return currentMode === 'nhan' ? ans / 6 : ans;
+            });
+
+            let randomFactor;
+            if (availableFactors.length > 1) {
+                let validFactors = availableFactors.filter(f => !recentQuestions.includes(f));
+                if (validFactors.length > 0) {
+                    randomFactor = validFactors[Math.floor(Math.random() * validFactors.length)];
+                } else {
+                    randomFactor = availableFactors[Math.floor(Math.random() * availableFactors.length)];
+                }
+            } else {
+                randomFactor = availableFactors[0];
+            }
+
+            recentQuestions.push(randomFactor);
+            if (recentQuestions.length > 5) recentQuestions.shift();
+
+            if (currentMode === 'nhan') {
+                currentMultiplier = randomFactor;
+                expectedAnswer = 6 * currentMultiplier;
+                prob.innerText = `6 x ${currentMultiplier}`;
+            } else {
+                expectedAnswer = randomFactor;
+                currentDividend = 6 * expectedAnswer;
+                prob.innerText = `${currentDividend} : 6`;
+            }
+            
+            const sign = prob.parentElement;
+            sign.classList.remove('shake', 'bounce-in');
+            void sign.offsetWidth;
+            sign.classList.add('bounce-in');
+
+            if (isSwitchingMode) {
+                let modeName = currentMode === 'nhan' ? 'Bảng Nhân 6' : 'Bảng Chia 6';
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-blue-600 font-bold">Tuyệt vời! Bóng bay <b class="text-blue-800">${modeName}</b> đã xuất hiện! 👇</span>`;
+                playSound('snd-pop');
+            } else {
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bé hãy nhấp vào bóng mang số <b class="text-emerald-600">đáp án</b> nhé! 👇</span>`;
+            }
+        }
+
+        // TỐI ƯU HÓA ANIMATION BẮN CUNG VỚI requestAnimationFrame (60FPS)
+        function shootArrow(balloonElement) {
+            isShooting = true;
+            playSound('snd-shoot'); 
+            
+            // Hiệu ứng giật cung
+            document.getElementById('loaded-arrow').classList.add('hidden');
+            document.getElementById('bow-string').setAttribute('d', 'M 150 30 L 150 90 L 150 150'); // Dây cung bật thẳng
+
+            const board = document.getElementById('game-board');
+            const boardRect = board.getBoundingClientRect();
+            
+            const startPt = document.getElementById('arrow-start-point');
+            const startRect = startPt.getBoundingClientRect();
+            
+            // Tìm tâm quả bóng
+            const balloonBody = balloonElement.querySelector('.balloon-shape');
+            const targetRect = balloonBody.getBoundingClientRect();
+
+            // Tọa độ tương đối với Game Board
+            const startX = (startRect.left + startRect.width/2) - boardRect.left;
+            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+
+            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+
+            const arrow = document.getElementById('flying-arrow');
+            arrow.classList.remove('hidden');
+            arrow.style.left = startX + 'px';
+            arrow.style.top = startY + 'px';
+
+            // Xoay mũi tên hướng về quả bóng
+            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
+            arrow.style.transform = `translate(0, -50%) rotate(${angle}deg)`;
+
+            const duration = 250; // Bay rất nhanh (250ms)
+            let animationStartTime = null;
+
+            function animateFly(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
+                
+                let currentX = startX + (targetX - startX) * progress;
+                let currentY = startY + (targetY - startY) * progress;
+                
+                arrow.style.left = currentX + 'px';
+                arrow.style.top = currentY + 'px';
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateFly);
+                } else {
+                    // Trúng đích
+                    arrow.classList.add('hidden');
+                    
+                    // Phục hồi mũi tên trên cung
+                    document.getElementById('loaded-arrow').classList.remove('hidden');
+                    document.getElementById('bow-string').setAttribute('d', 'M 150 30 L 120 90 L 150 150');
+                    
+                    balloonElement.style.display = 'none';
+                    balloonElement.classList.add('popped');
+                    
+                    playSound('snd-pop');
+                    confetti({ particleCount: 60, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100 });
+                    
+                    score += 10;
+                    streak++;
+                    updateScore();
+
+                    let feedbackText = currentMode === 'nhan' ? `Chính xác! 6 x ${currentMultiplier} = ${expectedAnswer} 🎉` : `Chính xác! ${currentDividend} : 6 = ${expectedAnswer} 🎉`;
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-600 font-black">${feedbackText}</span>`;
+                    
+                    setTimeout(() => {
+                        generateQuestion();
+                        isShooting = false;
+                    }, 600);
+                }
+            }
+
+            requestAnimationFrame(animateFly);
+        }
+
+        async function checkAnswer(balloonElement) {
+            if (isShooting || balloonElement.classList.contains('popped')) return;
+
+            let selectedVal = parseInt(balloonElement.dataset.val);
+
+            if (selectedVal === expectedAnswer) {
+                shootArrow(balloonElement);
+            } else {
+                playSound('snd-wrong');
+                streak = 0;
+                updateScore();
+
+                const sign = document.getElementById('math-problem').parentElement;
+                sign.classList.remove('bounce-in', 'shake');
+                void sign.offsetWidth;
+                sign.classList.add('shake');
+
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Úi chà trượt rồi! Lắng nghe kết quả nhé 🎧</span>`;
+                
+                isShooting = true; // Khóa màn hình
+                
+                const numWords = {
+                    1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 6: 'sáu', 7: 'bảy', 8: 'tám', 9: 'chín', 10: 'mười',
+                    12: 'mười hai', 18: 'mười tám', 24: 'hai mươi tư', 30: 'ba mươi',
+                    36: 'ba mươi sáu', 42: 'bốn mươi hai', 48: 'bốn mươi tám', 54: 'năm mươi tư', 60: 'sáu mươi'
+                };
+                
+                let readText = currentMode === 'nhan'
+                    ? `Sáu nhân ${numWords[currentMultiplier] || currentMultiplier} bằng ${numWords[expectedAnswer] || expectedAnswer}`
+                    : `${numWords[currentDividend] || currentDividend} chia sáu bằng ${numWords[expectedAnswer] || expectedAnswer}`;
+                
+                let ttsPrompt = "Đáp án đúng là: " + readText; 
+                
+                // Đọc TTS
+                await playTTS(ttsPrompt);
+                
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500 font-bold">Phép tính đã đổi, bé ngắm bắn lại nhé 🔄</span>`;
+
+                setTimeout(() => {
+                    generateQuestion();
+                    isShooting = false;
+                }, 300);
+            }
+        }
+
+        // --- FULLSCREEN ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
+                if (req) { try { req.call(doc); } catch(e){} } 
+            } else { 
+                if (ext) ext.call(document); 
+            }
+        }
+    </script>
+</body>
+</html>
