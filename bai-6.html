@@ -176,7 +176,7 @@
         }
     </style>
 </head>
-<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen">
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative">
 
     <!-- Header -->
     <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
@@ -205,17 +205,41 @@
     <!-- MAIN APP CONTAINER -->
     <div class="max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-2xl border border-sky-100 overflow-hidden flex flex-col flex-grow relative">
         
+        <!-- MÀN HÌNH BẮT ĐẦU (Khắc phục lỗi chặn âm thanh của trình duyệt) -->
+        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-sky-400 via-blue-500 to-blue-700 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            <!-- Trang trí nền -->
+            <div class="absolute top-10 right-10 text-6xl opacity-30">☁️</div>
+            <div class="absolute bottom-20 left-10 text-7xl opacity-30">☁️</div>
+            
+            <div class="text-8xl md:text-9xl mb-6 drop-shadow-lg bounce-in" style="animation-delay: 0.1s">🎣</div>
+            <h1 class="text-4xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)] bounce-in text-yellow-300" style="animation-delay: 0.2s; text-shadow: 2px 4px 0 #1e3a8a, -2px -2px 0 #1e3a8a, 2px -2px 0 #1e3a8a, -2px 2px 0 #1e3a8a;">
+                VUI CÂU CÁ
+            </h1>
+            
+            <div class="bg-white/20 backdrop-blur-md p-6 md:p-8 rounded-3xl border-2 border-white/40 max-w-lg text-center mb-10 bounce-in shadow-xl" style="animation-delay: 0.3s">
+                <p class="text-lg md:text-xl font-bold mb-3 text-yellow-200 uppercase tracking-widest">Cách chơi:</p>
+                <p class="text-base md:text-lg mb-4 font-medium leading-relaxed">Bé hãy chọn con cá có số là <b class="text-white bg-blue-600/50 px-2 py-1 rounded">đáp án đúng</b> của phép tính trên thuyền để câu lên nhé!</p>
+                <div class="inline-flex items-center gap-2 bg-black/30 rounded-xl p-3 font-medium text-sm md:text-base border border-white/20 shadow-inner mt-2 text-sky-100">
+                    <span>🔊 Hãy bật âm thanh thiết bị để nghe đọc kết quả nha!</span>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="btn-press px-12 py-5 bg-gradient-to-b from-amber-300 to-amber-500 text-amber-900 font-black rounded-full text-2xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-amber-200 shadow-xl" style="animation-delay: 0.4s">
+                BẮT ĐẦU 🚀
+            </button>
+        </div>
+
         <!-- Header Bài học -->
         <div class="bg-gradient-to-b from-cyan-400 to-blue-600 text-white p-5 md:p-6 text-center shadow-md relative z-10">
             <h1 class="text-2xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1">Vui Câu Cá 🎣</h1>
-            <p id="game-subtitle" class="text-cyan-100 text-sm md:text-base font-medium transition-colors duration-300">Đang khởi tạo...</p>
+            <p id="game-subtitle" class="text-cyan-100 text-sm md:text-base font-medium transition-colors duration-300">Đang chuẩn bị...</p>
         </div>
 
         <!-- Khung Game Chính -->
         <div class="flex-grow flex items-center justify-center p-3 md:p-6 relative bg-slate-50">
             
             <!-- Đại dương (Game Board) -->
-            <div id="game-board" class="ocean-container w-full max-w-[500px] md:max-w-[700px] aspect-[3/4] md:aspect-[4/3.5] rounded-[2.5rem] bounce-in relative">
+            <div id="game-board" class="ocean-container w-full max-w-[500px] md:max-w-[700px] aspect-[3/4] md:aspect-[4/3.5] rounded-[2.5rem] relative">
                 
                 <!-- Bầu trời: Mây & Mặt trời -->
                 <div class="absolute top-4 right-8 text-6xl md:text-8xl animate-spin-slow z-0 drop-shadow-[0_0_20px_rgba(253,224,71,0.9)]">☀️</div>
@@ -283,9 +307,11 @@
     <audio id="snd-splash" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio>
 
     <script>
-        const apiKey = "";
+        const apiKey = ""; // API key gets injected here at runtime
         
         // --- HÀM HỖ TRỢ ĐỌC TTS ---
+        let globalTTSAudio = new Audio(); // Dùng Audio Element toàn cục để tránh bị chặn
+
         function writeString(view, offset, string) {
             for (let i = 0; i < string.length; i++) {
                 view.setUint8(offset + i, string.charCodeAt(i));
@@ -372,14 +398,15 @@
                         
                         const blob = new Blob([wavBuffer], { type: 'audio/wav' });
                         const url = URL.createObjectURL(blob);
-                        const audio = new Audio(url);
+                        
+                        // Sử dụng biến audio toàn cục để tránh bị chặn trên iOS
+                        globalTTSAudio.src = url;
                         return new Promise((resolve) => {
-                            audio.onended = () => { URL.revokeObjectURL(url); resolve(); };
-                            audio.onerror = () => resolve();
-                            audio.play().catch(()=> resolve());
+                            globalTTSAudio.onended = () => { URL.revokeObjectURL(url); resolve(); };
+                            globalTTSAudio.onerror = () => resolve();
+                            globalTTSAudio.play().catch(()=> resolve());
                         });
                     } else {
-                        // Sửa lỗi kẹt vòng lặp vô tận: Nếu không có data, ném lỗi để nhảy vào catch
                         throw new Error("Không có dữ liệu âm thanh trả về");
                     }
                 } catch (e) {
@@ -387,7 +414,8 @@
                         await new Promise(r => setTimeout(r, delays[retries]));
                         retries++;
                     } else {
-                        return new Promise(resolve => setTimeout(resolve, 1000)); // Fallback delay if failed
+                        // Vẫn chờ 1 xíu rồi bỏ qua phần đọc TTS
+                        return new Promise(resolve => setTimeout(resolve, 1000)); 
                     }
                 }
             }
@@ -408,10 +436,27 @@
         const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         const fishEmojis = ['🐟', '🐠', '🐡'];
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initFishes();
-            generateQuestion();
-        });
+        // --- KHỞI ĐỘNG GAME ---
+        function startGame() {
+            // Mở khóa AudioContext bằng cách chơi các âm thanh câm (hoặc có tiếng) ngay khi bấm
+            playSound('snd-pop');
+            globalTTSAudio.play().catch(()=>{}); // Mở khóa TTS Audio
+            
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                // Hiển thị board với bounce-in animation
+                const gameBoard = document.getElementById('game-board');
+                gameBoard.classList.remove('bounce-in');
+                void gameBoard.offsetWidth;
+                gameBoard.classList.add('bounce-in');
+
+                initFishes();
+                generateQuestion();
+            }, 300);
+        }
 
         function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
         function updateScore() { 
@@ -432,9 +477,6 @@
             const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
             
             // Lưới thả cá: Đảm bảo không đè lên phần thuyền (mốc 0-45% độ cao)
-            // Hàng 1 (Vừa dưới thuyền): Y ~55%
-            // Hàng 2 (Giữa): Y ~72%
-            // Hàng 3 (Đáy): Y ~88%
             const basePositions = [
                 { top: 55, left: 15 }, { top: 55, left: 50 }, { top: 55, left: 85 },
                 { top: 72, left: 12 }, { top: 72, left: 38 }, { top: 72, left: 62 }, { top: 72, left: 88 },
@@ -554,7 +596,6 @@
             const fishRect = fishInner.getBoundingClientRect();
 
             // Tính toán tọa độ Đích (Đầu cần câu) và Nguồn (Con cá)
-            // Lấy offset an toàn so với Board
             const targetX = (rodRect.right - 20) - boardRect.left;
             const targetY = (rodRect.top + 20) - boardRect.top;
 
@@ -596,10 +637,9 @@
                 let currentX = targetX + (startX - targetX) * easeProgress;
                 let currentY = targetY + (startY - targetY) * easeProgress;
                 
-                // Cập nhật đường dây
+                // Cập nhật đường dây và lưỡi câu
                 line.setAttribute('x2', currentX);
                 line.setAttribute('y2', currentY);
-                // Cập nhật lưỡi câu
                 hookGroup.setAttribute('transform', `translate(${currentX - 8}, ${currentY})`);
 
                 if (progress < 1) {
