@@ -52,7 +52,7 @@
             border-radius: 2.5rem;
         }
 
-        /* Lưới không gian (Synthwave Grid) */
+        /* Lưới không gian (Synthwave Grid) - Optimized */
         .synthwave-grid {
             position: absolute;
             bottom: 0; left: 0; right: 0; height: 50%;
@@ -65,6 +65,7 @@
             animation: gridMove 3s linear infinite;
             pointer-events: none;
             z-index: 1;
+            will-change: background-position;
         }
         @keyframes gridMove {
             0% { background-position: 0 0; }
@@ -72,7 +73,7 @@
         }
 
         /* Bầu trời sao chuyển động (Parallax Stars) */
-        .star-layer { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 0; }
+        .star-layer { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 0; will-change: background-position; }
         .star-layer-1 { 
             background-image: radial-gradient(1px 1px at 20px 30px, white, transparent), radial-gradient(1px 1px at 150px 80px, white, transparent), radial-gradient(1px 1px at 300px 10px, white, transparent), radial-gradient(1px 1px at 450px 120px, white, transparent); 
             background-size: 500px 200px;
@@ -87,18 +88,16 @@
             background-image: radial-gradient(3px 3px at 120px 180px, #38bdf8, transparent), radial-gradient(3px 3px at 400px 90px, #7dd3fc, transparent); 
             background-size: 700px 300px;
             animation: moveStars 25s linear infinite; opacity: 0.9;
-            filter: drop-shadow(0 0 4px #38bdf8);
         }
         @keyframes moveStars { 0% { background-position: 0 0; } 100% { background-position: -1000px 0; } }
 
         /* Bảng Hologram (Công nghệ tương lai) */
         .hologram-sign {
-            background: linear-gradient(180deg, rgba(8, 145, 178, 0.2) 0%, rgba(8, 145, 178, 0.05) 100%);
+            background: linear-gradient(180deg, rgba(8, 145, 178, 0.4) 0%, rgba(8, 145, 178, 0.1) 100%);
             border: 2px solid #22d3ee;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), inset 0 0 15px rgba(6, 182, 212, 0.4);
             border-radius: 12px;
             position: relative;
-            backdrop-filter: blur(4px);
             overflow: hidden;
         }
         .hologram-sign::before {
@@ -118,10 +117,10 @@
             will-change: transform;
         }
         @keyframes ufoBuzz {
-            0% { transform: translate(-4px, -6px) rotate(-3deg); }
-            33% { transform: translate(5px, 3px) rotate(2deg); }
-            66% { transform: translate(-5px, 5px) rotate(-2deg); }
-            100% { transform: translate(4px, -5px) rotate(3deg); }
+            0% { transform: translate3d(-4px, -6px, 0) rotate(-3deg); }
+            33% { transform: translate3d(5px, 3px, 0) rotate(2deg); }
+            66% { transform: translate3d(-5px, 5px, 0) rotate(-2deg); }
+            100% { transform: translate3d(4px, -5px, 0) rotate(3deg); }
         }
 
         .alien-wrapper:hover .ufo-float {
@@ -133,20 +132,21 @@
         .thruster {
             animation: thrust 0.05s infinite alternate;
             transform-origin: left center;
+            will-change: transform;
         }
         @keyframes thrust {
             0% { transform: scaleX(0.8); opacity: 0.6; }
             100% { transform: scaleX(1.1); opacity: 1; }
         }
 
-        /* Tàu vũ trụ giật lùi khi bắn */
+        /* Tàu vũ trụ giật lùi khi bắn - Áp dụng vào inner div để bảo toàn transform gốc của parent */
         .ship-recoil {
             animation: recoil 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes recoil {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-20px); }
-            100% { transform: translateX(0); }
+            0% { transform: translate3d(0, 0, 0); }
+            50% { transform: translate3d(-20px, 0, 0); }
+            100% { transform: translate3d(0, 0, 0); }
         }
 
         /* Tàu vũ trụ nháy đỏ khi bị bắn trúng */
@@ -154,8 +154,8 @@
             animation: flashRed 0.5s ease-in-out;
         }
         @keyframes flashRed {
-            0%, 100% { filter: brightness(1) drop-shadow(0 0 15px rgba(56,189,248,0.5)); }
-            50% { filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 30px red); transform: translateX(-10px) rotate(-5deg); }
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); transform: translate3d(-10px, 0, 0) rotate(-5deg); }
         }
 
         #laser-beam, #enemy-laser {
@@ -200,7 +200,7 @@
             <div class="star-layer star-layer-3"></div>
             
             <!-- Icon Tàu vũ trụ Lớn -->
-            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(34,211,238,0.8)] bounce-in flex items-center justify-center bg-slate-800/80 backdrop-blur-md rounded-full border-4 border-cyan-400 relative z-10" style="animation-delay: 0.1s">
+            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(34,211,238,0.8)] bounce-in flex items-center justify-center bg-slate-800/90 rounded-full border-4 border-cyan-400 relative z-10" style="animation-delay: 0.1s">
                 <span class="text-5xl md:text-8xl transform translate-x-1 -rotate-45">🚀</span>
             </div>
 
@@ -208,9 +208,9 @@
                 BẮN RUỒI KHÔNG GIAN
             </h1>
             
-            <div class="bg-slate-800/80 backdrop-blur-md p-5 md:p-8 rounded-3xl border border-cyan-500/50 max-w-lg text-center mb-8 md:mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
+            <div class="bg-slate-800/90 p-5 md:p-8 rounded-3xl border border-cyan-500/50 max-w-lg text-center mb-8 md:mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
                 <p class="text-base md:text-xl font-bold mb-2 md:mb-3 text-cyan-200 uppercase tracking-widest">Nhiệm vụ:</p>
-                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy nhấp vào Đĩa bay UFO mang khiên số là <b class="text-white bg-indigo-600/80 px-2 py-1 rounded">đáp án đúng</b> để khai hỏa Laser nhé!</p>
+                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy nhấp vào Đĩa bay UFO mang khiên số là <b class="text-white bg-indigo-600 px-2 py-1 rounded">đáp án đúng</b> để khai hỏa Laser nhé!</p>
                 
                 <div class="flex items-center justify-center gap-2 md:gap-3 mt-4 mb-2">
                     <label class="text-indigo-200 font-bold text-xs md:text-base">Thời gian mỗi câu:</label>
@@ -232,7 +232,7 @@
         </div>
 
         <!-- MÀN HÌNH GAME OVER -->
-        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-rose-950/80 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-rose-950/80 hidden opacity-0 transition-opacity duration-300">
             <div class="bg-slate-900 p-6 md:p-8 rounded-[2rem] border-4 border-rose-600 shadow-[0_0_50px_rgba(225,29,72,0.6)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
                 <div class="text-6xl md:text-7xl mb-4 animate-bounce">💥</div>
                 <h2 class="text-2xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">TÀU BỊ PHÁ HỦY!</h2>
@@ -262,7 +262,7 @@
                 <!-- TRẠNG THÁI SINH TỒN (Thanh máu & Thời gian) -->
                 <div class="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-start z-30 pointer-events-none">
                     <!-- Thanh Máu -->
-                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/80 backdrop-blur border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
+                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/90 border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
                         <span class="text-rose-500 font-bold tracking-widest text-[10px] md:text-sm mr-1">HP</span>
                         <div class="flex gap-1 md:gap-1.5" id="health-bar">
                             <!-- JS sinh thanh máu -->
@@ -270,7 +270,7 @@
                     </div>
                     
                     <!-- Đồng hồ đếm ngược -->
-                    <div class="bg-slate-900/80 backdrop-blur border border-cyan-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 w-32 md:w-48 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 scale-90 md:scale-100 origin-top-right" id="timer-wrapper">
+                    <div class="bg-slate-900/90 border border-cyan-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 w-32 md:w-48 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 scale-90 md:scale-100 origin-top-right" id="timer-wrapper">
                         <span class="text-cyan-400 font-bold text-xs md:text-base">⏱️</span>
                         <div class="h-1.5 md:h-2.5 flex-grow bg-slate-700 rounded-full overflow-hidden">
                             <div id="timer-bar" class="h-full bg-cyan-400 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
@@ -294,19 +294,11 @@
                 <!-- Lưới hiển thị 3D cho không gian -->
                 <div class="synthwave-grid"></div>
 
-                <!-- Tàu Vũ Trụ & Bảng Hologram -->
-                <div class="absolute bottom-[2%] md:bottom-[10%] left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-20 w-full md:w-auto px-4 md:px-0">
-                    
-                    <!-- Bảng Hologram hiển thị phép tính -->
-                    <div class="relative flex flex-col items-center mb-0 md:mb-6 mt-2 md:mt-6 w-full max-w-[250px] md:max-w-none">
-                        <div class="hologram-sign px-3 py-1 md:px-8 md:py-3 flex items-center justify-center relative z-20 w-full">
-                            <span id="math-problem" class="font-black hologram-text text-2xl md:text-5xl tracking-widest relative z-10 font-mono">7 x ? = ?</span>
-                        </div>
-                    </div>
-                    
-                    <!-- SVG Tàu Vũ Trụ Chuyên Nghiệp -->
-                    <!-- Trên mobile xoay -90deg để hướng súng lên trên -->
-                    <div class="relative w-28 h-28 md:w-48 md:h-48 z-10 drop-shadow-[0_0_20px_rgba(34,211,238,0.4)] -rotate-90 md:rotate-0 mt-4 md:mt-0" id="spaceship-container">
+                <!-- Tàu Vũ Trụ Chuyên Nghiệp -->
+                <!-- Trên mobile: xoay -90deg để súng hướng lên trên, đặt ở dưới cùng -->
+                <!-- Trên Desktop: Không xoay, đặt ở dưới cùng bên trái -->
+                <div class="absolute bottom-[75px] md:bottom-[20%] left-1/2 md:left-6 transform -translate-x-1/2 md:translate-x-0 -rotate-90 md:rotate-0 z-20 w-24 h-24 md:w-40 md:h-40 drop-shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+                    <div id="spaceship-container" class="w-full h-full relative">
                         <svg viewBox="0 0 200 200" class="w-full h-full">
                             <!-- Engine Flames -->
                             <path class="thruster" d="M 15 90 Q -15 100 15 110 Q 5 100 15 90" fill="#0ea5e9"/>
@@ -340,17 +332,25 @@
                     </div>
                 </div>
 
-                <!-- SVG Tia Laser Phi thuyền (Animation mượt với 3 lớp phát sáng) -->
-                <svg id="laser-beam" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 20px; top: 0; left: 0;">
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#06b6d4" stroke-width="12" stroke-linecap="round" opacity="0.4" filter="blur(2px)"/>
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#22d3ee" stroke-width="6" stroke-linecap="round" filter="drop-shadow(0 0 4px #22d3ee)"/>
+                <!-- Bảng Hologram hiển thị phép tính (Tách biệt khỏi Tàu vũ trụ) -->
+                <!-- Mobile: Dưới cùng ở giữa. Desktop: Dưới cùng bên trái -->
+                <div class="absolute bottom-2 md:bottom-6 left-1/2 md:left-6 transform -translate-x-1/2 md:translate-x-0 z-30 w-[95%] md:w-auto max-w-[320px] md:max-w-none">
+                    <div class="hologram-sign bg-slate-900/90 px-3 py-2 md:px-8 md:py-3 flex items-center justify-center relative w-full rounded-xl">
+                        <span id="math-problem" class="font-black hologram-text text-3xl md:text-5xl tracking-widest relative z-10 font-mono text-center w-full">7 x ? = ?</span>
+                    </div>
+                </div>
+
+                <!-- SVG Tia Laser Phi thuyền -->
+                <svg id="laser-beam" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 20px; top: 0; left: 0; will-change: transform;">
+                    <line x1="0" y1="10" x2="100" y2="10" stroke="#06b6d4" stroke-width="12" stroke-linecap="round" opacity="0.4" />
+                    <line x1="0" y1="10" x2="100" y2="10" stroke="#22d3ee" stroke-width="6" stroke-linecap="round" />
                     <line x1="10" y1="10" x2="100" y2="10" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
                 </svg>
 
                 <!-- SVG Tia Laser Kẻ Địch bắn trả -->
-                <svg id="enemy-laser" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 20px; top: 0; left: 0;">
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#f43f5e" stroke-width="14" stroke-linecap="round" opacity="0.5" filter="blur(3px)"/>
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#fb7185" stroke-width="8" stroke-linecap="round" filter="drop-shadow(0 0 6px #fb7185)"/>
+                <svg id="enemy-laser" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 20px; top: 0; left: 0; will-change: transform;">
+                    <line x1="0" y1="10" x2="100" y2="10" stroke="#f43f5e" stroke-width="14" stroke-linecap="round" opacity="0.4" />
+                    <line x1="0" y1="10" x2="100" y2="10" stroke="#fb7185" stroke-width="8" stroke-linecap="round" />
                     <line x1="0" y1="10" x2="90" y2="10" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
                 </svg>
 
@@ -454,13 +454,13 @@
             { t: '70 : 7', a: 10, read: 'Bảy mươi chia bảy bằng mười' }
         ];
         
-        // Cấu hình màu cho Đĩa bay (UFO) bằng CSS
+        // Cấu hình màu cho Đĩa bay (UFO)
         const ufoColors = [
-            { dome: 'rgba(52, 211, 153, 0.4)', base: 'bg-emerald-700', light: 'bg-emerald-300', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.8)]' }, // Emerald
-            { dome: 'rgba(251, 113, 133, 0.4)', base: 'bg-rose-700', light: 'bg-rose-300', glow: 'shadow-[0_0_20px_rgba(225,29,72,0.8)]' }, // Rose
-            { dome: 'rgba(192, 132, 252, 0.4)', base: 'bg-purple-700', light: 'bg-purple-300', glow: 'shadow-[0_0_20px_rgba(126,34,206,0.8)]' }, // Purple
-            { dome: 'rgba(250, 204, 21, 0.4)', base: 'bg-amber-700', light: 'bg-amber-300', glow: 'shadow-[0_0_20px_rgba(217,119,6,0.8)]' }, // Amber
-            { dome: 'rgba(45, 212, 191, 0.4)', base: 'bg-cyan-700', light: 'bg-cyan-300', glow: 'shadow-[0_0_20px_rgba(8,145,178,0.8)]' }  // Cyan
+            { dome: 'rgba(52, 211, 153, 0.4)', base: 'bg-emerald-700', light: 'bg-emerald-300', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.8)]' }, 
+            { dome: 'rgba(251, 113, 133, 0.4)', base: 'bg-rose-700', light: 'bg-rose-300', glow: 'shadow-[0_0_20px_rgba(225,29,72,0.8)]' }, 
+            { dome: 'rgba(192, 132, 252, 0.4)', base: 'bg-purple-700', light: 'bg-purple-300', glow: 'shadow-[0_0_20px_rgba(126,34,206,0.8)]' }, 
+            { dome: 'rgba(250, 204, 21, 0.4)', base: 'bg-amber-700', light: 'bg-amber-300', glow: 'shadow-[0_0_20px_rgba(217,119,6,0.8)]' }, 
+            { dome: 'rgba(45, 212, 191, 0.4)', base: 'bg-cyan-700', light: 'bg-cyan-300', glow: 'shadow-[0_0_20px_rgba(8,145,178,0.8)]' }  
         ];
         
         const alienEmojis = ['👾', '👽', '👁️'];
@@ -489,7 +489,6 @@
             const container = document.getElementById('health-bar');
             container.innerHTML = '';
             for(let i = 0; i < 3; i++) {
-                // Tạo hình dạng thanh pin nhỏ (Sci-Fi battery cell)
                 let cellClass = i < lives 
                     ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)] border-rose-300' 
                     : 'bg-slate-700 border-slate-600';
@@ -521,7 +520,7 @@
             updateTimerUI();
             
             timerInterval = setInterval(() => {
-                if(isShooting || !isPlaying) return; // Dừng đếm giờ lúc đang bắn hoặc game over
+                if(isShooting || !isPlaying) return; 
                 
                 timeLeft--;
                 updateTimerUI();
@@ -551,7 +550,6 @@
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
             }
 
-            // Lấy thời gian từ setting của người chơi
             GAME_TIME = parseInt(document.getElementById('time-select').value) || 30;
 
             const goModal = document.getElementById('game-over-modal');
@@ -602,19 +600,18 @@
             const container = document.getElementById('aliens-container');
             container.innerHTML = '';
             
-            // Lấy ngẫu nhiên 10 câu hỏi để gắn cho 10 đĩa bay
             let shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 10);
             
             const isMobile = window.innerWidth < 768;
             let basePositions = [];
 
             if (isMobile) {
-                // Trên Mobile: Phi thuyền ở dưới cùng. Mục tiêu trải đều nửa trên (top: 8% -> 60%)
+                // Trên Mobile: Phi thuyền ở dưới cùng. Mục tiêu trải đều nửa trên (top: 8% -> 55%)
                 basePositions = [
                     { top: 8, left: 20 }, { top: 12, left: 50 }, { top: 8, left: 80 },
-                    { top: 24, left: 30 }, { top: 28, left: 70 },
-                    { top: 42, left: 20 }, { top: 45, left: 50 }, { top: 42, left: 80 },
-                    { top: 58, left: 30 }, { top: 60, left: 70 }
+                    { top: 22, left: 30 }, { top: 26, left: 70 },
+                    { top: 38, left: 20 }, { top: 40, left: 50 }, { top: 38, left: 80 },
+                    { top: 52, left: 30 }, { top: 55, left: 70 }
                 ];
             } else {
                 // Trên Desktop: Phi thuyền ở trái. Mục tiêu ở khu vực bên phải (x: 45-90%, y: 15-80%)
@@ -650,17 +647,14 @@
                 let animDelay = Math.random() * 2;
                 let animDur = 2 + Math.random() * 1.5; 
 
-                // HTML Thiết kế Đĩa bay UFO (Thu nhỏ linh hoạt cho mobile)
                 wrap.innerHTML = `
                     <div class="relative flex flex-col items-center justify-center ufo-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
                         
-                        <!-- Mái vòm trong suốt -->
-                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white/40 backdrop-blur-[2px] relative z-10 flex items-end justify-center pb-1.5 md:pb-2 overflow-hidden ${color.glow}" style="background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6), ${color.dome});">
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white/40 relative z-10 flex items-end justify-center pb-1.5 md:pb-2 overflow-hidden ${color.glow}" style="background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6), ${color.dome});">
                             <span class="text-3xl md:text-5xl relative z-10 select-none">${emoji}</span>
                             <div class="absolute top-1 left-2 w-4 h-2 md:w-5 md:h-3 bg-white/50 rounded-full transform -rotate-45 pointer-events-none"></div>
                         </div>
                         
-                        <!-- Thân đĩa bay -->
                         <div class="w-16 h-4 md:w-24 md:h-6 rounded-[50%] ${color.base} -mt-3 md:-mt-4 z-20 flex items-center justify-around px-2 border-b-2 border-black/40 shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
                             <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse"></div>
                             <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.2s"></div>
@@ -668,8 +662,7 @@
                             <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.6s"></div>
                         </div>
                         
-                        <!-- Khiên hiển thị số (Hologram text) -->
-                        <div class="absolute -bottom-5 md:-bottom-6 z-30 bg-slate-900/90 backdrop-blur-md rounded-lg w-8 h-6 md:w-12 md:h-10 flex items-center justify-center font-black font-mono text-xs md:text-xl border border-cyan-400/50 shadow-[0_0_10px_rgba(34,211,238,0.5)] text-cyan-300">
+                        <div class="absolute -bottom-5 md:-bottom-6 z-30 bg-slate-900/95 rounded-lg w-8 h-6 md:w-12 md:h-10 flex items-center justify-center font-black font-mono text-xs md:text-xl border border-cyan-400/50 shadow-[0_0_10px_rgba(34,211,238,0.5)] text-cyan-300">
                             ${q.a}
                         </div>
                     </div>
@@ -696,8 +689,6 @@
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 text-sm md:text-xl">Nhấp vào đĩa bay mang số <b class="text-cyan-400">đáp án</b> nhé! 👇</span>`;
             }
 
-            document.getElementById('game-subtitle').innerHTML = "Nhiệm vụ: <b class='text-yellow-400 text-sm md:text-xl drop-shadow-md'>Nhân & Chia Bảng 7 ⚔️</b>";
-
             let randomFactor;
             if (availableAliens.length > 1) {
                 let validAliens = availableAliens.filter(a => !recentQuestions.includes(a.dataset.text));
@@ -714,7 +705,6 @@
 
                     prob.innerText = qText + ' = ?';
                 } else {
-                    // Nếu tất cả đều ở recent, random lại
                     let selectedAlien = availableAliens[Math.floor(Math.random() * availableAliens.length)];
                     let qText = selectedAlien.dataset.text;
                     expectedAnswer = parseInt(selectedAlien.dataset.val);
@@ -747,7 +737,6 @@
             startTimer();
         }
 
-        // ANIMATION BẮN LASER CỦA PHI THUYỀN
         function shootLaser(targetElement) {
             isShooting = true;
             clearInterval(timerInterval); // Dừng đếm giờ khi bắn
@@ -804,7 +793,6 @@
                     targetElement.classList.add('popped');
                     
                     playSound('snd-pop'); 
-                    // Pháo hoa Neon màu Cyan/Blue
                     confetti({ particleCount: 70, spread: 90, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#22d3ee', '#818cf8', '#38bdf8', '#f8fafc'] });
                     
                     score += 10;
@@ -825,7 +813,6 @@
             requestAnimationFrame(animateFly);
         }
 
-        // KẺ ĐỊCH BẮN TRẢ (Khi hết giờ)
         function enemyAttack() {
             isShooting = true;
             playSound('snd-shoot'); // Âm thanh laser địch
@@ -834,7 +821,6 @@
             const board = document.getElementById('game-board');
             const boardRect = board.getBoundingClientRect();
             
-            // Tìm một mục tiêu ngẫu nhiên còn sống để bắn
             const aliens = Array.from(document.querySelectorAll('.alien-wrapper:not(.popped)'));
             if (aliens.length === 0) {
                 generateQuestion();
@@ -879,25 +865,20 @@
                     laser.classList.add('hidden');
                     playSound('snd-wrong'); 
                     
-                    // Hiệu ứng nháy đỏ phi thuyền
                     shipContainer.classList.remove('ship-hit');
                     void shipContainer.offsetWidth;
                     shipContainer.classList.add('ship-hit');
                     
-                    // Nổ tia lửa đỏ tại phi thuyền
                     confetti({ particleCount: 40, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#ef4444', '#f59e0b', '#020617'] });
                     
-                    // Trừ máu
                     lives--;
                     updateLivesUI();
                     
                     streak = 0; updateScoreBoard();
 
                     if (lives <= 0) {
-                        // Game Over
                         setTimeout(gameOver, 600);
                     } else {
-                        // Cảnh báo và ra câu mới
                         document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 text-sm md:text-xl font-bold">Hết giờ! Tàu bị trúng đạn! Tải mục tiêu mới... 🛡️</span>`;
                         setTimeout(() => {
                             generateQuestion();
@@ -939,7 +920,7 @@
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 text-sm md:text-xl font-bold">Mục tiêu đã đổi, chuẩn bị khai hỏa! 🔄</span>`;
 
                 setTimeout(() => {
-                    generateQuestion(); // generateQuestion sẽ tự động restart Timer
+                    generateQuestion(); 
                     isShooting = false;
                 }, 300);
             }
