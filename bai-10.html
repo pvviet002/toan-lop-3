@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 10: Bảng nhân, chia 7 - Bắn ruồi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            overscroll-behavior-y: none; 
+            overflow-x: hidden;
+        }
+        
+        .no-select { user-select: none; -webkit-user-select: none; }
+        
+        .btn-press {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        .btn-press:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
+        }
+
+        .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Bối cảnh Không gian (Space Theme) */
+        .space-container {
+            position: relative;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 40%, #1e1b4b 100%);
+            border: 6px solid #312e81; 
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border-radius: 2.5rem;
+        }
+
+        /* Bầu trời sao lấp lánh */
+        .stars {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #e2e8f0, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 80px 70px, #cbd5e1, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 150px 160px, #f8fafc, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 290px 40px, #e2e8f0, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 330px 180px, #cbd5e1, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 460px 120px, #f8fafc, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 520px 50px, #38bdf8, rgba(0,0,0,0)), /* Ngôi sao xanh sáng */
+                radial-gradient(2px 2px at 650px 190px, #e2e8f0, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 300px 300px;
+            animation: twinkle 4s infinite alternate;
+            z-index: 1;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Hành tinh trang trí */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        /* Bảng Hologram (Công nghệ tương lai) */
+        .hologram-sign {
+            background: rgba(14, 165, 233, 0.15);
+            border: 2px solid rgba(56, 189, 248, 0.6);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3), inset 0 0 20px rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
+            position: relative;
+            backdrop-filter: blur(4px);
+        }
+        .hologram-sign::before {
+            content: ''; position: absolute; top: -2px; left: 10%; width: 20%; height: 2px; background: #38bdf8; box-shadow: 0 0 10px #38bdf8;
+        }
+        .hologram-sign::after {
+            content: ''; position: absolute; bottom: -2px; right: 10%; width: 20%; height: 2px; background: #38bdf8; box-shadow: 0 0 10px #38bdf8;
+        }
+        .hologram-text {
+            color: #e0f2fe;
+            text-shadow: 0 0 8px #38bdf8, 0 0 15px #0ea5e9;
+        }
+
+        /* Ruồi bay lượn lộn xộn (Alien Float) */
+        .alien-float {
+            animation: bugBuzz ease-in-out infinite alternate;
+            will-change: transform;
+        }
+        @keyframes bugBuzz {
+            0% { transform: translate(-3px, -5px) rotate(-5deg); }
+            33% { transform: translate(4px, 2px) rotate(3deg); }
+            66% { transform: translate(-4px, 4px) rotate(-3deg); }
+            100% { transform: translate(3px, -4px) rotate(5deg); }
+        }
+
+        .alien-wrapper:hover .alien-float {
+            filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.8));
+            transform: scale(1.1);
+        }
+
+        /* Lửa phản lực tàu vũ trụ */
+        .thruster {
+            animation: thrust 0.1s infinite alternate;
+        }
+        @keyframes thrust {
+            0% { transform: scaleX(0.9); opacity: 0.8; }
+            100% { transform: scaleX(1.1); opacity: 1; }
+        }
+
+        /* Tàu vũ trụ giật lùi khi bắn */
+        .ship-recoil {
+            animation: recoil 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes recoil {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-15px); }
+            100% { transform: translateX(0); }
+        }
+
+        #laser-beam {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative bg-slate-900">
+
+    <!-- Header Global -->
+    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+                <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
+            </a>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+        
+        <div class="bg-slate-800 px-5 py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-cyan-800 flex items-center space-x-5">
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🎯</span>
+                <span id="score-display" class="font-black text-cyan-400 text-xl">0</span>
+            </div>
+            <div class="w-1 h-6 bg-slate-600 rounded-full"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-400 text-xl">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="max-w-5xl mx-auto w-full bg-slate-800 rounded-3xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col flex-grow relative">
+        
+        <!-- MÀN HÌNH BẮT ĐẦU -->
+        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-indigo-900 via-slate-900 to-black flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            <div class="stars opacity-50"></div>
+            
+            <!-- Icon Tàu vũ trụ Lớn -->
+            <div class="w-32 h-32 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_30px_rgba(56,189,248,0.8)] bounce-in flex items-center justify-center bg-slate-800 rounded-full border-4 border-cyan-400 relative z-10" style="animation-delay: 0.1s">
+                <span class="text-7xl md:text-8xl transform translate-x-1">🚀</span>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-cyan-300 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(34,211,238,0.8);">
+                BẮN RUỒI KHÔNG GIAN
+            </h1>
+            
+            <div class="bg-slate-800/80 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-cyan-500/50 max-w-lg text-center mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
+                <p class="text-lg md:text-xl font-bold mb-3 text-cyan-200 uppercase tracking-widest">Nhiệm vụ:</p>
+                <p class="text-base md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy nhấp vào con ruồi mang khiên số là <b class="text-white bg-indigo-600/80 px-2 py-1 rounded">đáp án đúng</b> để khai hỏa Laser nhé!</p>
+                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-sm md:text-base border border-slate-600 shadow-inner mt-2 text-indigo-200">
+                    <span>🔊 Bật âm thanh để nghe đọc kết quả khi lỡ chọn sai nha!</span>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="btn-press px-12 py-5 bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black rounded-full text-2xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.6)] relative z-10" style="animation-delay: 0.4s">
+                XUẤT PHÁT 🚀
+            </button>
+        </div>
+
+        <!-- Header Bài học -->
+        <div class="bg-gradient-to-r from-indigo-800 to-blue-900 text-white p-5 md:p-6 text-center shadow-md relative z-10 border-b border-indigo-700">
+            <h1 class="text-2xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-cyan-300">Bắn Ruồi Không Gian 🛸</h1>
+            <p id="game-subtitle" class="text-indigo-200 text-sm md:text-base font-medium transition-colors duration-300">Đang chuẩn bị hệ thống vũ khí...</p>
+        </div>
+
+        <!-- Khung Game Chính -->
+        <div class="flex-grow flex items-center justify-center p-3 md:p-6 relative bg-slate-900">
+            
+            <!-- Khu vực Vũ Trụ (Game Board) -->
+            <div id="game-board" class="space-container w-full max-w-[500px] md:max-w-[800px] aspect-[3/4] md:aspect-[16/11] relative bounce-in">
+                
+                <!-- Hiệu ứng không gian -->
+                <div class="stars"></div>
+                
+                <!-- Hành tinh trang trí -->
+                <div class="planet bg-gradient-to-br from-purple-500 to-indigo-900 w-24 h-24 md:w-32 md:h-32 top-[10%] right-[15%] shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.5)] opacity-80"></div>
+                <div class="planet bg-gradient-to-br from-rose-400 to-orange-600 w-12 h-12 md:w-16 md:h-16 bottom-[20%] right-[30%] shadow-[inset_-5px_-5px_10px_rgba(0,0,0,0.6)] opacity-60"></div>
+                
+                <!-- Lưới hiển thị 3D cho đẹp -->
+                <div class="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [transform:perspective(500px)_rotateX(60deg)] origin-bottom opacity-30 pointer-events-none"></div>
+
+                <!-- Tàu Vũ Trụ & Bảng Hologram (Bên trái) -->
+                <div class="absolute bottom-[10%] left-[2%] md:left-[5%] flex flex-col items-center z-20">
+                    
+                    <!-- Bảng Hologram hiển thị phép tính -->
+                    <div class="relative flex flex-col items-center mb-4 mt-6">
+                        <div class="hologram-sign w-32 md:w-44 h-14 md:h-16 flex items-center justify-center relative z-20">
+                            <span id="math-problem" class="font-black hologram-text text-2xl md:text-4xl tracking-widest relative z-10">7 x ?</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG Tàu Vũ Trụ -->
+                    <div class="relative w-28 h-28 md:w-36 md:h-36 z-10" id="spaceship-container">
+                        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]">
+                            <!-- Lửa phản lực -->
+                            <path class="thruster" d="M 40 80 Q 0 100 40 120 Q 25 100 40 80" fill="#0ea5e9"/>
+                            <path class="thruster" d="M 40 85 Q 15 100 40 115 Q 30 100 40 85" fill="#f0f9ff"/>
+                            
+                            <!-- Thân tàu -->
+                            <path d="M 40 70 L 130 70 L 170 100 L 130 130 L 40 130 Z" fill="#cbd5e1" />
+                            <path d="M 130 70 L 170 100 L 130 130 Z" fill="#94a3b8" />
+                            <path d="M 40 100 L 170 100 L 130 130 L 40 130 Z" fill="#64748b" opacity="0.5"/>
+                            
+                            <!-- Cánh tàu -->
+                            <path d="M 40 70 L 60 30 L 90 70 Z" fill="#3b82f6" />
+                            <path d="M 40 130 L 60 170 L 90 130 Z" fill="#3b82f6" />
+                            <path d="M 60 30 L 90 70 L 70 70 Z" fill="#1d4ed8" />
+                            <path d="M 60 170 L 90 130 L 70 130 Z" fill="#1d4ed8" />
+                            
+                            <!-- Buồng lái -->
+                            <ellipse cx="110" cy="100" rx="25" ry="12" fill="#38bdf8" opacity="0.9"/>
+                            <ellipse cx="115" cy="98" rx="8" ry="4" fill="#ffffff" opacity="0.6"/>
+                            
+                            <!-- Nòng súng Laser -->
+                            <rect x="160" y="96" width="25" height="8" fill="#475569" rx="2"/>
+                            <rect x="175" y="94" width="10" height="12" fill="#38bdf8" rx="2"/>
+                        </svg>
+                        
+                        <!-- Điểm mỏ neo để xuất phát tia Laser -->
+                        <div id="laser-start-point" class="absolute w-1 h-1" style="top: 50%; right: -5%;"></div>
+                    </div>
+                </div>
+
+                <!-- SVG Tia Laser (Animation) -->
+                <svg id="laser-beam" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 10px; top: 0; left: 0;">
+                    <line x1="0" y1="10" x2="100" y2="10" stroke="#22d3ee" stroke-width="8" stroke-linecap="round" filter="drop-shadow(0 0 8px #06b6d4)"/>
+                    <line x1="20" y1="10" x2="100" y2="10" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+
+                <!-- Vùng chứa Ruồi Không Gian (Aliens) -->
+                <div id="aliens-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
+                    <!-- Sinh mục tiêu bằng JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Thanh Tương Tác Cố Định Dưới Cùng -->
+        <div class="bg-slate-800 p-5 border-t border-slate-700 flex items-center justify-center z-10 rounded-b-3xl">
+            <div id="feedback-msg" class="text-xl md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
+                Nhấp vào mục tiêu để khai hỏa nhé! 🎯
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio> <!-- Tiếng nổ mục tiêu -->
+    <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio> <!-- Tiếng súng Laser -->
+
+    <script>
+        // --- HÀM HỖ TRỢ ĐỌC TTS GỐC CỦA TRÌNH DUYỆT ---
+        function playTTS(text) {
+            return new Promise(resolve => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = 0.95; 
+                    utterance.pitch = 1.1; 
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
+                    if (viVoice) utterance.voice = viVoice;
+
+                    utterance.onend = resolve;
+                    utterance.onerror = resolve;
+                    
+                    window.speechSynthesis.speak(utterance);
+                    setTimeout(resolve, 5000); 
+                } else {
+                    setTimeout(resolve, 1000);
+                }
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        }
+
+        // TỪ ĐIỂN ĐỌC SỐ
+        const numWords = {
+            1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 6: 'sáu', 7: 'bảy', 8: 'tám', 9: 'chín', 10: 'mười',
+            14: 'mười bốn', 21: 'hai mươi mốt', 28: 'hai mươi tám', 35: 'ba mươi lăm',
+            42: 'bốn mươi hai', 49: 'bốn mươi chín', 56: 'năm mươi sáu', 63: 'sáu mươi ba', 70: 'bảy mươi'
+        };
+
+        // Game State
+        let currentMode = 'nhan'; 
+        let currentMultiplier = 1;
+        let currentDividend = 7;
+        let expectedAnswer = 7;
+        
+        let score = 0;
+        let streak = 0;
+        let isShooting = false; 
+        let recentQuestions = [];
+
+        // Bảng nhân 7, chia 7
+        const answersNhan = [7, 14, 21, 28, 35, 42, 49, 56, 63, 70];
+        const answersChia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        
+        // Emoji mục tiêu (Space Invader, Đĩa bay, Alien)
+        const alienEmojis = ['👾', '🛸', '👽'];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initAliens();
+            generateQuestion();
+        });
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+        function updateScore() { 
+            document.getElementById('score-display').innerText = score; 
+            document.getElementById('streak-display').innerText = streak; 
+        }
+
+        function startGame() {
+            playSound('snd-pop');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            }
+
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                const gameBoard = document.getElementById('game-board');
+                gameBoard.classList.remove('bounce-in');
+                void gameBoard.offsetWidth;
+                gameBoard.classList.add('bounce-in');
+
+                initAliens();
+                generateQuestion();
+            }, 300);
+        }
+
+        function initAliens() {
+            const container = document.getElementById('aliens-container');
+            container.innerHTML = '';
+            
+            const currentAnswers = currentMode === 'nhan' ? answersNhan : answersChia;
+            
+            // Lưới phân bổ 10 mục tiêu ở khu vực bên phải (x: 45-90%, y: 15-80%)
+            // Tránh khu vực bên trái (Tàu vũ trụ) hoàn toàn
+            const basePositions = [
+                { top: 15, left: 50 }, { top: 20, left: 70 }, { top: 15, left: 90 },
+                { top: 38, left: 58 }, { top: 42, left: 82 },
+                { top: 60, left: 48 }, { top: 65, left: 70 }, { top: 60, left: 92 },
+                { top: 82, left: 55 }, { top: 82, left: 80 }
+            ];
+
+            const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
+
+            currentAnswers.forEach((ans, index) => {
+                const pos = shuffledPositions[index];
+                
+                let topPercent = pos.top + (Math.random() * 4 - 2); 
+                let leftPercent = pos.left + (Math.random() * 4 - 2);
+                
+                const emoji = alienEmojis[Math.floor(Math.random() * alienEmojis.length)];
+                
+                const wrap = document.createElement('div');
+                wrap.className = `alien-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30 transition-transform duration-200`;
+                wrap.style.left = `${leftPercent}%`;
+                wrap.style.top = `${topPercent}%`;
+                wrap.dataset.val = ans;
+                
+                wrap.onclick = function() { checkAnswer(this); };
+
+                let animDelay = Math.random() * 2;
+                let animDur = 1.5 + Math.random() * 1.5; // Bay nhanh hơn bóng bay một chút
+
+                wrap.innerHTML = `
+                    <div class="relative flex flex-col items-center alien-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
+                        <div class="text-[50px] md:text-[65px] drop-shadow-[0_0_10px_rgba(56,189,248,0.5)] z-0 select-none">${emoji}</div>
+                        <div class="absolute z-10 bg-slate-900/90 backdrop-blur-md rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-black text-sm md:text-lg border-2 border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] text-cyan-300" style="bottom: -8px;">
+                            ${ans}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(wrap);
+            });
+        }
+
+        function generateQuestion() {
+            const prob = document.getElementById('math-problem');
+            let isSwitchingMode = false;
+            
+            let availableAliens = Array.from(document.querySelectorAll('.alien-wrapper:not(.popped)'));
+            
+            if (availableAliens.length === 0) {
+                currentMode = currentMode === 'nhan' ? 'chia' : 'nhan';
+                isSwitchingMode = true;
+                
+                initAliens();
+                availableAliens = Array.from(document.querySelectorAll('.alien-wrapper:not(.popped)'));
+                recentQuestions = [];
+            }
+
+            document.getElementById('game-subtitle').innerHTML = currentMode === 'nhan' 
+                ? "Nhiệm vụ: <b class='text-yellow-400 text-lg md:text-xl drop-shadow-md'>Bảng Nhân 7 ✖️</b>" 
+                : "Nhiệm vụ: <b class='text-yellow-400 text-lg md:text-xl drop-shadow-md'>Bảng Chia 7 ➗</b>";
+
+            const availableFactors = availableAliens.map(b => {
+                let ans = parseInt(b.dataset.val);
+                return currentMode === 'nhan' ? ans / 7 : ans;
+            });
+
+            let randomFactor;
+            if (availableFactors.length > 1) {
+                let validFactors = availableFactors.filter(f => !recentQuestions.includes(f));
+                if (validFactors.length > 0) {
+                    randomFactor = validFactors[Math.floor(Math.random() * validFactors.length)];
+                } else {
+                    randomFactor = availableFactors[Math.floor(Math.random() * availableFactors.length)];
+                }
+            } else {
+                randomFactor = availableFactors[0];
+            }
+
+            recentQuestions.push(randomFactor);
+            if (recentQuestions.length > 5) recentQuestions.shift();
+
+            if (currentMode === 'nhan') {
+                currentMultiplier = randomFactor;
+                expectedAnswer = 7 * currentMultiplier;
+                prob.innerText = `7 x ${currentMultiplier}`;
+            } else {
+                expectedAnswer = randomFactor;
+                currentDividend = 7 * expectedAnswer;
+                prob.innerText = `${currentDividend} : 7`;
+            }
+            
+            const sign = prob.parentElement;
+            sign.classList.remove('shake', 'bounce-in');
+            void sign.offsetWidth;
+            sign.classList.add('bounce-in');
+
+            if (isSwitchingMode) {
+                let modeName = currentMode === 'nhan' ? 'Bảng Nhân 7' : 'Bảng Chia 7';
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 font-bold">Cấp độ mới: <b class="text-cyan-300">${modeName}</b>! Cảnh giác! 👇</span>`;
+                playSound('snd-pop');
+            } else {
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400">Nhấp vào mục tiêu mang số <b class="text-cyan-400">đáp án</b> nhé! 👇</span>`;
+            }
+        }
+
+        // ANIMATION BẮN LASER (Dùng translate3d)
+        function shootLaser(targetElement) {
+            isShooting = true;
+            playSound('snd-shoot'); 
+            
+            const shipContainer = document.getElementById('spaceship-container');
+            shipContainer.classList.remove('ship-recoil');
+            void shipContainer.offsetWidth;
+            shipContainer.classList.add('ship-recoil');
+
+            const board = document.getElementById('game-board');
+            const boardRect = board.getBoundingClientRect();
+            
+            const startPt = document.getElementById('laser-start-point');
+            const startRect = startPt.getBoundingClientRect();
+            
+            const targetBody = targetElement.querySelector('.text-\\[50px\\]'); // Chọn phần emoji
+            const targetRect = targetBody.getBoundingClientRect();
+
+            const startX = (startRect.left + startRect.width/2) - boardRect.left;
+            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+
+            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+
+            const laser = document.getElementById('laser-beam');
+            laser.classList.remove('hidden');
+            
+            // Tính toán góc và độ dài tia laser nếu muốn (ở đây cố định 100px cho đẹp)
+            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
+            laser.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle}deg)`;
+
+            const duration = 150; // Laser bay cực nhanh (150ms)
+            let animationStartTime = null;
+
+            function animateFly(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
+                
+                // Laser bay thẳng tắp (Linear)
+                let currentX = startX + (targetX - startX) * progress;
+                let currentY = startY + (targetY - startY) * progress;
+                
+                laser.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateFly);
+                } else {
+                    laser.classList.add('hidden');
+                    
+                    targetElement.style.display = 'none';
+                    targetElement.classList.add('popped');
+                    
+                    playSound('snd-pop'); 
+                    // Pháo hoa Neon
+                    confetti({ particleCount: 50, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#22d3ee', '#818cf8', '#f472b6', '#fef08a'] });
+                    
+                    score += 10;
+                    streak++;
+                    updateScore();
+
+                    let feedbackText = currentMode === 'nhan' ? `Chính xác! 7 x ${currentMultiplier} = ${expectedAnswer} 🎉` : `Chính xác! ${currentDividend} : 7 = ${expectedAnswer} 🎉`;
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 font-black">${feedbackText}</span>`;
+                    
+                    setTimeout(() => {
+                        generateQuestion();
+                        isShooting = false;
+                    }, 500);
+                }
+            }
+
+            requestAnimationFrame(animateFly);
+        }
+
+        async function checkAnswer(targetElement) {
+            if (isShooting || targetElement.classList.contains('popped')) return;
+
+            let selectedVal = parseInt(targetElement.dataset.val);
+
+            if (selectedVal === expectedAnswer) {
+                shootLaser(targetElement);
+            } else {
+                playSound('snd-wrong');
+                streak = 0;
+                updateScore();
+
+                const sign = document.getElementById('math-problem').parentElement;
+                sign.classList.remove('bounce-in', 'shake');
+                void sign.offsetWidth;
+                sign.classList.add('shake');
+
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 font-bold">Trượt rồi! Đang khôi phục dữ liệu mục tiêu... 🎧</span>`;
+                
+                isShooting = true;
+                
+                let readText = currentMode === 'nhan'
+                    ? `Bảy nhân ${numWords[currentMultiplier] || currentMultiplier} bằng ${numWords[expectedAnswer] || expectedAnswer}`
+                    : `${numWords[currentDividend] || currentDividend} chia bảy bằng ${numWords[expectedAnswer] || expectedAnswer}`;
+                
+                let ttsPrompt = "Đáp án đúng là: " + readText; 
+                
+                await playTTS(ttsPrompt);
+                
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 font-bold">Mục tiêu đã đổi, chuẩn bị khai hỏa! 🔄</span>`;
+
+                setTimeout(() => {
+                    generateQuestion();
+                    isShooting = false;
+                }, 300);
+            }
+        }
+
+        // --- FULLSCREEN ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
+                if (req) { try { req.call(doc); } catch(e){} } 
+            } else { 
+                if (ext) ext.call(document); 
+            }
+        }
+    </script>
+</body>
+</html>
