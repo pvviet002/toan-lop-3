@@ -168,23 +168,23 @@
     <!-- Header Global -->
     <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
         <div class="flex items-center space-x-2 md:space-x-3">
-            <a href="index.html" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
                 <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
             </a>
-            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
                 <span>🔲 Phóng to</span>
             </button>
         </div>
         
-        <div class="bg-slate-800 px-5 py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-cyan-800 flex items-center space-x-5">
+        <div class="bg-slate-800 px-3 py-2 md:px-5 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-cyan-800 flex items-center space-x-3 md:space-x-5">
             <div class="flex items-center space-x-1">
-                <span class="text-xl">🎯</span>
-                <span id="score-display" class="font-black text-cyan-400 text-xl">0</span>
+                <span class="text-lg md:text-xl">🎯</span>
+                <span id="score-display" class="font-black text-cyan-400 text-lg md:text-xl">0</span>
             </div>
-            <div class="w-1 h-6 bg-slate-600 rounded-full"></div>
+            <div class="w-1 h-5 md:h-6 bg-slate-600 rounded-full"></div>
             <div class="flex items-center space-x-1">
-                <span class="text-xl">🔥</span>
-                <span id="streak-display" class="font-black text-orange-400 text-xl">0</span>
+                <span class="text-lg md:text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-400 text-lg md:text-xl">0</span>
             </div>
         </div>
     </div>
@@ -200,82 +200,82 @@
             <div class="star-layer star-layer-3"></div>
             
             <!-- Icon Tàu vũ trụ Lớn -->
-            <div class="w-32 h-32 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(34,211,238,0.8)] bounce-in flex items-center justify-center bg-slate-800/80 backdrop-blur-md rounded-full border-4 border-cyan-400 relative z-10" style="animation-delay: 0.1s">
-                <span class="text-7xl md:text-8xl transform translate-x-1 -rotate-45">🚀</span>
+            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(34,211,238,0.8)] bounce-in flex items-center justify-center bg-slate-800/80 backdrop-blur-md rounded-full border-4 border-cyan-400 relative z-10" style="animation-delay: 0.1s">
+                <span class="text-5xl md:text-8xl transform translate-x-1 -rotate-45">🚀</span>
             </div>
 
-            <h1 class="text-4xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-cyan-300 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(34,211,238,0.6);">
+            <h1 class="text-3xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-cyan-300 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(34,211,238,0.6);">
                 BẮN RUỒI KHÔNG GIAN
             </h1>
             
-            <div class="bg-slate-800/80 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-cyan-500/50 max-w-lg text-center mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
-                <p class="text-lg md:text-xl font-bold mb-3 text-cyan-200 uppercase tracking-widest">Nhiệm vụ:</p>
-                <p class="text-base md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy nhấp vào Đĩa bay UFO mang khiên số là <b class="text-white bg-indigo-600/80 px-2 py-1 rounded">đáp án đúng</b> để khai hỏa Laser nhé!</p>
+            <div class="bg-slate-800/80 backdrop-blur-md p-5 md:p-8 rounded-3xl border border-cyan-500/50 max-w-lg text-center mb-8 md:mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
+                <p class="text-base md:text-xl font-bold mb-2 md:mb-3 text-cyan-200 uppercase tracking-widest">Nhiệm vụ:</p>
+                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy nhấp vào Đĩa bay UFO mang khiên số là <b class="text-white bg-indigo-600/80 px-2 py-1 rounded">đáp án đúng</b> để khai hỏa Laser nhé!</p>
                 
-                <div class="flex items-center justify-center gap-3 mt-4 mb-2">
-                    <label class="text-indigo-200 font-bold text-sm md:text-base">Thời gian mỗi câu:</label>
-                    <select id="time-select" class="bg-slate-900 text-cyan-300 border-2 border-cyan-600 rounded-xl px-4 py-2 outline-none font-bold text-lg cursor-pointer hover:border-cyan-400 transition-colors">
+                <div class="flex items-center justify-center gap-2 md:gap-3 mt-4 mb-2">
+                    <label class="text-indigo-200 font-bold text-xs md:text-base">Thời gian mỗi câu:</label>
+                    <select id="time-select" class="bg-slate-900 text-cyan-300 border-2 border-cyan-600 rounded-xl px-2 py-1 md:px-4 md:py-2 outline-none font-bold text-sm md:text-lg cursor-pointer hover:border-cyan-400 transition-colors">
                         <option value="10">10 giây</option>
                         <option value="20">20 giây</option>
                         <option value="30" selected>30 giây</option>
                     </select>
                 </div>
 
-                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-sm md:text-base border border-slate-600 shadow-inner mt-2 text-indigo-200 text-left">
+                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-[11px] md:text-base border border-slate-600 shadow-inner mt-2 text-indigo-200 text-left">
                     <span>⚠️ <b>Chú ý:</b> Trả lời chậm sẽ bị UFO bắn trúng và <b class="text-rose-400">mất máu</b> đấy! Bật âm thanh để nghe đọc kết quả khi lỡ chọn sai nha!</span>
                 </div>
             </div>
             
-            <button onclick="startGame()" class="btn-press px-12 py-5 bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black rounded-full text-2xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-cyan-200 shadow-[0_0_25px_rgba(34,211,238,0.8)] relative z-10" style="animation-delay: 0.4s">
+            <button onclick="startGame()" class="btn-press px-10 py-4 md:px-12 md:py-5 bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black rounded-full text-xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-cyan-200 shadow-[0_0_25px_rgba(34,211,238,0.8)] relative z-10" style="animation-delay: 0.4s">
                 XUẤT PHÁT 🚀
             </button>
         </div>
 
         <!-- MÀN HÌNH GAME OVER -->
         <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-rose-950/80 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
-            <div class="bg-slate-900 p-8 rounded-[2rem] border-4 border-rose-600 shadow-[0_0_50px_rgba(225,29,72,0.6)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
-                <div class="text-7xl mb-4 animate-bounce">💥</div>
-                <h2 class="text-3xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">TÀU BỊ PHÁ HỦY!</h2>
-                <p class="text-slate-300 mb-6 font-medium text-lg">Bé đã hết máu. Hãy thử lại để bảo vệ phi thuyền nhé!</p>
+            <div class="bg-slate-900 p-6 md:p-8 rounded-[2rem] border-4 border-rose-600 shadow-[0_0_50px_rgba(225,29,72,0.6)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
+                <div class="text-6xl md:text-7xl mb-4 animate-bounce">💥</div>
+                <h2 class="text-2xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">TÀU BỊ PHÁ HỦY!</h2>
+                <p class="text-slate-300 mb-6 font-medium text-sm md:text-lg">Bé đã hết máu. Hãy thử lại để bảo vệ phi thuyền nhé!</p>
                 <div class="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700">
-                    <span class="text-slate-400 block mb-1">Điểm đạt được</span>
-                    <span class="text-5xl font-black text-cyan-400" id="final-score">0</span>
+                    <span class="text-slate-400 block mb-1 text-sm md:text-base">Điểm đạt được</span>
+                    <span class="text-4xl md:text-5xl font-black text-cyan-400" id="final-score">0</span>
                 </div>
-                <button onclick="showStartScreen()" class="btn-press px-8 py-4 bg-gradient-to-b from-rose-500 to-rose-700 text-white font-black rounded-full text-xl w-full shadow-[0_0_20px_rgba(225,29,72,0.5)]">
+                <button onclick="showStartScreen()" class="btn-press px-6 py-3 md:px-8 md:py-4 bg-gradient-to-b from-rose-500 to-rose-700 text-white font-black rounded-full text-lg md:text-xl w-full shadow-[0_0_20px_rgba(225,29,72,0.5)]">
                     CHƠI LẠI TỪ ĐẦU 🔄
                 </button>
             </div>
         </div>
 
         <!-- Header Bài học -->
-        <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-5 md:p-6 text-center shadow-md relative z-10 border-b border-indigo-900/50">
-            <h1 class="text-2xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-cyan-400" style="text-shadow: 0 0 15px rgba(34,211,238,0.5);">Bắn Ruồi Không Gian 🛸</h1>
-            <p id="game-subtitle" class="text-indigo-300 text-sm md:text-base font-medium transition-colors duration-300">Hệ thống vũ khí đang khởi động...</p>
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-4 md:p-6 text-center shadow-md relative z-10 border-b border-indigo-900/50">
+            <h1 class="text-xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-cyan-400" style="text-shadow: 0 0 15px rgba(34,211,238,0.5);">Bắn Ruồi Không Gian 🛸</h1>
+            <p id="game-subtitle" class="text-indigo-300 text-xs md:text-base font-medium transition-colors duration-300">Hệ thống vũ khí đang khởi động...</p>
         </div>
 
         <!-- Khung Game Chính -->
-        <div class="flex-grow flex items-center justify-center p-3 md:p-6 relative bg-slate-900 overflow-hidden">
+        <div class="flex-grow flex items-center justify-center p-2 md:p-6 relative bg-slate-900 overflow-hidden">
             
             <!-- Khu vực Vũ Trụ (Game Board) -->
-            <div id="game-board" class="space-container w-full max-w-[500px] md:max-w-[800px] aspect-[3/4] md:aspect-[16/11] relative bounce-in">
+            <div id="game-board" class="space-container w-full max-w-[500px] md:max-w-[800px] aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] relative bounce-in mx-auto">
                 
                 <!-- TRẠNG THÁI SINH TỒN (Thanh máu & Thời gian) -->
-                <div class="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-30 pointer-events-none">
+                <div class="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-start z-30 pointer-events-none">
                     <!-- Thanh Máu -->
-                    <div class="flex items-center gap-2 bg-slate-900/80 backdrop-blur border border-rose-500/50 rounded-full px-4 py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
-                        <span class="text-rose-500 font-bold tracking-widest text-sm mr-1">HP</span>
-                        <div class="flex gap-1.5" id="health-bar">
+                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/80 backdrop-blur border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
+                        <span class="text-rose-500 font-bold tracking-widest text-[10px] md:text-sm mr-1">HP</span>
+                        <div class="flex gap-1 md:gap-1.5" id="health-bar">
                             <!-- JS sinh thanh máu -->
                         </div>
                     </div>
                     
                     <!-- Đồng hồ đếm ngược -->
-                    <div class="bg-slate-900/80 backdrop-blur border border-cyan-500/50 rounded-full px-4 py-2 flex items-center gap-3 w-40 md:w-48 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300" id="timer-wrapper">
-                        <span class="text-cyan-400 font-bold">⏱️</span>
-                        <div class="h-2.5 flex-grow bg-slate-700 rounded-full overflow-hidden">
+                    <div class="bg-slate-900/80 backdrop-blur border border-cyan-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 w-32 md:w-48 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 scale-90 md:scale-100 origin-top-right" id="timer-wrapper">
+                        <span class="text-cyan-400 font-bold text-xs md:text-base">⏱️</span>
+                        <div class="h-1.5 md:h-2.5 flex-grow bg-slate-700 rounded-full overflow-hidden">
                             <div id="timer-bar" class="h-full bg-cyan-400 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
                         </div>
-                        <span id="timer-text" class="text-cyan-400 font-mono font-bold text-lg min-w-[24px] text-right">30</span>
+                        <span id="timer-text" class="text-cyan-400 font-mono font-bold text-sm md:text-lg min-w-[20px] md:min-w-[24px] text-right">30</span>
                     </div>
                 </div>
 
@@ -285,27 +285,28 @@
                 <div class="star-layer star-layer-3"></div>
                 
                 <!-- Hành tinh trang trí -->
-                <div class="absolute top-[12%] right-[15%] w-20 h-20 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-indigo-500 to-purple-900 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.6),_0_0_30px_rgba(99,102,241,0.4)] z-0">
-                    <div class="absolute top-1/2 left-1/2 w-[140%] h-[30%] border-[6px] border-indigo-300/50 rounded-[50%] transform -translate-x-1/2 -translate-y-1/2 -rotate-12 shadow-[0_0_15px_rgba(165,180,252,0.6)]"></div>
+                <div class="absolute top-[12%] right-[15%] w-16 h-16 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-indigo-500 to-purple-900 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.6),_0_0_30px_rgba(99,102,241,0.4)] z-0">
+                    <div class="absolute top-1/2 left-1/2 w-[140%] h-[30%] border-[4px] md:border-[6px] border-indigo-300/50 rounded-[50%] transform -translate-x-1/2 -translate-y-1/2 -rotate-12 shadow-[0_0_15px_rgba(165,180,252,0.6)]"></div>
                 </div>
                 
-                <div class="absolute bottom-[25%] right-[35%] w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-300 to-orange-600 shadow-[0_0_50px_rgba(245,158,11,0.8),_inset_-5px_-5px_10px_rgba(0,0,0,0.3)] z-0 animate-pulse"></div>
+                <div class="absolute bottom-[25%] right-[35%] w-8 h-8 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-300 to-orange-600 shadow-[0_0_50px_rgba(245,158,11,0.8),_inset_-5px_-5px_10px_rgba(0,0,0,0.3)] z-0 animate-pulse"></div>
                 
                 <!-- Lưới hiển thị 3D cho không gian -->
                 <div class="synthwave-grid"></div>
 
-                <!-- Tàu Vũ Trụ & Bảng Hologram (Bên trái) -->
-                <div class="absolute bottom-[10%] left-[2%] md:left-[5%] flex flex-col items-center z-20">
+                <!-- Tàu Vũ Trụ & Bảng Hologram -->
+                <div class="absolute bottom-[2%] md:bottom-[10%] left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-20 w-full md:w-auto px-4 md:px-0">
                     
                     <!-- Bảng Hologram hiển thị phép tính -->
-                    <div class="relative flex flex-col items-center mb-6 mt-6">
-                        <div class="hologram-sign px-6 py-2 md:px-8 md:py-3 flex items-center justify-center relative z-20">
-                            <span id="math-problem" class="font-black hologram-text text-3xl md:text-5xl tracking-widest relative z-10 font-mono">7 x ? = ?</span>
+                    <div class="relative flex flex-col items-center mb-0 md:mb-6 mt-2 md:mt-6 w-full max-w-[250px] md:max-w-none">
+                        <div class="hologram-sign px-3 py-1 md:px-8 md:py-3 flex items-center justify-center relative z-20 w-full">
+                            <span id="math-problem" class="font-black hologram-text text-2xl md:text-5xl tracking-widest relative z-10 font-mono">7 x ? = ?</span>
                         </div>
                     </div>
                     
                     <!-- SVG Tàu Vũ Trụ Chuyên Nghiệp -->
-                    <div class="relative w-36 h-36 md:w-48 md:h-48 z-10 drop-shadow-[0_0_20px_rgba(34,211,238,0.4)]" id="spaceship-container">
+                    <!-- Trên mobile xoay -90deg để hướng súng lên trên -->
+                    <div class="relative w-28 h-28 md:w-48 md:h-48 z-10 drop-shadow-[0_0_20px_rgba(34,211,238,0.4)] -rotate-90 md:rotate-0 mt-4 md:mt-0" id="spaceship-container">
                         <svg viewBox="0 0 200 200" class="w-full h-full">
                             <!-- Engine Flames -->
                             <path class="thruster" d="M 15 90 Q -15 100 15 110 Q 5 100 15 90" fill="#0ea5e9"/>
@@ -362,8 +363,8 @@
         </div>
 
         <!-- Thanh Tương Tác Cố Định Dưới Cùng -->
-        <div class="bg-slate-900 p-5 border-t border-slate-800 flex items-center justify-center z-10 rounded-b-3xl">
-            <div id="feedback-msg" class="text-xl md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
+        <div class="bg-slate-900 p-3 md:p-5 border-t border-slate-800 flex items-center justify-center z-10 rounded-b-3xl">
+            <div id="feedback-msg" class="text-sm md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
                 Bảo vệ Phi thuyền! Bắn mục tiêu mang đáp án nhé 🎯
             </div>
         </div>
@@ -406,6 +407,13 @@
         if ('speechSynthesis' in window) {
             window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
         }
+
+        // TỪ ĐIỂN ĐỌC SỐ
+        const numWords = {
+            1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 6: 'sáu', 7: 'bảy', 8: 'tám', 9: 'chín', 10: 'mười',
+            14: 'mười bốn', 21: 'hai mươi mốt', 28: 'hai mươi tám', 35: 'ba mươi lăm',
+            42: 'bốn mươi hai', 49: 'bốn mươi chín', 56: 'năm mươi sáu', 63: 'sáu mươi ba', 70: 'bảy mươi'
+        };
 
         // Game State Core
         let isPlaying = false;
@@ -459,6 +467,13 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             initAliens();
+            
+            // Xử lý màn hình xoay (Resize)
+            window.addEventListener('resize', () => {
+                if(!isPlaying) {
+                    initAliens();
+                }
+            });
         });
 
         function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
@@ -478,7 +493,7 @@
                 let cellClass = i < lives 
                     ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)] border-rose-300' 
                     : 'bg-slate-700 border-slate-600';
-                container.innerHTML += `<div class="w-6 h-4 md:w-8 md:h-5 rounded-sm transform skew-x-[-15deg] border-t border-b border-l-2 ${cellClass}"></div>`;
+                container.innerHTML += `<div class="w-4 h-3 md:w-8 md:h-5 rounded-sm transform skew-x-[-15deg] border-t border-b border-l-2 ${cellClass}"></div>`;
             }
         }
 
@@ -590,13 +605,26 @@
             // Lấy ngẫu nhiên 10 câu hỏi để gắn cho 10 đĩa bay
             let shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 10);
             
-            // Lưới phân bổ 10 mục tiêu ở khu vực bên phải (x: 45-90%, y: 15-80%)
-            const basePositions = [
-                { top: 15, left: 50 }, { top: 20, left: 75 }, { top: 15, left: 95 },
-                { top: 40, left: 60 }, { top: 45, left: 85 },
-                { top: 65, left: 50 }, { top: 70, left: 75 }, { top: 65, left: 95 },
-                { top: 85, left: 60 }, { top: 85, left: 85 }
-            ];
+            const isMobile = window.innerWidth < 768;
+            let basePositions = [];
+
+            if (isMobile) {
+                // Trên Mobile: Phi thuyền ở dưới cùng. Mục tiêu trải đều nửa trên (top: 8% -> 60%)
+                basePositions = [
+                    { top: 8, left: 20 }, { top: 12, left: 50 }, { top: 8, left: 80 },
+                    { top: 24, left: 30 }, { top: 28, left: 70 },
+                    { top: 42, left: 20 }, { top: 45, left: 50 }, { top: 42, left: 80 },
+                    { top: 58, left: 30 }, { top: 60, left: 70 }
+                ];
+            } else {
+                // Trên Desktop: Phi thuyền ở trái. Mục tiêu ở khu vực bên phải (x: 45-90%, y: 15-80%)
+                basePositions = [
+                    { top: 15, left: 50 }, { top: 20, left: 75 }, { top: 15, left: 95 },
+                    { top: 40, left: 60 }, { top: 45, left: 85 },
+                    { top: 65, left: 50 }, { top: 70, left: 75 }, { top: 65, left: 95 },
+                    { top: 85, left: 60 }, { top: 85, left: 85 }
+                ];
+            }
 
             const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
 
@@ -622,26 +650,26 @@
                 let animDelay = Math.random() * 2;
                 let animDur = 2 + Math.random() * 1.5; 
 
-                // HTML Thiết kế Đĩa bay UFO
+                // HTML Thiết kế Đĩa bay UFO (Thu nhỏ linh hoạt cho mobile)
                 wrap.innerHTML = `
                     <div class="relative flex flex-col items-center justify-center ufo-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
                         
                         <!-- Mái vòm trong suốt -->
-                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white/40 backdrop-blur-[2px] relative z-10 flex items-end justify-center pb-1.5 md:pb-2 overflow-hidden ${color.glow}" style="background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6), ${color.dome});">
-                            <span class="text-4xl md:text-5xl relative z-10 select-none">${emoji}</span>
-                            <div class="absolute top-1 left-2 w-5 h-3 bg-white/50 rounded-full transform -rotate-45 pointer-events-none"></div>
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white/40 backdrop-blur-[2px] relative z-10 flex items-end justify-center pb-1.5 md:pb-2 overflow-hidden ${color.glow}" style="background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6), ${color.dome});">
+                            <span class="text-3xl md:text-5xl relative z-10 select-none">${emoji}</span>
+                            <div class="absolute top-1 left-2 w-4 h-2 md:w-5 md:h-3 bg-white/50 rounded-full transform -rotate-45 pointer-events-none"></div>
                         </div>
                         
                         <!-- Thân đĩa bay -->
-                        <div class="w-20 h-5 md:w-24 md:h-6 rounded-[50%] ${color.base} -mt-4 z-20 flex items-center justify-around px-2 border-b-2 border-black/40 shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
-                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse"></div>
-                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.2s"></div>
-                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.4s"></div>
-                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.6s"></div>
+                        <div class="w-16 h-4 md:w-24 md:h-6 rounded-[50%] ${color.base} -mt-3 md:-mt-4 z-20 flex items-center justify-around px-2 border-b-2 border-black/40 shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
+                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse"></div>
+                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.2s"></div>
+                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.4s"></div>
+                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.6s"></div>
                         </div>
                         
                         <!-- Khiên hiển thị số (Hologram text) -->
-                        <div class="absolute -bottom-6 z-30 bg-slate-900/90 backdrop-blur-md rounded-lg w-10 h-8 md:w-12 md:h-10 flex items-center justify-center font-black font-mono text-base md:text-xl border border-cyan-400/50 shadow-[0_0_10px_rgba(34,211,238,0.5)] text-cyan-300">
+                        <div class="absolute -bottom-5 md:-bottom-6 z-30 bg-slate-900/90 backdrop-blur-md rounded-lg w-8 h-6 md:w-12 md:h-10 flex items-center justify-center font-black font-mono text-xs md:text-xl border border-cyan-400/50 shadow-[0_0_10px_rgba(34,211,238,0.5)] text-cyan-300">
                             ${q.a}
                         </div>
                     </div>
@@ -665,29 +693,50 @@
                 playSound('snd-pop');
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 font-bold">Đợt tấn công mới đã xuất hiện! Cảnh giác! 👇</span>`;
             } else {
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400">Nhấp vào đĩa bay mang số <b class="text-cyan-400">đáp án</b> nhé! 👇</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 text-sm md:text-xl">Nhấp vào đĩa bay mang số <b class="text-cyan-400">đáp án</b> nhé! 👇</span>`;
             }
 
-            document.getElementById('game-subtitle').innerHTML = "Nhiệm vụ: <b class='text-yellow-400 text-lg md:text-xl drop-shadow-md'>Nhân & Chia Bảng 7 ⚔️</b>";
+            document.getElementById('game-subtitle').innerHTML = "Nhiệm vụ: <b class='text-yellow-400 text-sm md:text-xl drop-shadow-md'>Nhân & Chia Bảng 7 ⚔️</b>";
 
-            let validAliens = availableAliens.filter(a => !recentQuestions.includes(a.dataset.text));
-            let selectedAlien;
-            if (validAliens.length > 0) {
-                selectedAlien = validAliens[Math.floor(Math.random() * validAliens.length)];
+            let randomFactor;
+            if (availableAliens.length > 1) {
+                let validAliens = availableAliens.filter(a => !recentQuestions.includes(a.dataset.text));
+                if (validAliens.length > 0) {
+                    let selectedAlien = validAliens[Math.floor(Math.random() * validAliens.length)];
+                    let qText = selectedAlien.dataset.text;
+                    expectedAnswer = parseInt(selectedAlien.dataset.val);
+                    
+                    let qData = allQuestions.find(q => q.t === qText);
+                    expectedReadText = qData.read;
+
+                    recentQuestions.push(qText);
+                    if (recentQuestions.length > 5) recentQuestions.shift();
+
+                    prob.innerText = qText + ' = ?';
+                } else {
+                    // Nếu tất cả đều ở recent, random lại
+                    let selectedAlien = availableAliens[Math.floor(Math.random() * availableAliens.length)];
+                    let qText = selectedAlien.dataset.text;
+                    expectedAnswer = parseInt(selectedAlien.dataset.val);
+                    
+                    let qData = allQuestions.find(q => q.t === qText);
+                    expectedReadText = qData.read;
+
+                    recentQuestions.push(qText);
+                    if (recentQuestions.length > 5) recentQuestions.shift();
+
+                    prob.innerText = qText + ' = ?';
+                }
             } else {
-                selectedAlien = availableAliens[Math.floor(Math.random() * availableAliens.length)];
+                let selectedAlien = availableAliens[0];
+                let qText = selectedAlien.dataset.text;
+                expectedAnswer = parseInt(selectedAlien.dataset.val);
+                
+                let qData = allQuestions.find(q => q.t === qText);
+                expectedReadText = qData.read;
+
+                prob.innerText = qText + ' = ?';
             }
-
-            let qText = selectedAlien.dataset.text;
-            expectedAnswer = parseInt(selectedAlien.dataset.val);
-            
-            let qData = allQuestions.find(q => q.t === qText);
-            expectedReadText = qData.read;
-
-            recentQuestions.push(qText);
-            if (recentQuestions.length > 5) recentQuestions.shift();
-
-            prob.innerText = qText + ' = ?';
             
             const sign = prob.parentElement;
             sign.classList.remove('shake', 'bounce-in');
@@ -698,7 +747,7 @@
             startTimer();
         }
 
-        // ANIMATION BẮN LASER CỦA PHI THUYỀN (Chính xác)
+        // ANIMATION BẮN LASER CỦA PHI THUYỀN
         function shootLaser(targetElement) {
             isShooting = true;
             clearInterval(timerInterval); // Dừng đếm giờ khi bắn
@@ -764,7 +813,7 @@
 
                     let qText = document.getElementById('math-problem').innerText.replace(' = ?', '');
                     let feedbackText = `Chính xác! ${qText} = ${expectedAnswer} 🎉`;
-                    document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 font-black">${feedbackText}</span>`;
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 text-sm md:text-xl font-black">${feedbackText}</span>`;
                     
                     setTimeout(() => {
                         generateQuestion();
@@ -849,7 +898,7 @@
                         setTimeout(gameOver, 600);
                     } else {
                         // Cảnh báo và ra câu mới
-                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Hết giờ! Tàu bị trúng đạn! Tải mục tiêu mới... 🛡️</span>`;
+                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 text-sm md:text-xl font-bold">Hết giờ! Tàu bị trúng đạn! Tải mục tiêu mới... 🛡️</span>`;
                         setTimeout(() => {
                             generateQuestion();
                             isShooting = false;
@@ -878,7 +927,7 @@
                 void sign.offsetWidth;
                 sign.classList.add('shake');
 
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 font-bold">Trượt rồi! Đang phân tích mục tiêu... 🎧</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 text-sm md:text-xl font-bold">Trượt rồi! Đang phân tích mục tiêu... 🎧</span>`;
                 
                 isShooting = true;
                 clearInterval(timerInterval); // Dừng đồng hồ trong lúc đọc gợi ý
@@ -887,7 +936,7 @@
                 
                 await playTTS(ttsPrompt);
                 
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 font-bold">Mục tiêu đã đổi, chuẩn bị khai hỏa! 🔄</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 text-sm md:text-xl font-bold">Mục tiêu đã đổi, chuẩn bị khai hỏa! 🔄</span>`;
 
                 setTimeout(() => {
                     generateQuestion(); // generateQuestion sẽ tự động restart Timer
