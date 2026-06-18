@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 11: Bảng nhân, chia 8 - Ninja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a; 
+            overscroll-behavior-y: none; 
+            overflow-x: hidden;
+        }
+        
+        .no-select { user-select: none; -webkit-user-select: none; }
+        
+        .btn-press {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        .btn-press:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
+        }
+
+        .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Bối cảnh Hoàng Hôn (Sunset Dojo Theme) */
+        .dojo-container {
+            position: relative;
+            background: linear-gradient(180deg, #be123c 0%, #e11d48 30%, #f59e0b 80%, #1e293b 100%);
+            border: 6px solid #4c0519; 
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border-radius: 2.5rem;
+        }
+
+        /* Mặt trời khổng lồ */
+        .giant-sun {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle at center, #fef08a 0%, #f59e0b 80%, transparent 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 80px rgba(250,204,21,0.6);
+            z-index: 1;
+        }
+
+        /* Núi bóng đêm (Silhouettes) */
+        .mountain-bg {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 40%;
+            background: #0f172a;
+            clip-path: polygon(0 40%, 15% 10%, 35% 50%, 55% 15%, 80% 60%, 100% 25%, 100% 100%, 0 100%);
+            z-index: 2;
+        }
+        .mountain-fg {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 25%;
+            background: #020617;
+            clip-path: polygon(0 30%, 25% 60%, 50% 10%, 75% 50%, 100% 20%, 100% 100%, 0 100%);
+            z-index: 3;
+        }
+
+        /* Đèn lồng trôi nổi (Lanterns) */
+        .lantern-float {
+            animation: lanternSway 3s ease-in-out infinite alternate;
+            will-change: transform;
+        }
+        @keyframes lanternSway {
+            0% { transform: translateY(-5px) rotate(-3deg); }
+            100% { transform: translateY(5px) rotate(3deg); }
+        }
+
+        .lantern-wrapper:hover .lantern-float {
+            filter: brightness(1.2) drop-shadow(0 0 15px rgba(250,204,21,0.6));
+            transform: scale(1.1);
+            transition: all 0.2s;
+        }
+
+        /* Ninja Animation */
+        .ninja-throw {
+            animation: throwAction 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes throwAction {
+            0% { transform: translateX(0) scaleX(1); }
+            40% { transform: translateX(15px) scaleX(1.1) rotate(5deg); }
+            100% { transform: translateX(0) scaleX(1) rotate(0deg); }
+        }
+
+        .ninja-hit {
+            animation: flashHit 0.5s ease-in-out;
+        }
+        @keyframes flashHit {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(0.2) sepia(1) hue-rotate(-50deg) saturate(10) drop-shadow(0 0 30px red); transform: translateX(-10px); }
+        }
+
+        /* Phi tiêu (Shuriken) */
+        #shuriken-wrapper { will-change: transform; }
+        .spin-fast { animation: spin 0.3s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Cuộn giấy bí kíp (Scroll) */
+        .magic-scroll {
+            background-color: #fef3c7;
+            background-image: linear-gradient(90deg, #fde68a 0%, #fef3c7 20%, #fef3c7 80%, #fde68a 100%);
+            border-top: 8px solid #92400e;
+            border-bottom: 8px solid #92400e;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative bg-slate-900">
+
+    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <a href="index.html" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+                <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
+            </a>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+        
+        <div class="bg-slate-800 px-3 py-2 md:px-5 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-rose-800 flex items-center space-x-3 md:space-x-5">
+            <div class="flex items-center space-x-1">
+                <span class="text-lg md:text-xl">🎯</span>
+                <span id="score-display" class="font-black text-rose-400 text-lg md:text-xl">0</span>
+            </div>
+            <div class="w-1 h-5 md:h-6 bg-slate-600 rounded-full"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-lg md:text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-amber-400 text-lg md:text-xl">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="max-w-5xl mx-auto w-full bg-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-slate-700 overflow-hidden flex flex-col flex-grow relative">
+        
+        <!-- MÀN HÌNH BẮT ĐẦU -->
+        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-rose-950 via-slate-900 to-black flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            
+            <!-- Icon Ninja Lớn -->
+            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(244,63,94,0.8)] bounce-in flex items-center justify-center bg-slate-900 rounded-full border-4 border-rose-500 relative z-10" style="animation-delay: 0.1s">
+                <span class="text-6xl md:text-8xl transform translate-x-1">🥷</span>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-rose-400 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(225,29,72,0.6);">
+                NINJA PHI TIÊU
+            </h1>
+            
+            <div class="bg-slate-800/90 p-5 md:p-8 rounded-3xl border border-rose-500/50 max-w-lg text-center mb-8 md:mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
+                <p class="text-base md:text-xl font-bold mb-2 md:mb-3 text-rose-200 uppercase tracking-widest">Nhiệm vụ:</p>
+                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy phóng phi tiêu vào Đèn lồng mang <b class="text-white bg-rose-600 px-2 py-1 rounded">đáp án đúng</b> của Bí kíp nhé!</p>
+                
+                <div class="flex items-center justify-center gap-2 md:gap-3 mt-4 mb-2">
+                    <label class="text-rose-200 font-bold text-xs md:text-base">Thời gian mỗi câu:</label>
+                    <select id="time-select" class="bg-slate-900 text-rose-300 border-2 border-rose-600 rounded-xl px-2 py-1 md:px-4 md:py-2 outline-none font-bold text-sm md:text-lg cursor-pointer hover:border-rose-400 transition-colors">
+                        <option value="10">10 giây</option>
+                        <option value="20">20 giây</option>
+                        <option value="30" selected>30 giây</option>
+                    </select>
+                </div>
+
+                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-[11px] md:text-base border border-slate-600 shadow-inner mt-2 text-rose-200 text-left">
+                    <span>⚠️ <b>Chú ý:</b> Kẻ địch ẩn nấp trong bóng đêm sẽ tấn công nếu bé hết giờ! Hãy bật âm thanh nhé.</span>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="btn-press px-10 py-4 md:px-12 md:py-5 bg-gradient-to-b from-rose-500 to-rose-700 text-white font-black rounded-full text-xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-rose-300 shadow-[0_0_25px_rgba(225,29,72,0.8)] relative z-10" style="animation-delay: 0.4s">
+                XUẤT CHIÊU ⚔️
+            </button>
+        </div>
+
+        <!-- MÀN HÌNH GAME OVER -->
+        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 p-6 md:p-8 rounded-[2rem] border-4 border-rose-700 shadow-[0_0_50px_rgba(225,29,72,0.8)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
+                <div class="text-6xl md:text-7xl mb-4 animate-bounce">💨</div>
+                <h2 class="text-2xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">THẤT BẠI!</h2>
+                <p class="text-slate-300 mb-6 font-medium text-sm md:text-lg">Ninja đã cạn kiệt sinh lực. Hãy rèn luyện lại tốc độ nhé!</p>
+                <div class="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700">
+                    <span class="text-slate-400 block mb-1 text-sm md:text-base">Điểm đạt được</span>
+                    <span class="text-4xl md:text-5xl font-black text-rose-400" id="final-score">0</span>
+                </div>
+                <button onclick="showStartScreen()" class="btn-press px-6 py-3 md:px-8 md:py-4 bg-gradient-to-b from-rose-600 to-rose-800 text-white font-black rounded-full text-lg md:text-xl w-full shadow-[0_0_20px_rgba(225,29,72,0.5)]">
+                    TU LUYỆN LẠI 🔄
+                </button>
+            </div>
+        </div>
+
+        <!-- Header Bài học -->
+        <div class="bg-gradient-to-r from-slate-900 to-rose-950 text-white p-4 md:p-6 text-center shadow-md relative z-10 border-b border-rose-900/50">
+            <h1 class="text-xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-rose-400" style="text-shadow: 0 0 15px rgba(244,63,94,0.5);">Bảng Nhân & Chia 8 🥷</h1>
+            <p id="game-subtitle" class="text-rose-200 text-xs md:text-base font-medium transition-colors duration-300">Đang khởi động nhẫn thuật...</p>
+        </div>
+
+        <!-- Khung Game Chính -->
+        <div class="flex-grow flex items-center justify-center p-2 md:p-6 relative bg-slate-900 overflow-hidden">
+            
+            <!-- Khu vực Hoàng Hôn (Game Board) -->
+            <div id="game-board" class="dojo-container w-full max-w-[500px] md:max-w-[800px] aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] relative bounce-in mx-auto">
+                
+                <!-- TRẠNG THÁI SINH TỒN -->
+                <div class="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-start z-30 pointer-events-none">
+                    <!-- Thanh Máu -->
+                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/90 border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
+                        <span class="text-rose-500 font-bold tracking-widest text-[10px] md:text-sm mr-1">HP</span>
+                        <div class="flex gap-1 md:gap-1.5" id="health-bar">
+                            <!-- JS sinh thanh máu -->
+                        </div>
+                    </div>
+                    
+                    <!-- Đồng hồ đếm ngược -->
+                    <div class="bg-slate-900/90 border border-amber-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 w-32 md:w-48 shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all duration-300 scale-90 md:scale-100 origin-top-right" id="timer-wrapper">
+                        <span class="text-amber-400 font-bold text-xs md:text-base">⏳</span>
+                        <div class="h-1.5 md:h-2.5 flex-grow bg-slate-700 rounded-full overflow-hidden">
+                            <div id="timer-bar" class="h-full bg-amber-400 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+                        </div>
+                        <span id="timer-text" class="text-amber-400 font-mono font-bold text-sm md:text-lg min-w-[20px] md:min-w-[24px] text-right">30</span>
+                    </div>
+                </div>
+
+                <!-- Hoàng hôn & Núi -->
+                <div class="giant-sun"></div>
+                <div class="mountain-bg"></div>
+                <div class="mountain-fg"></div>
+
+                <!-- Ninja & Bí kíp (Bên trái / Dưới cùng) -->
+                <div class="absolute bottom-[2%] md:bottom-[10%] left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-20 w-full md:w-auto px-4 md:px-0">
+                    
+                    <!-- Bí kíp hiển thị phép tính -->
+                    <div class="relative flex flex-col items-center mb-2 md:mb-4 mt-2 md:mt-6 w-full max-w-[250px] md:max-w-none">
+                        <div class="magic-scroll px-4 py-2 md:px-6 md:py-3 flex items-center justify-center relative z-20 w-full">
+                            <span id="math-problem" class="font-black text-amber-900 text-2xl md:text-5xl tracking-widest relative z-10 font-mono">8 x ? = ?</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG Ninja Chuyên nghiệp (Bóng đen) -->
+                    <div class="relative w-28 h-28 md:w-40 md:h-40 z-10 drop-shadow-[0_0_15px_rgba(0,0,0,0.8)] mt-2 md:mt-0" id="ninja-container">
+                        <svg viewBox="0 0 200 200" class="w-full h-full">
+                            <!-- Chân -->
+                            <path d="M 70 180 Q 80 150 90 140" fill="none" stroke="#020617" stroke-width="20" stroke-linecap="round"/>
+                            <path d="M 130 180 Q 120 150 110 140" fill="none" stroke="#020617" stroke-width="20" stroke-linecap="round"/>
+                            
+                            <!-- Thân (Crouched) -->
+                            <path d="M 60 140 Q 100 80 140 140 Z" fill="#0f172a" />
+                            <path d="M 60 140 C 60 100, 140 100, 140 140 Z" fill="#020617" />
+                            <!-- Đai đỏ -->
+                            <path d="M 70 135 L 130 135" stroke="#be123c" stroke-width="8"/>
+                            
+                            <!-- Dải băng đỏ bay trong gió -->
+                            <path d="M 130 75 Q 170 80 180 110 Q 150 90 120 85" fill="#e11d48" />
+                            <path d="M 125 80 Q 160 100 170 130 Q 140 110 115 90" fill="#be123c" />
+
+                            <!-- Đầu -->
+                            <circle cx="100" cy="80" r="28" fill="#020617" />
+                            <!-- Khe mắt -->
+                            <rect x="85" y="72" width="30" height="10" fill="#fde047" rx="3" />
+                            <!-- Mắt -->
+                            <circle cx="95" cy="77" r="3" fill="#000" />
+                            <circle cx="105" cy="77" r="3" fill="#000" />
+                            
+                            <!-- Cánh tay (Đang giơ phi tiêu) -->
+                            <path d="M 85 110 Q 40 120 50 80" fill="none" stroke="#0f172a" stroke-width="16" stroke-linecap="round" />
+                            
+                            <!-- Phi tiêu cầm trên tay -->
+                            <g transform="translate(45, 65) scale(1.5)" id="hand-shuriken">
+                                <path d="M 10 0 L 13 8 L 20 10 L 13 12 L 10 20 L 7 12 L 0 10 L 7 8 Z" fill="#94a3b8" />
+                                <circle cx="10" cy="10" r="2" fill="#0f172a"/>
+                            </g>
+                        </svg>
+                        
+                        <!-- Điểm mỏ neo để xuất phát Phi tiêu bay -->
+                        <div id="shuriken-start-point" class="absolute w-1 h-1" style="top: 40%; left: 25%;"></div>
+                    </div>
+                </div>
+
+                <!-- SVG Phi tiêu bay (Sử dụng wrapper để translate, inner để spin) -->
+                <div id="shuriken-wrapper" class="absolute pointer-events-none z-50 hidden" style="width: 40px; height: 40px; top: 0; left: 0; will-change: transform;">
+                    <svg viewBox="0 0 20 20" class="w-full h-full spin-fast" filter="drop-shadow(0 0 5px rgba(255,255,255,0.8))">
+                        <path d="M 10 0 L 13 8 L 20 10 L 13 12 L 10 20 L 7 12 L 0 10 L 7 8 Z" fill="#cbd5e1" stroke="#475569" stroke-width="0.5"/>
+                        <circle cx="10" cy="10" r="2" fill="#0f172a"/>
+                    </svg>
+                </div>
+
+                <!-- SVG Kẻ Địch bắn trả (Kunai Bóng tối) -->
+                <svg id="enemy-kunai" viewBox="0 0 30 10" class="absolute pointer-events-none z-50 hidden" style="width: 60px; height: 20px; top: 0; left: 0; will-change: transform;">
+                    <path d="M 0 5 L 20 2 L 30 5 L 20 8 Z" fill="#1e293b" stroke="#ef4444" stroke-width="1" filter="drop-shadow(0 0 4px #ef4444)"/>
+                    <circle cx="2" cy="5" r="2" fill="#ef4444"/>
+                </svg>
+
+                <!-- Vùng chứa Đèn lồng (Targets) -->
+                <div id="lanterns-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
+                    <!-- Sinh mục tiêu bằng JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Thanh Tương Tác Cố Định Dưới Cùng -->
+        <div class="bg-slate-900 p-3 md:p-5 border-t border-slate-800 flex items-center justify-center z-10 rounded-b-3xl">
+            <div id="feedback-msg" class="text-sm md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
+                Phóng phi tiêu vào đèn lồng đáp án! 🎯
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio> <!-- Tiếng nổ / xé giấy -->
+    <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio> <!-- Tiếng phi tiêu xé gió -->
+
+    <script>
+        const apiKey = ""; // Không cần API key cho Web Speech API
+        
+        // --- HÀM HỖ TRỢ ĐỌC TTS GỐC CỦA TRÌNH DUYỆT ---
+        function playTTS(text) {
+            return new Promise(resolve => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = 0.95; 
+                    utterance.pitch = 1.1; 
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
+                    if (viVoice) utterance.voice = viVoice;
+
+                    utterance.onend = resolve;
+                    utterance.onerror = resolve;
+                    
+                    window.speechSynthesis.speak(utterance);
+                    setTimeout(resolve, 5000); 
+                } else {
+                    setTimeout(resolve, 1000);
+                }
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        }
+
+        // TỪ ĐIỂN ĐỌC SỐ CHO BẢNG 8
+        const numWords = {
+            1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 6: 'sáu', 7: 'bảy', 8: 'tám', 9: 'chín', 10: 'mười',
+            16: 'mười sáu', 24: 'hai mươi tư', 32: 'ba mươi hai', 40: 'bốn mươi',
+            48: 'bốn mươi tám', 56: 'năm mươi sáu', 64: 'sáu mươi tư', 72: 'bảy mươi hai', 80: 'tám mươi'
+        };
+
+        // Game State Core
+        let isPlaying = false;
+        let lives = 3;
+        let GAME_TIME = 30;
+        let timeLeft = 30;
+        let timerInterval = null;
+
+        // Math State
+        let expectedAnswer = 8;
+        let expectedReadText = '';
+        let score = 0;
+        let streak = 0;
+        let isShooting = false; 
+        let recentQuestions = [];
+
+        // Ngân hàng 20 câu hỏi (Nhân & Chia bảng 8 hỗn hợp)
+        const allQuestions = [
+            { t: '8 x 1', a: 8 }, { t: '8 x 2', a: 16 }, { t: '8 x 3', a: 24 }, { t: '8 x 4', a: 32 }, { t: '8 x 5', a: 40 },
+            { t: '8 x 6', a: 48 }, { t: '8 x 7', a: 56 }, { t: '8 x 8', a: 64 }, { t: '8 x 9', a: 72 }, { t: '8 x 10', a: 80 },
+            { t: '8 : 8', a: 1 }, { t: '16 : 8', a: 2 }, { t: '24 : 8', a: 3 }, { t: '32 : 8', a: 4 }, { t: '40 : 8', a: 5 },
+            { t: '48 : 8', a: 6 }, { t: '56 : 8', a: 7 }, { t: '64 : 8', a: 8 }, { t: '72 : 8', a: 9 }, { t: '80 : 8', a: 10 }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initLanterns();
+            
+            window.addEventListener('resize', () => {
+                if(!isPlaying) initLanterns();
+            });
+        });
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+        function updateScoreBoard() { 
+            document.getElementById('score-display').innerText = score; 
+            document.getElementById('streak-display').innerText = streak; 
+        }
+
+        function updateLivesUI() {
+            const container = document.getElementById('health-bar');
+            container.innerHTML = '';
+            for(let i = 0; i < 3; i++) {
+                let cellClass = i < lives 
+                    ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)] border-rose-300' 
+                    : 'bg-slate-700 border-slate-600';
+                container.innerHTML += `<div class="w-5 h-4 md:w-6 md:h-5 rounded-sm transform skew-x-[-15deg] border-t border-b border-l-2 ${cellClass}"></div>`;
+            }
+        }
+
+        function updateTimerUI() {
+            document.getElementById('timer-text').innerText = timeLeft;
+            const pct = (timeLeft / GAME_TIME) * 100;
+            const bar = document.getElementById('timer-bar');
+            const wrapper = document.getElementById('timer-wrapper');
+            bar.style.width = pct + '%';
+            
+            if (timeLeft <= 5) {
+                bar.className = 'h-full bg-rose-500 transition-all duration-1000 ease-linear shadow-[0_0_10px_rgba(244,63,94,0.8)]';
+                wrapper.classList.remove('border-amber-500/50', 'shadow-[0_0_15px_rgba(245,158,11,0.4)]');
+                wrapper.classList.add('border-rose-500/80', 'shadow-[0_0_20px_rgba(244,63,94,0.6)]', 'animate-pulse');
+            } else {
+                bar.className = 'h-full bg-amber-400 transition-all duration-1000 ease-linear';
+                wrapper.classList.remove('border-rose-500/80', 'shadow-[0_0_20px_rgba(244,63,94,0.6)]', 'animate-pulse');
+                wrapper.classList.add('border-amber-500/50', 'shadow-[0_0_15px_rgba(245,158,11,0.4)]');
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = GAME_TIME;
+            updateTimerUI();
+            
+            timerInterval = setInterval(() => {
+                if(isShooting || !isPlaying) return; 
+                
+                timeLeft--;
+                updateTimerUI();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    enemyAttack();
+                }
+            }, 1000);
+        }
+
+        function showStartScreen() {
+            const goModal = document.getElementById('game-over-modal');
+            goModal.classList.add('opacity-0');
+            setTimeout(() => { goModal.classList.add('hidden'); }, 300);
+
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.remove('hidden');
+            setTimeout(() => { startScreen.classList.remove('opacity-0'); }, 10);
+            
+            isPlaying = false;
+        }
+
+        function startGame() {
+            playSound('snd-pop');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            }
+
+            GAME_TIME = parseInt(document.getElementById('time-select').value) || 30;
+
+            const goModal = document.getElementById('game-over-modal');
+            if (!goModal.classList.contains('hidden')) {
+                goModal.classList.add('opacity-0');
+                document.getElementById('game-over-content').classList.add('scale-95');
+                setTimeout(() => goModal.classList.add('hidden'), 300);
+            }
+
+            score = 0; streak = 0; updateScoreBoard();
+            lives = 3; updateLivesUI();
+            isPlaying = true;
+            isShooting = false;
+            recentQuestions = [];
+
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                const gameBoard = document.getElementById('game-board');
+                gameBoard.classList.remove('bounce-in');
+                void gameBoard.offsetWidth;
+                gameBoard.classList.add('bounce-in');
+
+                initLanterns();
+                generateQuestion();
+            }, 300);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            document.getElementById('final-score').innerText = score;
+            
+            playSound('snd-wrong'); 
+            
+            const modal = document.getElementById('game-over-modal');
+            const content = document.getElementById('game-over-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function initLanterns() {
+            const container = document.getElementById('lanterns-container');
+            container.innerHTML = '';
+            
+            // Random mix 10 câu từ toàn bộ bảng (cả nhân và chia)
+            let shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 10);
+            
+            const isMobile = window.innerWidth < 768;
+            let basePositions = [];
+
+            if (isMobile) {
+                // Trên Mobile: Ninja ở dưới cùng. Mục tiêu trải đều nửa trên (top: 8% -> 55%)
+                basePositions = [
+                    { top: 10, left: 20 }, { top: 15, left: 50 }, { top: 10, left: 80 },
+                    { top: 25, left: 30 }, { top: 30, left: 70 },
+                    { top: 40, left: 20 }, { top: 45, left: 50 }, { top: 40, left: 80 },
+                    { top: 55, left: 35 }, { top: 55, left: 65 }
+                ];
+            } else {
+                // Trên Desktop: Ninja ở trái. Mục tiêu ở khu vực bên phải (x: 45-90%, y: 15-80%)
+                basePositions = [
+                    { top: 15, left: 50 }, { top: 20, left: 75 }, { top: 15, left: 95 },
+                    { top: 40, left: 60 }, { top: 45, left: 85 },
+                    { top: 65, left: 50 }, { top: 70, left: 75 }, { top: 65, left: 95 },
+                    { top: 85, left: 60 }, { top: 85, left: 85 }
+                ];
+            }
+
+            const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
+
+            shuffledQuestions.forEach((q, index) => {
+                const pos = shuffledPositions[index];
+                
+                let topPercent = pos.top + (Math.random() * 4 - 2); 
+                let leftPercent = pos.left + (Math.random() * 4 - 2);
+                
+                const wrap = document.createElement('div');
+                wrap.className = `lantern-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30`;
+                wrap.style.left = `${leftPercent}%`;
+                wrap.style.top = `${topPercent}%`;
+                
+                wrap.dataset.val = q.a;
+                wrap.dataset.text = q.t;
+                
+                wrap.onclick = function() { checkAnswer(this); };
+
+                let animDelay = Math.random() * 2;
+                
+                wrap.innerHTML = `
+                    <div class="relative flex flex-col items-center justify-center lantern-float" style="animation-delay: ${animDelay}s;">
+                        <div class="text-[50px] md:text-[60px] drop-shadow-md select-none">🏮</div>
+                        <!-- Tag hiển thị số -->
+                        <div class="absolute -bottom-2 z-10 bg-amber-100 rounded-md w-8 h-6 md:w-10 md:h-8 flex items-center justify-center font-black text-xs md:text-base border border-amber-500 shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-amber-900">
+                            ${q.a}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(wrap);
+            });
+        }
+
+        function generateQuestion() {
+            if (!isPlaying) return;
+
+            const prob = document.getElementById('math-problem');
+            
+            let availableLanterns = Array.from(document.querySelectorAll('.lantern-wrapper:not(.popped)'));
+            
+            if (availableLanterns.length === 0) {
+                initLanterns();
+                availableLanterns = Array.from(document.querySelectorAll('.lantern-wrapper:not(.popped)'));
+                recentQuestions = [];
+                playSound('snd-pop');
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 font-bold">Lồng đèn mới đã xuất hiện! Cảnh giác! 👇</span>`;
+            } else {
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400">Phóng phi tiêu vào lồng đèn <b class="text-rose-400">đáp án</b> nhé! 👇</span>`;
+            }
+
+            document.getElementById('game-subtitle').innerHTML = "Bí kíp: <b class='text-rose-300 text-lg md:text-xl drop-shadow-md'>Nhân & Chia Bảng 8 📜</b>";
+
+            let randomQ;
+            if (availableLanterns.length > 1) {
+                let validLanterns = availableLanterns.filter(a => !recentQuestions.includes(a.dataset.text));
+                if (validLanterns.length > 0) {
+                    let selected = validLanterns[Math.floor(Math.random() * validLanterns.length)];
+                    randomQ = { t: selected.dataset.text, a: parseInt(selected.dataset.val) };
+                } else {
+                    let selected = availableLanterns[Math.floor(Math.random() * availableLanterns.length)];
+                    randomQ = { t: selected.dataset.text, a: parseInt(selected.dataset.val) };
+                }
+            } else {
+                let selected = availableLanterns[0];
+                randomQ = { t: selected.dataset.text, a: parseInt(selected.dataset.val) };
+            }
+
+            let qText = randomQ.t;
+            expectedAnswer = randomQ.a;
+
+            // Xây dựng text cho TTS
+            if (qText.includes('x')) {
+                let factor = parseInt(qText.split('x')[1].trim());
+                expectedReadText = `Tám nhân ${numWords[factor] || factor} bằng ${numWords[expectedAnswer] || expectedAnswer}`;
+            } else {
+                let dividend = parseInt(qText.split(':')[0].trim());
+                expectedReadText = `${numWords[dividend] || dividend} chia tám bằng ${numWords[expectedAnswer] || expectedAnswer}`;
+            }
+
+            recentQuestions.push(qText);
+            if (recentQuestions.length > 5) recentQuestions.shift();
+
+            prob.innerText = qText + ' = ?';
+            
+            const sign = prob.parentElement;
+            sign.classList.remove('shake', 'bounce-in');
+            void sign.offsetWidth;
+            sign.classList.add('bounce-in');
+
+            startTimer();
+        }
+
+        // ANIMATION PHÓNG PHI TIÊU
+        function shootShuriken(targetElement) {
+            isShooting = true;
+            clearInterval(timerInterval); // Dừng đếm giờ khi ném
+            playSound('snd-shoot'); 
+            
+            const ninjaContainer = document.getElementById('ninja-container');
+            ninjaContainer.classList.remove('ninja-throw');
+            void ninjaContainer.offsetWidth;
+            ninjaContainer.classList.add('ninja-throw');
+
+            // Ẩn phi tiêu trên tay
+            document.getElementById('hand-shuriken').style.opacity = '0';
+
+            const board = document.getElementById('game-board');
+            const boardRect = board.getBoundingClientRect();
+            
+            const startPt = document.getElementById('shuriken-start-point');
+            const startRect = startPt.getBoundingClientRect();
+            
+            const targetBody = targetElement.querySelector('.text-\\[50px\\]'); 
+            const targetRect = targetBody.getBoundingClientRect();
+
+            const startX = (startRect.left + startRect.width/2) - boardRect.left;
+            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+
+            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+
+            const shuriken = document.getElementById('shuriken-wrapper');
+            shuriken.classList.remove('hidden');
+            
+            // Đặt điểm bắt đầu
+            shuriken.style.transform = `translate3d(${startX - 20}px, ${startY - 20}px, 0)`;
+
+            const duration = 250; // Bay nhanh
+            let animationStartTime = null;
+
+            function animateFly(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
+                
+                let currentX = startX + (targetX - startX) * progress;
+                let currentY = startY + (targetY - startY) * progress;
+                
+                shuriken.style.transform = `translate3d(${currentX - 20}px, ${currentY - 20}px, 0)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateFly);
+                } else {
+                    shuriken.classList.add('hidden');
+                    document.getElementById('hand-shuriken').style.opacity = '1';
+                    
+                    targetElement.style.display = 'none';
+                    targetElement.classList.add('popped');
+                    
+                    playSound('snd-pop'); 
+                    // Pháo hoa màu Đỏ/Cam lửa
+                    confetti({ particleCount: 50, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#f43f5e', '#f59e0b', '#fef08a'] });
+                    
+                    score += 10;
+                    streak++;
+                    updateScoreBoard();
+
+                    let qText = document.getElementById('math-problem').innerText.replace(' = ?', '');
+                    let feedbackText = `Chính xác! ${qText} = ${expectedAnswer} 🎉`;
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-black">${feedbackText}</span>`;
+                    
+                    setTimeout(() => {
+                        generateQuestion();
+                        isShooting = false;
+                    }, 400);
+                }
+            }
+
+            requestAnimationFrame(animateFly);
+        }
+
+        // KẺ ĐỊCH BẮN TRẢ (Khi hết giờ)
+        function enemyAttack() {
+            isShooting = true;
+            playSound('snd-shoot'); // Âm thanh vút
+            
+            const ninjaContainer = document.getElementById('ninja-container');
+            const board = document.getElementById('game-board');
+            const boardRect = board.getBoundingClientRect();
+            
+            const lanterns = Array.from(document.querySelectorAll('.lantern-wrapper:not(.popped)'));
+            if (lanterns.length === 0) {
+                generateQuestion();
+                isShooting = false;
+                return;
+            }
+            const shooterElement = lanterns[Math.floor(Math.random() * lanterns.length)];
+            
+            const shooterBody = shooterElement.querySelector('.text-\\[50px\\]'); 
+            const startRect = shooterBody.getBoundingClientRect();
+            const targetRect = ninjaContainer.getBoundingClientRect();
+
+            const startX = (startRect.left + startRect.width/2) - boardRect.left;
+            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+
+            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+
+            const kunai = document.getElementById('enemy-kunai');
+            kunai.classList.remove('hidden');
+            
+            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
+            
+            kunai.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle}deg)`;
+
+            const duration = 200; 
+            let animationStartTime = null;
+
+            function animateEnemyFly(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
+                
+                let currentX = startX + (targetX - startX) * progress;
+                let currentY = startY + (targetY - startY) * progress;
+                
+                kunai.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateEnemyFly);
+                } else {
+                    kunai.classList.add('hidden');
+                    playSound('snd-wrong'); 
+                    
+                    // Hiệu ứng Ninja trúng đòn
+                    ninjaContainer.classList.remove('ninja-hit');
+                    void ninjaContainer.offsetWidth;
+                    ninjaContainer.classList.add('ninja-hit');
+                    
+                    // Nổ tia lửa đỏ tại Ninja
+                    confetti({ particleCount: 30, spread: 60, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#ef4444', '#000'] });
+                    
+                    // Trừ máu
+                    lives--;
+                    updateLivesUI();
+                    
+                    streak = 0; updateScoreBoard();
+
+                    if (lives <= 0) {
+                        setTimeout(gameOver, 600);
+                    } else {
+                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Hết giờ! Trúng ám khí! Tải bí kíp mới... 🛡️</span>`;
+                        setTimeout(() => {
+                            generateQuestion();
+                            isShooting = false;
+                        }, 1500);
+                    }
+                }
+            }
+
+            requestAnimationFrame(animateEnemyFly);
+        }
+
+        async function checkAnswer(targetElement) {
+            if (isShooting || targetElement.classList.contains('popped') || !isPlaying) return;
+
+            let selectedVal = parseInt(targetElement.dataset.val);
+
+            if (selectedVal === expectedAnswer) {
+                shootShuriken(targetElement);
+            } else {
+                playSound('snd-wrong');
+                streak = 0;
+                updateScoreBoard();
+
+                const sign = document.getElementById('math-problem').parentElement;
+                sign.classList.remove('bounce-in', 'shake');
+                void sign.offsetWidth;
+                sign.classList.add('shake');
+
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 font-bold">Phóng trượt! Nghe lại đáp án nhé... 🎧</span>`;
+                
+                isShooting = true;
+                clearInterval(timerInterval);
+                
+                let ttsPrompt = "Đáp án đúng là: " + expectedReadText; 
+                
+                await playTTS(ttsPrompt);
+                
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 font-bold">Bí kíp đã đổi, chuẩn bị phóng! 🔄</span>`;
+
+                setTimeout(() => {
+                    generateQuestion(); 
+                    isShooting = false;
+                }, 300);
+            }
+        }
+
+        // --- FULLSCREEN ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
+                if (req) { try { req.call(doc); } catch(e){} } 
+            } else { 
+                if (ext) ext.call(document); 
+            }
+        }
+    </script>
+</body>
+</html>
