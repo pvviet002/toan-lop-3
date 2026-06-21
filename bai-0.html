@@ -266,10 +266,11 @@
                 <div class="mist-layer"></div>
 
                 <!-- Hiệp sĩ & Bảng Nhiệm vụ -->
-                <div class="absolute bottom-2 md:bottom-6 left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-20 w-[95%] md:w-auto max-w-[320px] md:max-w-none">
+                <!-- Đã cấu hình z-index thành 50 để luôn nổi lên trên Quái vật (z-40) -->
+                <div class="absolute bottom-2 md:bottom-6 left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-50 w-[95%] md:w-auto max-w-[320px] md:max-w-none pointer-events-none">
                     
                     <!-- SVG Knight -->
-                    <div class="relative w-28 h-28 md:w-44 md:h-44 z-10 drop-shadow-[0_15px_20px_rgba(0,0,0,0.8)]" id="knight-container">
+                    <div class="relative w-24 h-24 md:w-44 md:h-44 z-10 drop-shadow-[0_15px_20px_rgba(0,0,0,0.8)] pointer-events-auto" id="knight-container">
                         <svg viewBox="0 0 200 200" class="w-full h-full transform scale-x-[-1]">
                             <!-- Bóng râm dưới chân -->
                             <ellipse cx="100" cy="185" rx="50" ry="10" fill="rgba(0,0,0,0.6)" />
@@ -310,23 +311,23 @@
                     </div>
                     
                     <!-- Bảng Đá hiển thị phép tính -->
-                    <div class="relative flex flex-col items-center mt-2 md:mt-4 w-full md:w-auto">
-                        <div class="stone-tablet px-4 py-2 md:px-8 md:py-4 flex flex-col items-center justify-center relative z-20 w-full">
+                    <div class="relative flex flex-col items-center mt-0 md:mt-2 w-full md:w-auto pointer-events-auto">
+                        <div class="stone-tablet px-4 py-3 md:px-10 md:py-4 flex flex-col items-center justify-center relative z-20 w-full min-w-[260px]">
                             <span class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1">Mục tiêu</span>
-                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest relative z-10 font-mono drop-shadow-[0_0_5px_rgba(56,189,248,0.8)] text-center w-full">2 x 3 = ?</span>
+                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest relative z-10 font-mono drop-shadow-[0_0_5px_rgba(56,189,248,0.8)] text-center w-full whitespace-nowrap">2 x 3 = ?</span>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- SVG Nhát chém năng lượng (Sword Slash) -->
-                <svg id="sword-slash" viewBox="0 0 40 100" class="absolute pointer-events-none z-50 hidden" style="width: 30px; height: 80px; top: 0; left: 0;">
+                <!-- SVG Nhát chém năng lượng (Sword Slash) - Đã nâng z-index lên 60 để trên Hiệp sĩ -->
+                <svg id="sword-slash" viewBox="0 0 40 100" class="absolute pointer-events-none z-[60] hidden" style="width: 30px; height: 80px; top: 0; left: 0;">
                     <path d="M 10 0 Q 40 50 10 100 Q 25 50 5 0 Z" fill="#38bdf8" filter="drop-shadow(0 0 10px #0ea5e9)"/>
                     <path d="M 12 10 Q 35 50 12 90 Q 20 50 8 10 Z" fill="#ffffff" />
                 </svg>
 
                 <!-- SVG Cầu lửa Kẻ địch -->
-                <svg id="enemy-fireball" viewBox="0 0 40 40" class="absolute pointer-events-none z-50 hidden" style="width: 40px; height: 40px; top: 0; left: 0;">
+                <svg id="enemy-fireball" viewBox="0 0 40 40" class="absolute pointer-events-none z-[60] hidden" style="width: 40px; height: 40px; top: 0; left: 0;">
                     <circle cx="20" cy="20" r="10" fill="#dc2626" filter="drop-shadow(0 0 8px #ef4444)"/>
                     <circle cx="20" cy="20" r="5" fill="#fcd34d" />
                     <!-- Lửa đuôi -->
@@ -462,12 +463,12 @@
         function setupPositions() {
             const isMobile = window.innerWidth < 768;
             if (isMobile) {
-                // Mobile: Hiệp sĩ dưới. Quái vật ở nửa trên (top: 8% -> 50% để tránh bảng)
+                // Mobile: Hiệp sĩ dưới. Quái vật ở nửa trên (top: 8% -> 48% để tránh bảng hoàn toàn)
                 basePositions = [
                     { top: 8, left: 20 }, { top: 12, left: 50 }, { top: 8, left: 80 },
                     { top: 22, left: 30 }, { top: 26, left: 70 },
                     { top: 38, left: 20 }, { top: 42, left: 50 }, { top: 38, left: 80 },
-                    { top: 50, left: 35 }, { top: 50, left: 65 }
+                    { top: 48, left: 35 }, { top: 48, left: 65 }
                 ];
             } else {
                 // Desktop: Hiệp sĩ trái. Quái vật bên phải
@@ -633,13 +634,16 @@
                 let animDelay = Math.random() * 2;
                 let animDur = 2.5 + Math.random() * 1.5; 
 
+                // Tách class pop-in ra thẻ div bọc ngoài để không xung đột animation với monster-float
                 wrap.innerHTML = `
-                    <div class="relative flex flex-col items-center justify-center monster-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
-                        <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
-                            ${emoji}
-                        </div>
-                        <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
-                            ${eq.a}
+                    <div class="pop-in">
+                        <div class="relative flex flex-col items-center justify-center monster-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
+                            <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
+                                ${emoji}
+                            </div>
+                            <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
+                                ${eq.a}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -659,10 +663,10 @@
 
         // Sinh một quái vật mới vào một slot cụ thể sau khi quái cũ chết
         function respawnMonsterAtSlot(index) {
-            // Lấy danh sách các đáp án của các quái vật đang sống khác (trừ slot hiện tại)
+            // Bước 1: Lấy danh sách các kết quả đang HIỆN HỮU trên sân (trừ slot hiện tại)
             let otherActiveAnswers = slots.filter((s, idx) => s.isActive && idx !== index).map(s => s.ans);
             
-            // Chọn phép tính có đáp án không trùng với các quái vật còn lại
+            // Bước 2: Dùng một kết quả KHÁC bù vào (Đảm bảo không trùng với các kết quả hiện hữu)
             let eq = getUniqueEquation(otherActiveAnswers);
             
             let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
@@ -675,17 +679,21 @@
             let animDelay = Math.random() * 2;
             let animDur = 2.5 + Math.random() * 1.5; 
 
+            // Tách class pop-in ra thẻ div bọc ngoài để tránh lỗi mất hình quái vật
             wrap.innerHTML = `
-                <div class="relative flex flex-col items-center justify-center monster-float pop-in" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
-                    <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
-                        ${emoji}
-                    </div>
-                    <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
-                        ${eq.a}
+                <div class="pop-in">
+                    <div class="relative flex flex-col items-center justify-center monster-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
+                        <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
+                            ${emoji}
+                        </div>
+                        <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
+                            ${eq.a}
+                        </div>
                     </div>
                 </div>
             `;
             
+            // Cập nhật dữ liệu mới vào slot
             slots[index].ans = eq.a;
             slots[index].eqText = eq.t;
             slots[index].readText = eq.read;
@@ -697,15 +705,14 @@
 
             const prob = document.getElementById('math-problem');
             
-            // Lấy danh sách các slot đang có quái vật sống
+            // Bước 3: Tạo ra câu hỏi dựa trên các kết quả hiện hữu
             let activeSlots = slots.filter(s => s.isActive);
             if (activeSlots.length === 0) {
-                 // Trường hợp cực hữu (hầu như không xảy ra): tất cả quái bị diệt cùng lúc
                  initMonstersBoard(); 
                  activeSlots = slots;
             }
             
-            // Chọn NGẪU NHIÊN một quái vật đang sống làm mục tiêu
+            // Chọn NGẪU NHIÊN một kết quả đang hiện hữu làm mục tiêu
             let selectedSlot = activeSlots[Math.floor(Math.random() * activeSlots.length)];
             
             expectedAnswer = selectedSlot.ans;
