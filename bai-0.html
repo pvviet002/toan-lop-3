@@ -596,11 +596,10 @@
 
         // --- HỆ THỐNG QUÁI VẬT LIÊN TỤC (PERSISTENT BOARD) ---
         
-        function getUniqueEquation() {
-            // Đảm bảo không trùng đáp án với các slot đang có trên sân
-            let currentAnswers = slots.map(s => s.ans);
-            let available = allEquations.filter(eq => !currentAnswers.includes(eq.a));
-            if (available.length === 0) available = allEquations; // Rất hiếm khi xảy ra vì mảng có 160 phần tử
+        // Lấy một phép tính có đáp án không trùng với các quái vật đang sống
+        function getUniqueEquation(excludeAnswers = []) {
+            let available = allEquations.filter(eq => !excludeAnswers.includes(eq.a));
+            if (available.length === 0) available = allEquations; // Phòng hờ
             return available[Math.floor(Math.random() * available.length)];
         }
 
@@ -610,9 +609,12 @@
             slots = [];
             
             const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
+            let currentAnswers = [];
 
             for(let i=0; i<10; i++) {
-                let eq = getUniqueEquation();
+                let eq = getUniqueEquation(currentAnswers);
+                currentAnswers.push(eq.a); // Thêm đáp án này vào danh sách loại trừ cho con tiếp theo
+
                 let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
                 let colorCls = monsterColors[Math.floor(Math.random() * monsterColors.length)];
                 let pos = shuffledPositions[i];
@@ -657,7 +659,12 @@
 
         // Sinh một quái vật mới vào một slot cụ thể sau khi quái cũ chết
         function respawnMonsterAtSlot(index) {
-            let eq = getUniqueEquation();
+            // Lấy danh sách các đáp án của các quái vật đang sống khác (trừ slot hiện tại)
+            let otherActiveAnswers = slots.filter((s, idx) => s.isActive && idx !== index).map(s => s.ans);
+            
+            // Chọn phép tính có đáp án không trùng với các quái vật còn lại
+            let eq = getUniqueEquation(otherActiveAnswers);
+            
             let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
             let colorCls = monsterColors[Math.floor(Math.random() * monsterColors.length)];
             
@@ -690,9 +697,15 @@
 
             const prob = document.getElementById('math-problem');
             
+            // Lấy danh sách các slot đang có quái vật sống
             let activeSlots = slots.filter(s => s.isActive);
-            if (activeSlots.length === 0) return; // Không thể xảy ra do cơ chế respawn
+            if (activeSlots.length === 0) {
+                 // Trường hợp cực hữu (hầu như không xảy ra): tất cả quái bị diệt cùng lúc
+                 initMonstersBoard(); 
+                 activeSlots = slots;
+            }
             
+            // Chọn NGẪU NHIÊN một quái vật đang sống làm mục tiêu
             let selectedSlot = activeSlots[Math.floor(Math.random() * activeSlots.length)];
             
             expectedAnswer = selectedSlot.ans;
@@ -778,6 +791,7 @@
                     // Delay ngắn rồi hồi sinh quái và ra câu hỏi mới
                     setTimeout(() => {
                         respawnMonsterAtSlot(slotIndex);
+                        // QUAN TRỌNG: Sinh câu hỏi MỚI sau khi quái đã hồi sinh
                         generateQuestion();
                         isAttacking = false;
                     }, 500);
