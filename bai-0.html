@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Nhân Chia 2-9 - Hiệp Sĩ Diệt Quái</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            overscroll-behavior-y: none; 
+            overflow-x: hidden;
+        }
+        
+        .no-select { user-select: none; -webkit-user-select: none; }
+        
+        .btn-press {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        .btn-press:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
+        }
+
+        .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
+        @keyframes bounceIn { 
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: scale(0); }
+        @keyframes popIn { 
+            100% { transform: scale(1); opacity: 1; } 
+        }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Bối cảnh Rừng Quái Vật (Fantasy Forest) */
+        .fantasy-container {
+            position: relative;
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 40%, #064e3b 80%, #022c22 100%);
+            border: 6px solid #1e293b; 
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border-radius: 2.5rem;
+        }
+
+        /* Mặt trăng khổng lồ */
+        .giant-moon {
+            position: absolute;
+            top: 5%; right: 10%;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle at 30% 30%, #fdfcc8, #fef08a, #ca8a04);
+            border-radius: 50%;
+            box-shadow: 0 0 60px rgba(253, 224, 71, 0.4);
+            z-index: 1;
+        }
+
+        /* Sương mù (Mist) */
+        .mist-layer {
+            position: absolute;
+            bottom: 0; left: 0; width: 200%; height: 50%;
+            background: linear-gradient(to top, rgba(16, 185, 129, 0.2), transparent);
+            animation: mistDrift 20s linear infinite alternate;
+            pointer-events: none;
+            z-index: 5;
+        }
+        @keyframes mistDrift {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-20%); }
+        }
+
+        /* Bảng Đá (Stone Tablet) */
+        .stone-tablet {
+            background-color: #475569;
+            background-image: 
+                radial-gradient(#334155 10%, transparent 11%),
+                radial-gradient(#334155 10%, transparent 11%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border: 4px solid #1e293b;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 15px 25px rgba(0,0,0,0.5);
+            border-radius: 16px;
+            position: relative;
+        }
+        .stone-text {
+            color: #f8fafc;
+            text-shadow: 0 0 10px #38bdf8, 0 0 20px #0ea5e9;
+            letter-spacing: 3px;
+        }
+
+        /* Quái vật lơ lửng */
+        .monster-float {
+            animation: floatAnim ease-in-out infinite alternate;
+            will-change: transform;
+        }
+        @keyframes floatAnim {
+            0% { transform: translate3d(-3px, -6px, 0) rotate(-2deg); }
+            100% { transform: translate3d(3px, 6px, 0) rotate(2deg); }
+        }
+
+        .monster-wrapper:hover .monster-float {
+            filter: brightness(1.2) drop-shadow(0 0 15px rgba(239, 68, 68, 0.6));
+            transform: scale(1.1);
+        }
+
+        /* Aura của quái vật */
+        .monster-aura {
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%);
+        }
+
+        /* Hiệp sĩ tung chiêu */
+        .knight-attack {
+            animation: slashAction 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes slashAction {
+            0% { transform: translateX(0) rotate(0deg); }
+            40% { transform: translateX(20px) rotate(10deg) scale(1.1); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+
+        /* Hiệp sĩ bị tấn công */
+        .knight-hit {
+            animation: flashRed 0.5s ease-in-out;
+        }
+        @keyframes flashRed {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(0.3) sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 30px red); transform: translateX(-15px); }
+        }
+
+        /* Nhát chém năng lượng (Sword Slash) */
+        #sword-slash { will-change: transform; }
+        
+        /* Cầu lửa quái vật bắn trả */
+        #enemy-fireball { will-change: transform; }
+    </style>
+</head>
+<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative bg-slate-900">
+
+    <!-- Header Global -->
+    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
+        <div class="flex items-center space-x-2 md:space-x-3">
+            <button onclick="showStartScreen()" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+                <span class="hidden md:inline">🏠 Về Trang Bìa</span><span class="md:hidden">🏠</span>
+            </button>
+            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
+                <span>🔲 Phóng to</span>
+            </button>
+        </div>
+        
+        <div class="bg-slate-800 px-3 py-2 md:px-5 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-emerald-800 flex items-center space-x-3 md:space-x-5">
+            <div class="flex items-center space-x-1">
+                <span class="text-lg md:text-xl">⚔️</span>
+                <span id="score-display" class="font-black text-emerald-400 text-lg md:text-xl">0</span>
+            </div>
+            <div class="w-1 h-5 md:h-6 bg-slate-600 rounded-full"></div>
+            <div class="flex items-center space-x-1">
+                <span class="text-lg md:text-xl">🔥</span>
+                <span id="streak-display" class="font-black text-orange-400 text-lg md:text-xl">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="max-w-5xl mx-auto w-full bg-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-slate-700 overflow-hidden flex flex-col flex-grow relative">
+        
+        <!-- MÀN HÌNH BẮT ĐẦU -->
+        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-indigo-950 via-slate-900 to-black flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
+            
+            <!-- Icon Hiệp sĩ Lớn -->
+            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(52,211,153,0.8)] bounce-in flex items-center justify-center bg-slate-900 rounded-full border-4 border-emerald-500 relative z-10" style="animation-delay: 0.1s">
+                <span class="text-6xl md:text-8xl transform translate-x-1">🤺</span>
+            </div>
+
+            <h1 class="text-3xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-emerald-400 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(52,211,153,0.6);">
+                HIỆP SĨ DIỆT QUÁI
+            </h1>
+            
+            <div class="bg-slate-800/90 p-5 md:p-8 rounded-3xl border border-emerald-500/50 max-w-xl text-center mb-8 md:mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
+                <p class="text-base md:text-xl font-bold mb-2 md:mb-3 text-emerald-200 uppercase tracking-widest">Nhiệm vụ Tổng Hợp:</p>
+                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy tung chiêu vào Quái vật mang <b class="text-white bg-emerald-600 px-2 py-1 rounded">đáp án đúng</b> cho các phép tính từ Bảng 2 đến Bảng 9!</p>
+                
+                <div class="flex items-center justify-center gap-2 md:gap-3 mt-4 mb-2">
+                    <label class="text-emerald-200 font-bold text-xs md:text-base">Thời gian mỗi chiêu:</label>
+                    <select id="time-select" class="bg-slate-900 text-emerald-300 border-2 border-emerald-600 rounded-xl px-2 py-1 md:px-4 md:py-2 outline-none font-bold text-sm md:text-lg cursor-pointer hover:border-emerald-400 transition-colors">
+                        <option value="10">10 giây</option>
+                        <option value="20">20 giây</option>
+                        <option value="30" selected>30 giây</option>
+                    </select>
+                </div>
+
+                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-[11px] md:text-base border border-slate-600 shadow-inner mt-2 text-emerald-200 text-left">
+                    <span>⚠️ <b>Chú ý:</b> Hết giờ quái vật sẽ phản công làm mất máu. Nhớ bật âm thanh nhé!</span>
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="btn-press px-10 py-4 md:px-12 md:py-5 bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black rounded-full text-xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-emerald-300 shadow-[0_0_25px_rgba(52,211,153,0.8)] relative z-10" style="animation-delay: 0.4s">
+                XUẤT CHIẾN ⚔️
+            </button>
+        </div>
+
+        <!-- MÀN HÌNH GAME OVER -->
+        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 p-6 md:p-8 rounded-[2rem] border-4 border-rose-700 shadow-[0_0_50px_rgba(225,29,72,0.8)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
+                <div class="text-6xl md:text-7xl mb-4 animate-bounce">💀</div>
+                <h2 class="text-2xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">GỤC NGÃ!</h2>
+                <p class="text-slate-300 mb-6 font-medium text-sm md:text-lg">Hiệp sĩ đã hết sạch sinh lực. Hãy đứng lên làm lại nào!</p>
+                <div class="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700">
+                    <span class="text-slate-400 block mb-1 text-sm md:text-base">Quái vật đã diệt</span>
+                    <span class="text-4xl md:text-5xl font-black text-emerald-400" id="final-score">0</span>
+                </div>
+                <button onclick="showStartScreen()" class="btn-press px-6 py-3 md:px-8 md:py-4 bg-gradient-to-b from-rose-600 to-rose-800 text-white font-black rounded-full text-lg md:text-xl w-full shadow-[0_0_20px_rgba(225,29,72,0.5)]">
+                    VỀ TRẠI CHÍNH 🏕️
+                </button>
+            </div>
+        </div>
+
+        <!-- Header Trò chơi -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 md:p-6 text-center shadow-md relative z-10 border-b border-indigo-900/50">
+            <h1 class="text-xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-emerald-400" style="text-shadow: 0 0 15px rgba(52,211,153,0.5);">Bảng Nhân Chia (2-9) ⚔️</h1>
+            <p id="game-subtitle" class="text-indigo-200 text-xs md:text-base font-medium transition-colors duration-300">Chuẩn bị vũ khí...</p>
+        </div>
+
+        <!-- Khung Game Chính -->
+        <div class="flex-grow flex items-center justify-center p-2 md:p-6 relative bg-slate-900 overflow-hidden">
+            
+            <!-- Khu vực Rừng Fantasy (Game Board) -->
+            <div id="game-board" class="fantasy-container w-full max-w-[500px] md:max-w-[800px] aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] relative bounce-in mx-auto">
+                
+                <!-- TRẠNG THÁI SINH TỒN -->
+                <div class="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-start z-30 pointer-events-none">
+                    <!-- Thanh Máu -->
+                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/90 border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
+                        <span class="text-rose-500 font-bold tracking-widest text-[10px] md:text-sm mr-1">HP</span>
+                        <div class="flex gap-1 md:gap-1.5" id="health-bar">
+                            <!-- JS sinh thanh máu -->
+                        </div>
+                    </div>
+                    
+                    <!-- Đồng hồ đếm ngược -->
+                    <div class="bg-slate-900/90 border border-emerald-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 w-32 md:w-48 shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all duration-300 scale-90 md:scale-100 origin-top-right" id="timer-wrapper">
+                        <span class="text-emerald-400 font-bold text-xs md:text-base">⏳</span>
+                        <div class="h-1.5 md:h-2.5 flex-grow bg-slate-700 rounded-full overflow-hidden">
+                            <div id="timer-bar" class="h-full bg-emerald-400 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+                        </div>
+                        <span id="timer-text" class="text-emerald-400 font-mono font-bold text-sm md:text-lg min-w-[20px] md:min-w-[24px] text-right">30</span>
+                    </div>
+                </div>
+
+                <!-- Bối cảnh -->
+                <div class="giant-moon"></div>
+                <div class="mist-layer"></div>
+
+                <!-- Hiệp sĩ & Bảng Nhiệm vụ -->
+                <div class="absolute bottom-[2%] md:bottom-[10%] left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-20 w-full md:w-auto px-4 md:px-0">
+                    
+                    <!-- Bảng Đá hiển thị phép tính -->
+                    <div class="relative flex flex-col items-center mb-2 md:mb-6 w-full max-w-[220px] md:max-w-[280px]">
+                        <div class="stone-tablet px-4 py-2 md:px-8 md:py-4 flex flex-col items-center justify-center relative z-20 w-full">
+                            <span class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1">Mục tiêu</span>
+                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest relative z-10 font-mono drop-shadow-[0_0_5px_rgba(56,189,248,0.8)]">2 x 3 = ?</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG Knight -->
+                    <div class="relative w-28 h-28 md:w-44 md:h-44 z-10 drop-shadow-[0_15px_20px_rgba(0,0,0,0.8)]" id="knight-container">
+                        <svg viewBox="0 0 200 200" class="w-full h-full transform scale-x-[-1]">
+                            <!-- Bóng râm dưới chân -->
+                            <ellipse cx="100" cy="185" rx="50" ry="10" fill="rgba(0,0,0,0.6)" />
+                            <!-- Chân -->
+                            <rect x="75" y="140" width="16" height="40" rx="6" fill="#1e293b" />
+                            <rect x="115" y="140" width="16" height="40" rx="6" fill="#0f172a" />
+                            <!-- Áo giáp thân -->
+                            <path d="M 60 70 L 140 70 L 120 140 L 80 140 Z" fill="#94a3b8" />
+                            <path d="M 80 70 L 120 70 L 110 140 L 90 140 Z" fill="#cbd5e1" />
+                            <!-- Thắt lưng đỏ -->
+                            <rect x="75" y="130" width="50" height="12" fill="#991b1b" rx="2" />
+                            <rect x="90" y="128" width="20" height="16" fill="none" stroke="#fcd34d" stroke-width="4" rx="2" />
+                            
+                            <!-- Đầu & Mũ bảo hiểm -->
+                            <circle cx="100" cy="45" r="25" fill="#f87171" /> <!-- Mặt -->
+                            <path d="M 65 50 Q 100 -10 135 50 Z" fill="#64748b" /> <!-- Mũ giáp trên -->
+                            <path d="M 75 50 L 125 50 L 115 70 L 85 70 Z" fill="#475569" /> <!-- Che mặt -->
+                            <rect x="85" y="55" width="30" height="8" fill="#0f172a" rx="2"/> <!-- Khe mắt -->
+                            <!-- Lông chóp mũ -->
+                            <path d="M 100 10 Q 120 -20 140 0 Q 110 -5 100 10" fill="#dc2626" />
+                            
+                            <!-- Khiên (Tay trái - do đã flip) -->
+                            <path d="M 130 80 L 170 80 L 170 110 L 150 140 L 130 110 Z" fill="#3b82f6" stroke="#fcd34d" stroke-width="4" stroke-linejoin="round"/>
+                            <circle cx="150" cy="100" r="10" fill="#fcd34d" />
+                            
+                            <!-- Tay phải & Kiếm -->
+                            <rect x="50" y="80" width="20" height="45" rx="10" fill="#64748b" transform="rotate(30 60 80)" />
+                            <!-- Kiếm đang phát sáng -->
+                            <path d="M 10 130 L 45 95 L 55 105 L 20 140 Z" fill="#e2e8f0" />
+                            <path d="M 5 135 L 25 155 L 35 145 L 15 125 Z" fill="#b45309" /> <!-- Chuôi kiếm -->
+                            <polygon points="10,130 0,140 20,140" fill="#e2e8f0" /> <!-- Mũi kiếm -->
+                            <!-- Ánh sáng kiếm -->
+                            <path d="M 0 140 L 60 80" stroke="#38bdf8" stroke-width="8" opacity="0.6" filter="blur(4px)" stroke-linecap="round"/>
+                        </svg>
+                        
+                        <!-- Mỏ neo xuất phát Nhát chém -->
+                        <div id="slash-start-point" class="absolute w-1 h-1" style="top: 50%; right: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- SVG Nhát chém năng lượng (Sword Slash) -->
+                <svg id="sword-slash" viewBox="0 0 40 100" class="absolute pointer-events-none z-50 hidden" style="width: 30px; height: 80px; top: 0; left: 0;">
+                    <path d="M 10 0 Q 40 50 10 100 Q 25 50 5 0 Z" fill="#38bdf8" filter="drop-shadow(0 0 10px #0ea5e9)"/>
+                    <path d="M 12 10 Q 35 50 12 90 Q 20 50 8 10 Z" fill="#ffffff" />
+                </svg>
+
+                <!-- SVG Cầu lửa Kẻ địch -->
+                <svg id="enemy-fireball" viewBox="0 0 40 40" class="absolute pointer-events-none z-50 hidden" style="width: 40px; height: 40px; top: 0; left: 0;">
+                    <circle cx="20" cy="20" r="10" fill="#dc2626" filter="drop-shadow(0 0 8px #ef4444)"/>
+                    <circle cx="20" cy="20" r="5" fill="#fcd34d" />
+                    <!-- Lửa đuôi -->
+                    <path d="M 20 10 L 0 20 L 20 30 Z" fill="#f97316" opacity="0.8" />
+                </svg>
+
+                <!-- Vùng chứa Quái vật (Monsters) -->
+                <div id="monsters-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
+                    <!-- JS sẽ sinh 10 con quái vật vào đây và giữ nguyên trên màn hình -->
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-slate-900 p-3 md:p-5 border-t border-slate-800 flex items-center justify-center z-10 rounded-b-3xl">
+            <div id="feedback-msg" class="text-sm md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
+                Chém quái vật đang ôm kết quả đúng! 🎯
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
+    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio> <!-- Tiếng quái nổ -->
+    <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio> <!-- Tiếng chém -->
+
+    <script>
+        // --- HÀM HỖ TRỢ ĐỌC TTS ---
+        function playTTS(text) {
+            return new Promise(resolve => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = 0.95; 
+                    utterance.pitch = 1.1; 
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
+                    if (viVoice) utterance.voice = viVoice;
+
+                    utterance.onend = resolve;
+                    utterance.onerror = resolve;
+                    
+                    window.speechSynthesis.speak(utterance);
+                    setTimeout(resolve, 5000); 
+                } else {
+                    setTimeout(resolve, 1000);
+                }
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        }
+
+        // TỪ ĐIỂN ĐỌC SỐ LỚN ĐẾN 90
+        function numberToWords(n) {
+            if (n === 0) return "không";
+            const digits = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+            if (n < 10) return digits[n];
+            let t = Math.floor(n / 10);
+            let u = n % 10;
+            let words = "";
+            if (t === 1) words += "mười";
+            else words += digits[t] + " mươi";
+
+            if (u > 0) {
+                if (u === 1 && t > 1) words += " mốt";
+                else if (u === 4 && t > 1) words += " tư";
+                else if (u === 5 && t > 0) words += " lăm";
+                else words += " " + digits[u];
+            }
+            return words.trim();
+        }
+
+        // Game State
+        let isPlaying = false;
+        let lives = 3;
+        let GAME_TIME = 30;
+        let timeLeft = 30;
+        let timerInterval = null;
+
+        let expectedAnswer = 0;
+        let expectedReadText = '';
+        let score = 0;
+        let streak = 0;
+        let isAttacking = false; 
+
+        // Kho Dữ Liệu 160 Câu Hỏi (Nhân & Chia bảng 2-9)
+        let allEquations = [];
+        for(let t = 2; t <= 9; t++) {
+            for(let f = 1; f <= 10; f++) {
+                allEquations.push({ 
+                    t: `${t} x ${f}`, 
+                    a: t * f, 
+                    read: `${numberToWords(t)} nhân ${numberToWords(f)} bằng ${numberToWords(t * f)}` 
+                });
+                allEquations.push({ 
+                    t: `${t * f} : ${t}`, 
+                    a: f, 
+                    read: `${numberToWords(t * f)} chia ${numberToWords(t)} bằng ${numberToWords(f)}` 
+                });
+            }
+        }
+
+        // Quản lý 10 Quái vật cố định trên sân
+        const monsterEmojis = ['🧟', '🧛', '👹', '👺', '👻', '👾', '🕷️', '🦂', '🐉', '🦖'];
+        const monsterColors = [
+            'bg-rose-900 shadow-rose-500', 'bg-purple-900 shadow-purple-500', 
+            'bg-indigo-900 shadow-indigo-500', 'bg-emerald-900 shadow-emerald-500',
+            'bg-amber-900 shadow-amber-500'
+        ];
+        
+        // Lưu trữ vị trí 10 slot và dữ liệu của chúng
+        let slots = [];
+        let basePositions = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupPositions();
+            initMonstersBoard();
+            
+            window.addEventListener('resize', () => {
+                if(!isPlaying) {
+                    setupPositions();
+                    initMonstersBoard();
+                }
+            });
+        });
+
+        function setupPositions() {
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                // Mobile: Hiệp sĩ dưới. Quái vật ở nửa trên (top: 8% -> 55%)
+                basePositions = [
+                    { top: 10, left: 20 }, { top: 15, left: 50 }, { top: 10, left: 80 },
+                    { top: 25, left: 30 }, { top: 30, left: 70 },
+                    { top: 40, left: 20 }, { top: 45, left: 50 }, { top: 40, left: 80 },
+                    { top: 55, left: 35 }, { top: 55, left: 65 }
+                ];
+            } else {
+                // Desktop: Hiệp sĩ trái. Quái vật bên phải
+                basePositions = [
+                    { top: 15, left: 50 }, { top: 20, left: 75 }, { top: 15, left: 95 },
+                    { top: 40, left: 60 }, { top: 45, left: 85 },
+                    { top: 65, left: 50 }, { top: 70, left: 75 }, { top: 65, left: 95 },
+                    { top: 85, left: 60 }, { top: 85, left: 85 }
+                ];
+            }
+        }
+
+        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
+        function updateScoreBoard() { 
+            document.getElementById('score-display').innerText = score; 
+            document.getElementById('streak-display').innerText = streak; 
+        }
+
+        function updateLivesUI() {
+            const container = document.getElementById('health-bar');
+            container.innerHTML = '';
+            for(let i = 0; i < 3; i++) {
+                let cellClass = i < lives 
+                    ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] border-emerald-300' 
+                    : 'bg-slate-700 border-slate-600';
+                container.innerHTML += `<div class="w-5 h-4 md:w-6 md:h-5 rounded-sm transform skew-x-[-15deg] border-t border-b border-l-2 ${cellClass}"></div>`;
+            }
+        }
+
+        function updateTimerUI() {
+            document.getElementById('timer-text').innerText = timeLeft;
+            const pct = (timeLeft / GAME_TIME) * 100;
+            const bar = document.getElementById('timer-bar');
+            const wrapper = document.getElementById('timer-wrapper');
+            bar.style.width = pct + '%';
+            
+            if (timeLeft <= 5) {
+                bar.className = 'h-full bg-rose-500 transition-all duration-1000 ease-linear shadow-[0_0_10px_rgba(244,63,94,0.8)]';
+                wrapper.classList.remove('border-emerald-500/50', 'shadow-[0_0_15px_rgba(16,185,129,0.4)]');
+                wrapper.classList.add('border-rose-500/80', 'shadow-[0_0_20px_rgba(244,63,94,0.6)]', 'animate-pulse');
+            } else {
+                bar.className = 'h-full bg-emerald-400 transition-all duration-1000 ease-linear';
+                wrapper.classList.remove('border-rose-500/80', 'shadow-[0_0_20px_rgba(244,63,94,0.6)]', 'animate-pulse');
+                wrapper.classList.add('border-emerald-500/50', 'shadow-[0_0_15px_rgba(16,185,129,0.4)]');
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = GAME_TIME;
+            updateTimerUI();
+            
+            timerInterval = setInterval(() => {
+                if(isAttacking || !isPlaying) return; 
+                
+                timeLeft--;
+                updateTimerUI();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    enemyAttack();
+                }
+            }, 1000);
+        }
+
+        function showStartScreen() {
+            const goModal = document.getElementById('game-over-modal');
+            goModal.classList.add('opacity-0');
+            setTimeout(() => { goModal.classList.add('hidden'); }, 300);
+
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.remove('hidden');
+            setTimeout(() => { startScreen.classList.remove('opacity-0'); }, 10);
+            
+            isPlaying = false;
+        }
+
+        function startGame() {
+            playSound('snd-pop');
+            if ('speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+
+            GAME_TIME = parseInt(document.getElementById('time-select').value) || 30;
+
+            const goModal = document.getElementById('game-over-modal');
+            if (!goModal.classList.contains('hidden')) {
+                goModal.classList.add('opacity-0');
+                document.getElementById('game-over-content').classList.add('scale-95');
+                setTimeout(() => goModal.classList.add('hidden'), 300);
+            }
+
+            score = 0; streak = 0; updateScoreBoard();
+            lives = 3; updateLivesUI();
+            isPlaying = true;
+            isAttacking = false;
+
+            const startScreen = document.getElementById('screen-start');
+            startScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                const gameBoard = document.getElementById('game-board');
+                gameBoard.classList.remove('bounce-in');
+                void gameBoard.offsetWidth;
+                gameBoard.classList.add('bounce-in');
+
+                initMonstersBoard();
+                generateQuestion();
+            }, 300);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            document.getElementById('final-score').innerText = score;
+            
+            playSound('snd-wrong'); 
+            
+            const modal = document.getElementById('game-over-modal');
+            const content = document.getElementById('game-over-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        // --- HỆ THỐNG QUÁI VẬT LIÊN TỤC (PERSISTENT BOARD) ---
+        
+        function getUniqueEquation() {
+            // Đảm bảo không trùng đáp án với các slot đang có trên sân
+            let currentAnswers = slots.map(s => s.ans);
+            let available = allEquations.filter(eq => !currentAnswers.includes(eq.a));
+            if (available.length === 0) available = allEquations; // Rất hiếm khi xảy ra vì mảng có 160 phần tử
+            return available[Math.floor(Math.random() * available.length)];
+        }
+
+        function initMonstersBoard() {
+            const container = document.getElementById('monsters-container');
+            container.innerHTML = '';
+            slots = [];
+            
+            const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
+
+            for(let i=0; i<10; i++) {
+                let eq = getUniqueEquation();
+                let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
+                let colorCls = monsterColors[Math.floor(Math.random() * monsterColors.length)];
+                let pos = shuffledPositions[i];
+                
+                let topPercent = pos.top + (Math.random() * 4 - 2); 
+                let leftPercent = pos.left + (Math.random() * 4 - 2);
+
+                let wrap = document.createElement('div');
+                wrap.id = `monster-slot-${i}`;
+                wrap.className = `monster-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30`;
+                wrap.style.left = `${leftPercent}%`;
+                wrap.style.top = `${topPercent}%`;
+                
+                wrap.onclick = () => { checkAnswer(i); };
+
+                let animDelay = Math.random() * 2;
+                let animDur = 2.5 + Math.random() * 1.5; 
+
+                wrap.innerHTML = `
+                    <div class="relative flex flex-col items-center justify-center monster-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
+                        <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
+                            ${emoji}
+                        </div>
+                        <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
+                            ${eq.a}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(wrap);
+                
+                slots.push({
+                    id: i,
+                    el: wrap,
+                    ans: eq.a,
+                    eqText: eq.t,
+                    readText: eq.read,
+                    isActive: true
+                });
+            }
+        }
+
+        // Sinh một quái vật mới vào một slot cụ thể sau khi quái cũ chết
+        function respawnMonsterAtSlot(index) {
+            let eq = getUniqueEquation();
+            let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
+            let colorCls = monsterColors[Math.floor(Math.random() * monsterColors.length)];
+            
+            let wrap = slots[index].el;
+            wrap.style.display = 'block';
+            wrap.classList.remove('popped');
+            
+            let animDelay = Math.random() * 2;
+            let animDur = 2.5 + Math.random() * 1.5; 
+
+            wrap.innerHTML = `
+                <div class="relative flex flex-col items-center justify-center monster-float pop-in" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
+                    <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
+                        ${emoji}
+                    </div>
+                    <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
+                        ${eq.a}
+                    </div>
+                </div>
+            `;
+            
+            slots[index].ans = eq.a;
+            slots[index].eqText = eq.t;
+            slots[index].readText = eq.read;
+            slots[index].isActive = true;
+        }
+
+        function generateQuestion() {
+            if (!isPlaying) return;
+
+            const prob = document.getElementById('math-problem');
+            
+            let activeSlots = slots.filter(s => s.isActive);
+            if (activeSlots.length === 0) return; // Không thể xảy ra do cơ chế respawn
+            
+            let selectedSlot = activeSlots[Math.floor(Math.random() * activeSlots.length)];
+            
+            expectedAnswer = selectedSlot.ans;
+            expectedReadText = selectedSlot.readText;
+            prob.innerText = selectedSlot.eqText + ' = ?';
+            
+            const sign = prob.parentElement;
+            sign.classList.remove('shake', 'bounce-in');
+            void sign.offsetWidth;
+            sign.classList.add('bounce-in');
+
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400">Tiêu diệt quái vật mang số <b class="text-emerald-400">đáp án</b> nhé! 👇</span>`;
+
+            startTimer();
+        }
+
+        // ANIMATION HIỆP SĨ TUNG CHIÊU
+        function shootSlash(slotIndex) {
+            isAttacking = true;
+            clearInterval(timerInterval); 
+            playSound('snd-shoot'); 
+            
+            const knight = document.getElementById('knight-container');
+            knight.classList.remove('knight-attack');
+            void knight.offsetWidth;
+            knight.classList.add('knight-attack');
+
+            const board = document.getElementById('game-board');
+            const boardRect = board.getBoundingClientRect();
+            
+            const startPt = document.getElementById('slash-start-point');
+            const startRect = startPt.getBoundingClientRect();
+            
+            const targetWrap = slots[slotIndex].el;
+            const targetBody = targetWrap.querySelector('.monster-aura'); 
+            const targetRect = targetBody.getBoundingClientRect();
+
+            const startX = (startRect.left + startRect.width/2) - boardRect.left;
+            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+
+            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+
+            const slash = document.getElementById('sword-slash');
+            slash.classList.remove('hidden');
+            
+            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
+            
+            slash.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+
+            const duration = 200; 
+            let animationStartTime = null;
+
+            function animateFly(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
+                
+                let currentX = startX + (targetX - startX) * progress;
+                let currentY = startY + (targetY - startY) * progress;
+                
+                slash.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateFly);
+                } else {
+                    slash.classList.add('hidden');
+                    
+                    targetWrap.style.display = 'none';
+                    targetWrap.classList.add('popped');
+                    slots[slotIndex].isActive = false;
+                    
+                    playSound('snd-pop'); 
+                    confetti({ particleCount: 70, spread: 90, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#38bdf8', '#e2e8f0', '#94a3b8'] });
+                    
+                    score += 10;
+                    streak++;
+                    updateScoreBoard();
+
+                    let qText = document.getElementById('math-problem').innerText.replace(' = ?', '');
+                    let feedbackText = `Hạ gục! ${qText} = ${expectedAnswer} 🗡️`;
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-400 font-black">${feedbackText}</span>`;
+                    
+                    // Delay ngắn rồi hồi sinh quái và ra câu hỏi mới
+                    setTimeout(() => {
+                        respawnMonsterAtSlot(slotIndex);
+                        generateQuestion();
+                        isAttacking = false;
+                    }, 500);
+                }
+            }
+
+            requestAnimationFrame(animateFly);
+        }
+
+        // KẺ ĐỊCH PHẢN CÔNG
+        function enemyAttack() {
+            isAttacking = true;
+            playSound('snd-shoot'); 
+            
+            const knight = document.getElementById('knight-container');
+            const board = document.getElementById('game-board');
+            const boardRect = board.getBoundingClientRect();
+            
+            let activeSlots = slots.filter(s => s.isActive);
+            if (activeSlots.length === 0) {
+                generateQuestion();
+                isAttacking = false;
+                return;
+            }
+            const shooterSlot = activeSlots[Math.floor(Math.random() * activeSlots.length)];
+            
+            const shooterBody = shooterSlot.el.querySelector('.monster-aura'); 
+            const startRect = shooterBody.getBoundingClientRect();
+            const targetRect = knight.getBoundingClientRect();
+
+            const startX = (startRect.left + startRect.width/2) - boardRect.left;
+            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+
+            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+
+            const fireball = document.getElementById('enemy-fireball');
+            fireball.classList.remove('hidden');
+            
+            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
+            
+            fireball.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+
+            const duration = 250; 
+            let animationStartTime = null;
+
+            function animateEnemyFly(timestamp) {
+                if (!animationStartTime) animationStartTime = timestamp;
+                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
+                
+                let currentX = startX + (targetX - startX) * progress;
+                let currentY = startY + (targetY - startY) * progress;
+                
+                fireball.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateEnemyFly);
+                } else {
+                    fireball.classList.add('hidden');
+                    playSound('snd-wrong'); 
+                    
+                    knight.classList.remove('knight-hit');
+                    void knight.offsetWidth;
+                    knight.classList.add('knight-hit');
+                    
+                    confetti({ particleCount: 40, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#ef4444', '#f59e0b', '#020617'] });
+                    
+                    lives--;
+                    updateLivesUI();
+                    streak = 0; updateScoreBoard();
+
+                    if (lives <= 0) {
+                        setTimeout(gameOver, 600);
+                    } else {
+                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Hết giờ! Trúng đòn! Tiếp tục chiến đấu... 🛡️</span>`;
+                        setTimeout(() => {
+                            generateQuestion();
+                            isAttacking = false;
+                        }, 1500);
+                    }
+                }
+            }
+
+            requestAnimationFrame(animateEnemyFly);
+        }
+
+        async function checkAnswer(slotIndex) {
+            if (isAttacking || !isPlaying || !slots[slotIndex].isActive) return;
+
+            let selectedVal = slots[slotIndex].ans;
+
+            if (selectedVal === expectedAnswer) {
+                shootSlash(slotIndex);
+            } else {
+                playSound('snd-wrong');
+                streak = 0;
+                updateScoreBoard();
+
+                const sign = document.getElementById('math-problem').parentElement;
+                sign.classList.remove('bounce-in', 'shake');
+                void sign.offsetWidth;
+                sign.classList.add('shake');
+
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 font-bold">Chém hụt rồi! Lắng nghe gợi ý nhé 🎧</span>`;
+                
+                isAttacking = true;
+                clearInterval(timerInterval); 
+                
+                let ttsPrompt = "Đáp án đúng là: " + expectedReadText; 
+                await playTTS(ttsPrompt);
+                
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 font-bold">Mục tiêu đã đổi, vung kiếm nào! 🔄</span>`;
+
+                setTimeout(() => {
+                    generateQuestion(); 
+                    isAttacking = false;
+                }, 300);
+            }
+        }
+
+        // --- FULLSCREEN ---
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
+                if (req) { try { req.call(doc); } catch(e){} } 
+            } else { 
+                if (ext) ext.call(document); 
+            }
+        }
+    </script>
+</body>
+</html>
