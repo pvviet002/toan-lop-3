@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảng Nhân Chia 2-9 - Hiệp Sĩ Diệt Quái</title>
+    <title>Hiệp Sĩ Tí Hon - Bảng Nhân Chia 2-9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
-            background-color: #0f172a; /* slate-900 */
-            overscroll-behavior-y: none; 
+            font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+            background: linear-gradient(180deg, #bfe9ff 0%, #e3f6ff 45%, #fff7e6 100%);
+            overscroll-behavior-y: none;
             overflow-x: hidden;
+            min-height: 100vh;
         }
-        
+
         .no-select { user-select: none; -webkit-user-select: none; }
-        
+
         .btn-press {
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(0);
         }
-        .btn-press:active:not(:disabled) { 
-            transform: translateY(4px); 
-            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
+        .btn-press:active:not(:disabled) {
+            transform: translateY(3px) scale(0.98);
+            box-shadow: 0 1px 0 0 rgba(0,0,0,0.1) !important;
         }
 
         .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
-        @keyframes bounceIn { 
+        @keyframes bounceIn {
             0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; } 
+            100% { transform: scale(1); opacity: 1; }
         }
-        
+
         .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: scale(0); }
-        @keyframes popIn { 
-            100% { transform: scale(1); opacity: 1; } 
-        }
+        @keyframes popIn { 100% { transform: scale(1); opacity: 1; } }
 
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
@@ -44,112 +46,132 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Bối cảnh Rừng Quái Vật (Fantasy Forest) */
-        .fantasy-container {
+        /* ── SÂN CHƠI: Đồng Cỏ Kẹo Ngọt ─────────────────── */
+        .meadow-container {
             position: relative;
-            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 40%, #064e3b 80%, #022c22 100%);
-            border: 6px solid #1e293b; 
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5);
+            background: linear-gradient(180deg, #8ed8ff 0%, #c3ecff 42%, #d5f7c8 68%, #9be89b 100%);
+            border: 6px solid #ffffff;
+            box-shadow: 0 12px 30px rgba(93, 160, 220, 0.35), inset 0 0 60px rgba(255,255,255,0.35);
             overflow: hidden;
             border-radius: 2.5rem;
         }
 
-        /* Mặt trăng khổng lồ */
-        .giant-moon {
+        /* Mặt trời tươi cười */
+        .happy-sun {
             position: absolute;
-            top: 5%; right: 10%;
-            width: 150px; height: 150px;
-            background: radial-gradient(circle at 30% 30%, #fdfcc8, #fef08a, #ca8a04);
+            top: 5%; right: 7%;
+            width: 90px; height: 90px;
+            background: radial-gradient(circle at 35% 35%, #fff7c2, #ffe066 60%, #ffc93c);
             border-radius: 50%;
-            box-shadow: 0 0 60px rgba(253, 224, 71, 0.4);
+            box-shadow: 0 0 45px rgba(255, 214, 90, 0.85);
             z-index: 1;
+            animation: sunPulse 4s ease-in-out infinite alternate;
+        }
+        @keyframes sunPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.06); }
         }
 
-        /* Sương mù (Mist) */
-        .mist-layer {
+        /* Mây trôi */
+        .cloud {
             position: absolute;
-            bottom: 0; left: 0; width: 200%; height: 50%;
-            background: linear-gradient(to top, rgba(16, 185, 129, 0.2), transparent);
-            animation: mistDrift 20s linear infinite alternate;
-            pointer-events: none;
-            z-index: 5;
+            background: #ffffff;
+            border-radius: 999px;
+            opacity: 0.9;
+            filter: blur(1px);
+            z-index: 1;
+            animation: cloudDrift linear infinite;
         }
-        @keyframes mistDrift {
+        .cloud::before, .cloud::after {
+            content: ''; position: absolute; background: #fff; border-radius: 50%;
+        }
+        .cloud-1 { width: 110px; height: 34px; top: 12%; left: -15%; animation-duration: 45s; }
+        .cloud-1::before { width: 45px; height: 45px; top: -20px; left: 18px; }
+        .cloud-1::after  { width: 32px; height: 32px; top: -12px; left: 55px; }
+        .cloud-2 { width: 80px; height: 26px; top: 30%; left: -25%; animation-duration: 60s; animation-delay: -20s; opacity: 0.7; }
+        .cloud-2::before { width: 34px; height: 34px; top: -15px; left: 12px; }
+        .cloud-2::after  { width: 24px; height: 24px; top: -9px; left: 40px; }
+        @keyframes cloudDrift {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-20%); }
+            100% { transform: translateX(130vw); }
         }
 
-        /* Bảng Đá (Stone Tablet) */
-        .stone-tablet {
-            background-color: #475569;
-            background-image: 
-                radial-gradient(#334155 10%, transparent 11%),
-                radial-gradient(#334155 10%, transparent 11%);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-            border: 4px solid #1e293b;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 15px 25px rgba(0,0,0,0.5);
-            border-radius: 16px;
-            position: relative;
+        /* Đồi cỏ */
+        .hill {
+            position: absolute; border-radius: 50%;
+            pointer-events: none; z-index: 2;
+        }
+        .hill-1 { width: 90%; height: 55%; bottom: -32%; left: -25%; background: #7ed67e; }
+        .hill-2 { width: 100%; height: 60%; bottom: -40%; right: -30%; background: #8fe08f; }
+
+        /* Bảng phép tính - biển gỗ kẹo */
+        .quest-sign {
+            background: linear-gradient(180deg, #ffffff, #fff4dd);
+            border: 5px solid #ffb054;
+            box-shadow: 0 8px 0 0 #f59e0b, 0 14px 22px rgba(180, 110, 20, 0.25);
+            border-radius: 24px;
         }
 
-        /* Quái vật lơ lửng */
+        /* Quái vật kẹo dẻo */
         .monster-float {
             animation: floatAnim ease-in-out infinite alternate;
             will-change: transform;
         }
         @keyframes floatAnim {
-            0% { transform: translate3d(-3px, -6px, 0) rotate(-2deg); }
-            100% { transform: translate3d(3px, 6px, 0) rotate(2deg); }
+            0% { transform: translate3d(-3px, -6px, 0) rotate(-3deg); }
+            100% { transform: translate3d(3px, 6px, 0) rotate(3deg); }
         }
         @media (prefers-reduced-motion: reduce) {
-            .monster-float, .mist-layer { animation: none !important; }
+            .monster-float, .cloud, .happy-sun, .grass-deco { animation: none !important; }
         }
 
-        .monster-wrapper:hover .monster-float {
-            filter: brightness(1.2) drop-shadow(0 0 15px rgba(239, 68, 68, 0.6));
-            transform: scale(1.1);
+        .monster-wrapper { transition: transform 0.15s ease; }
+        .monster-wrapper:hover { transform: translate(-50%, -50%) scale(1.12); }
+        .monster-wrapper:hover .monster-body {
+            filter: brightness(1.08) drop-shadow(0 0 14px rgba(255, 200, 60, 0.8));
         }
 
-        /* Aura của quái vật */
-        .monster-aura {
+        .monster-body {
             border-radius: 50%;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%);
+            border: 4px solid #ffffff;
+            box-shadow: 0 6px 14px rgba(80, 120, 180, 0.3), inset 0 -8px 0 rgba(0,0,0,0.07), inset 0 6px 10px rgba(255,255,255,0.5);
         }
 
-        /* Hiệp sĩ tung chiêu */
-        .knight-attack {
-            animation: slashAction 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .answer-pill {
+            background: #ffffff;
+            border-radius: 999px;
+            box-shadow: 0 3px 0 0 rgba(0,0,0,0.12), 0 5px 10px rgba(80,120,180,0.25);
         }
+
+        /* Cỏ hoa trang trí lắc lư */
+        .grass-deco {
+            position: absolute; z-index: 6; pointer-events: none;
+            animation: sway 3.5s ease-in-out infinite alternate;
+            transform-origin: bottom center;
+        }
+        @keyframes sway {
+            0% { transform: rotate(-6deg); }
+            100% { transform: rotate(6deg); }
+        }
+
+        /* Hiệp sĩ */
+        .knight-attack { animation: slashAction 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes slashAction {
             0% { transform: translateX(0) rotate(0deg); }
-            40% { transform: translateX(20px) rotate(10deg) scale(1.1); }
+            40% { transform: translateX(18px) rotate(8deg) scale(1.08); }
             100% { transform: translateX(0) rotate(0deg); }
         }
 
-        /* Hiệp sĩ bị tấn công */
-        .knight-hit {
-            animation: flashRed 0.5s ease-in-out;
-        }
-        @keyframes flashRed {
+        .knight-hit { animation: flashHit 0.5s ease-in-out; }
+        @keyframes flashHit {
             0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(0.3) sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 30px red); transform: translateX(-15px); }
+            50% { filter: brightness(0.75) sepia(0.6) hue-rotate(-40deg) saturate(3) drop-shadow(0 0 20px #fb7185); transform: translateX(-12px); }
         }
 
-        /* Nhát chém năng lượng (Sword Slash) */
-        #sword-slash { will-change: transform; }
-        
-        /* Cầu lửa quái vật bắn trả */
-        #enemy-fireball { will-change: transform; }
+        #star-shot, #enemy-bolt { will-change: transform; }
 
         /* Combo badge */
-        .combo-pop {
-            animation: comboPop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        .combo-pop { animation: comboPop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes comboPop {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
             20% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
@@ -157,255 +179,339 @@
             80% { transform: translate(-50%, -70%) scale(1); opacity: 1; }
             100% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
         }
+
+        /* Trái tim mất máu bay lên */
+        .heart-lost { animation: heartFly 0.8s ease-out forwards; }
+        @keyframes heartFly {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-40px) scale(1.6); opacity: 0; }
+        }
     </style>
 </head>
-<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative bg-slate-900">
+<body class="p-2 md:p-4 flex flex-col min-h-screen relative">
 
-    <!-- Header Global -->
-    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
-        <div class="flex items-center space-x-2 md:space-x-3">
-            <button onclick="showStartScreen()" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
-                <span class="hidden md:inline">🏠 Về Trang Bìa</span><span class="md:hidden">🏠</span>
-            </button>
-            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
-                <span id="fullscreen-label">🔲 <span class="hidden md:inline">Phóng to</span></span>
-            </button>
-            <button onclick="toggleSound()" id="btn-sound" title="Bật/tắt âm thanh" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
-                <span id="sound-label">🔊 <span class="hidden md:inline">Âm thanh</span></span>
-            </button>
+    <!-- Thanh công cụ trên cùng -->
+    <div class="max-w-4xl mx-auto w-full mb-3 flex justify-between items-center z-20 relative gap-2">
+        <div class="flex items-center gap-1.5 md:gap-2">
+            <button onclick="showStartScreen()" title="Về trang bìa" class="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-white text-lg md:text-xl rounded-2xl shadow-[0_4px_0_0_#cfe3f5] border-2 border-sky-100 hover:bg-sky-50 btn-press">🏠</button>
+            <button onclick="toggleSound()" id="btn-sound" title="Bật/tắt âm thanh" class="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-white text-lg md:text-xl rounded-2xl shadow-[0_4px_0_0_#cfe3f5] border-2 border-sky-100 hover:bg-sky-50 btn-press"><span id="sound-label">🔊</span></button>
+            <button onclick="toggleFullScreen()" title="Toàn màn hình" class="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center bg-white text-lg md:text-xl rounded-2xl shadow-[0_4px_0_0_#cfe3f5] border-2 border-sky-100 hover:bg-sky-50 btn-press"><span id="fullscreen-label">🔲</span></button>
         </div>
-        
-        <div class="bg-slate-800 px-3 py-2 md:px-5 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-emerald-800 flex items-center space-x-3 md:space-x-5">
-            <div class="flex items-center space-x-1" title="Điểm">
-                <span class="text-lg md:text-xl">⚔️</span>
-                <span id="score-display" class="font-black text-emerald-400 text-lg md:text-xl">0</span>
+
+        <div class="bg-white px-3 py-1.5 md:px-5 md:py-2 rounded-2xl shadow-[0_4px_0_0_#cfe3f5] border-2 border-sky-100 flex items-center gap-3 md:gap-4">
+            <div class="flex items-center gap-1" title="Điểm">
+                <span class="text-base md:text-xl">⭐</span>
+                <span id="score-display" class="font-extrabold text-amber-500 text-base md:text-xl">0</span>
             </div>
-            <div class="w-1 h-5 md:h-6 bg-slate-600 rounded-full"></div>
-            <div class="flex items-center space-x-1" title="Chuỗi thắng liên tiếp">
-                <span class="text-lg md:text-xl">🔥</span>
-                <span id="streak-display" class="font-black text-orange-400 text-lg md:text-xl">0</span>
+            <div class="w-0.5 h-5 bg-sky-100 rounded-full"></div>
+            <div class="flex items-center gap-1" title="Chuỗi thắng">
+                <span class="text-base md:text-xl">🔥</span>
+                <span id="streak-display" class="font-extrabold text-orange-500 text-base md:text-xl">0</span>
             </div>
-            <div class="w-1 h-5 md:h-6 bg-slate-600 rounded-full hidden sm:block"></div>
-            <div class="hidden sm:flex items-center space-x-1" title="Kỷ lục">
-                <span class="text-lg md:text-xl">🏆</span>
-                <span id="high-display" class="font-black text-yellow-400 text-lg md:text-xl">0</span>
+            <div class="w-0.5 h-5 bg-sky-100 rounded-full hidden sm:block"></div>
+            <div class="hidden sm:flex items-center gap-1" title="Kỷ lục">
+                <span class="text-base md:text-xl">🏆</span>
+                <span id="high-display" class="font-extrabold text-violet-500 text-base md:text-xl">0</span>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <div class="max-w-5xl mx-auto w-full bg-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-slate-700 overflow-hidden flex flex-col flex-grow relative">
-        
+    <!-- KHUNG CHÍNH -->
+    <div class="max-w-4xl mx-auto w-full flex flex-col flex-grow relative">
+
         <!-- MÀN HÌNH BẮT ĐẦU -->
-        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-indigo-950 via-slate-900 to-black flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300 overflow-y-auto hide-scrollbar">
-            
-            <!-- Icon Hiệp sĩ Lớn -->
-            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(52,211,153,0.8)] bounce-in flex items-center justify-center bg-slate-900 rounded-full border-4 border-emerald-500 relative z-10 shrink-0" style="animation-delay: 0.1s">
-                <span class="text-6xl md:text-8xl transform translate-x-1">🤺</span>
-            </div>
+        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-sky-200 via-sky-100 to-amber-50 flex flex-col items-center justify-center p-6 transition-opacity duration-300 overflow-y-auto rounded-[2.5rem] border-4 border-white shadow-2xl">
 
-            <h1 class="text-3xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-emerald-400 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(52,211,153,0.6);">
-                HIỆP SĨ DIỆT QUÁI
+            <div class="text-7xl md:text-9xl mb-3 bounce-in drop-shadow-[0_10px_15px_rgba(120,170,255,0.5)]" style="animation-delay: 0.1s">🛡️</div>
+
+            <h1 class="text-3xl md:text-6xl font-extrabold tracking-wide mb-1 text-center bounce-in relative z-10" style="animation-delay: 0.2s; color:#3b82f6; text-shadow: 0 3px 0 #fff, 0 6px 12px rgba(59,130,246,0.3);">
+                HIỆP SĨ TÍ HON
             </h1>
-            
-            <div class="bg-slate-800/90 p-5 md:p-8 rounded-3xl border border-emerald-500/50 max-w-xl text-center mb-6 md:mb-8 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
-                <p class="text-base md:text-xl font-bold mb-2 md:mb-3 text-emerald-200 uppercase tracking-widest">Nhiệm vụ Tổng Hợp:</p>
-                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy tung chiêu vào Quái vật mang <b class="text-white bg-emerald-600 px-2 py-1 rounded">đáp án đúng</b> cho các phép tính từ Bảng 2 đến Bảng 9!</p>
-                
-                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-[11px] md:text-base border border-slate-600 shadow-inner mt-2 text-emerald-200 text-left">
-                    <span>⚠️ <b>Chú ý:</b> Trả lời sai quái vật sẽ phản công làm mất máu và mất chuỗi 🔥. Cứ mỗi chuỗi 5 con sẽ được thưởng lớn! Nhớ bật âm thanh nhé!</span>
-                </div>
+            <p class="text-sky-500 font-bold text-sm md:text-xl mb-5 bounce-in" style="animation-delay: 0.25s">✨ Bảng Nhân Chia 2 – 9 ✨</p>
+
+            <div class="bg-white/90 p-4 md:p-6 rounded-3xl border-4 border-sky-200 max-w-md text-center mb-5 bounce-in shadow-lg relative z-10" style="animation-delay: 0.3s">
+                <p class="text-sm md:text-lg font-semibold leading-relaxed text-slate-600">Chạm vào bạn quái vật đang cầm <b class="text-white bg-emerald-400 px-2 py-0.5 rounded-lg">đáp án đúng</b> để hạ gục nhé!</p>
+                <p class="text-xs md:text-sm font-medium text-slate-500 mt-2">💗 Trả lời sai sẽ mất 1 tim &nbsp;·&nbsp; 🔥 Chuỗi 5 con liên tiếp được thưởng lớn!</p>
             </div>
 
-            <div id="start-highscore" class="mb-5 text-yellow-400 font-bold text-sm md:text-lg bounce-in relative z-10 hidden" style="animation-delay: 0.35s">
+            <div id="start-highscore" class="mb-4 text-violet-500 font-extrabold text-sm md:text-lg bounce-in relative z-10 hidden bg-white/80 px-4 py-1.5 rounded-full border-2 border-violet-200" style="animation-delay: 0.35s">
                 🏆 Kỷ lục của bé: <span id="start-highscore-value">0</span> điểm
             </div>
-            
-            <button onclick="startGame()" class="btn-press px-10 py-4 md:px-12 md:py-5 bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black rounded-full text-xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-emerald-300 shadow-[0_0_25px_rgba(52,211,153,0.8)] relative z-10 shrink-0" style="animation-delay: 0.4s">
-                XUẤT CHIẾN ⚔️
+
+            <button onclick="startGame()" class="btn-press px-10 py-4 md:px-14 md:py-5 bg-gradient-to-b from-emerald-400 to-emerald-500 text-white font-extrabold rounded-full text-xl md:text-3xl transition-all duration-200 bounce-in border-4 border-white shadow-[0_8px_0_0_#059669,0_14px_25px_rgba(16,185,129,0.4)] relative z-10 shrink-0" style="animation-delay: 0.4s">
+                XUẤT PHÁT! 🚀
             </button>
         </div>
 
         <!-- MÀN HÌNH GAME OVER -->
-        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 hidden opacity-0 transition-opacity duration-300">
-            <div class="bg-slate-900 p-6 md:p-8 rounded-[2rem] border-4 border-rose-700 shadow-[0_0_50px_rgba(225,29,72,0.8)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
-                <div class="text-6xl md:text-7xl mb-4 animate-bounce">💀</div>
-                <h2 class="text-2xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">GỤC NGÃ!</h2>
-                <p class="text-slate-300 mb-4 font-medium text-sm md:text-lg">Hiệp sĩ đã hết sạch sinh lực. Hãy đứng lên làm lại nào!</p>
-                <div id="new-record-badge" class="hidden mb-4 inline-block bg-yellow-500/20 border border-yellow-400 text-yellow-300 font-black px-4 py-2 rounded-full text-sm md:text-base animate-pulse">
+        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-sky-900/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-white p-6 md:p-8 rounded-[2rem] border-4 border-rose-200 shadow-2xl transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
+                <div class="text-6xl md:text-7xl mb-3 animate-bounce">😵</div>
+                <h2 class="text-2xl md:text-4xl font-extrabold text-rose-500 mb-1">ÔI KHÔNG!</h2>
+                <p class="text-slate-500 mb-4 font-semibold text-sm md:text-base">Hiệp sĩ hết tim mất rồi. Thử lại lần nữa nha, bé làm được mà! 💪</p>
+                <div id="new-record-badge" class="hidden mb-4 inline-block bg-amber-100 border-2 border-amber-300 text-amber-600 font-extrabold px-4 py-1.5 rounded-full text-sm md:text-base animate-pulse">
                     🏆 KỶ LỤC MỚI! 🏆
                 </div>
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-slate-800 rounded-xl p-4 border border-slate-700">
-                        <span class="text-slate-400 block mb-1 text-xs md:text-sm">Điểm số</span>
-                        <span class="text-3xl md:text-4xl font-black text-emerald-400" id="final-score">0</span>
+                    <div class="bg-amber-50 rounded-2xl p-3 border-2 border-amber-100">
+                        <span class="text-slate-400 block text-xs md:text-sm font-semibold">⭐ Điểm số</span>
+                        <span class="text-3xl md:text-4xl font-extrabold text-amber-500" id="final-score">0</span>
                     </div>
-                    <div class="bg-slate-800 rounded-xl p-4 border border-slate-700">
-                        <span class="text-slate-400 block mb-1 text-xs md:text-sm">Chuỗi cao nhất</span>
-                        <span class="text-3xl md:text-4xl font-black text-orange-400" id="final-streak">0</span>
+                    <div class="bg-orange-50 rounded-2xl p-3 border-2 border-orange-100">
+                        <span class="text-slate-400 block text-xs md:text-sm font-semibold">🔥 Chuỗi cao nhất</span>
+                        <span class="text-3xl md:text-4xl font-extrabold text-orange-500" id="final-streak">0</span>
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="showStartScreen()" class="btn-press px-4 py-3 md:px-6 md:py-4 bg-slate-700 text-white font-black rounded-full text-base md:text-lg flex-1 border border-slate-600">
-                        VỀ TRẠI 🏕️
+                    <button onclick="showStartScreen()" class="btn-press px-4 py-3 bg-sky-100 text-sky-600 font-extrabold rounded-full text-base md:text-lg flex-1 border-2 border-sky-200 shadow-[0_4px_0_0_#bae6fd]">
+                        🏠 Trang bìa
                     </button>
-                    <button onclick="startGame()" class="btn-press px-4 py-3 md:px-6 md:py-4 bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black rounded-full text-base md:text-lg flex-1 shadow-[0_0_20px_rgba(52,211,153,0.5)] border border-emerald-300">
-                        CHIẾN LẠI ⚔️
+                    <button onclick="startGame()" class="btn-press px-4 py-3 bg-gradient-to-b from-emerald-400 to-emerald-500 text-white font-extrabold rounded-full text-base md:text-lg flex-1 border-2 border-white shadow-[0_4px_0_0_#059669]">
+                        ⚔️ Chiến lại
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Header Trò chơi -->
-        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 md:p-6 text-center shadow-md relative z-10 border-b border-indigo-900/50">
-            <h1 class="text-xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-emerald-400" style="text-shadow: 0 0 15px rgba(52,211,153,0.5);">Bảng Nhân Chia (2-9) ⚔️</h1>
-            <p id="game-subtitle" class="text-indigo-200 text-xs md:text-base font-medium transition-colors duration-300">Chuẩn bị vũ khí...</p>
-        </div>
-
-        <!-- Khung Game Chính -->
-        <div class="flex-grow flex items-center justify-center p-2 md:p-6 relative bg-slate-900 overflow-hidden">
-            
-            <!-- Khu vực Rừng Fantasy (Game Board) -->
-            <div id="game-board" class="fantasy-container w-full max-w-[500px] md:max-w-[800px] aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] relative bounce-in mx-auto">
-                
-                <!-- TRẠNG THÁI SINH TỒN -->
-                <div class="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-start z-30 pointer-events-none">
-                    <!-- Thanh Máu -->
-                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/90 border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
-                        <span class="text-rose-500 font-bold tracking-widest text-[10px] md:text-sm mr-1">HP</span>
-                        <div class="flex gap-1 md:gap-1.5" id="health-bar">
-                            <!-- JS sinh thanh máu -->
-                        </div>
-                    </div>
-                </div>
+        <!-- SÂN CHƠI -->
+        <div class="flex-grow flex items-center justify-center relative">
+            <div id="game-board" class="meadow-container w-full aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] relative bounce-in mx-auto">
 
                 <!-- Bối cảnh -->
-                <div class="giant-moon"></div>
-                <div class="mist-layer"></div>
+                <div class="happy-sun"></div>
+                <div class="cloud cloud-1"></div>
+                <div class="cloud cloud-2"></div>
+                <div class="hill hill-1"></div>
+                <div class="hill hill-2"></div>
+                <div class="grass-deco text-2xl md:text-3xl" style="bottom: 4%; left: 6%; animation-delay: -1s;">🌷</div>
+                <div class="grass-deco text-xl md:text-2xl" style="bottom: 7%; right: 8%; animation-delay: -2s;">🌼</div>
+                <div class="grass-deco text-xl md:text-2xl hidden md:block" style="bottom: 3%; left: 42%;">🌱</div>
+                <div class="grass-deco text-2xl hidden md:block" style="bottom: 10%; right: 30%; animation-delay: -0.5s;">🍄</div>
 
                 <!-- Combo Badge -->
                 <div id="combo-badge" class="absolute left-1/2 top-1/2 z-[70] pointer-events-none hidden">
-                    <div class="bg-gradient-to-b from-yellow-400 to-orange-500 text-slate-900 font-black text-2xl md:text-4xl px-6 py-3 rounded-2xl border-4 border-yellow-200 shadow-[0_0_40px_rgba(250,204,21,0.9)] whitespace-nowrap">
+                    <div class="bg-gradient-to-b from-yellow-300 to-orange-400 text-white font-extrabold text-2xl md:text-4xl px-6 py-3 rounded-3xl border-4 border-white shadow-[0_0_35px_rgba(250,204,21,0.9)] whitespace-nowrap" style="text-shadow: 0 2px 0 rgba(0,0,0,0.15);">
                         🔥 COMBO x<span id="combo-value">5</span>! +<span id="combo-bonus">30</span>
                     </div>
                 </div>
 
-                <!-- Hiệp sĩ & Bảng Nhiệm vụ -->
-                <div class="absolute bottom-2 md:bottom-6 left-1/2 md:left-[5%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-50 w-[95%] md:w-auto max-w-[320px] md:max-w-none pointer-events-none">
-                    
-                    <!-- SVG Knight -->
-                    <div class="relative w-24 h-24 md:w-44 md:h-44 z-10 drop-shadow-[0_15px_20px_rgba(0,0,0,0.8)] pointer-events-auto" id="knight-container">
-                        <svg viewBox="0 0 200 200" class="w-full h-full transform scale-x-[-1]">
-                            <ellipse cx="100" cy="185" rx="50" ry="10" fill="rgba(0,0,0,0.6)" />
-                            <rect x="75" y="140" width="16" height="40" rx="6" fill="#1e293b" />
-                            <rect x="115" y="140" width="16" height="40" rx="6" fill="#0f172a" />
-                            <path d="M 60 70 L 140 70 L 120 140 L 80 140 Z" fill="#94a3b8" />
-                            <path d="M 80 70 L 120 70 L 110 140 L 90 140 Z" fill="#cbd5e1" />
-                            <rect x="75" y="130" width="50" height="12" fill="#991b1b" rx="2" />
-                            <rect x="90" y="128" width="20" height="16" fill="none" stroke="#fcd34d" stroke-width="4" rx="2" />
-                            
-                            <circle cx="100" cy="45" r="25" fill="#f87171" />
-                            <path d="M 65 50 Q 100 -10 135 50 Z" fill="#64748b" />
-                            <path d="M 75 50 L 125 50 L 115 70 L 85 70 Z" fill="#475569" />
-                            <rect x="85" y="55" width="30" height="8" fill="#0f172a" rx="2"/>
-                            <path d="M 100 10 Q 120 -20 140 0 Q 110 -5 100 10" fill="#dc2626" />
-                            
-                            <path d="M 130 80 L 170 80 L 170 110 L 150 140 L 130 110 Z" fill="#3b82f6" stroke="#fcd34d" stroke-width="4" stroke-linejoin="round"/>
-                            <circle cx="150" cy="100" r="10" fill="#fcd34d" />
-                            
-                            <rect x="50" y="80" width="20" height="45" rx="10" fill="#64748b" transform="rotate(30 60 80)" />
-                            <path d="M 10 130 L 45 95 L 55 105 L 20 140 Z" fill="#e2e8f0" />
-                            <path d="M 5 135 L 25 155 L 35 145 L 15 125 Z" fill="#b45309" />
-                            <polygon points="10,130 0,140 20,140" fill="#e2e8f0" />
-                            <path d="M 0 140 L 60 80" stroke="#38bdf8" stroke-width="8" opacity="0.6" filter="blur(4px)" stroke-linecap="round"/>
+                <!-- Hiệp sĩ & Biển phép tính -->
+                <div class="absolute bottom-2 md:bottom-5 left-1/2 md:left-[4%] transform -translate-x-1/2 md:translate-x-0 flex flex-col items-center z-50 w-[95%] md:w-auto max-w-[300px] md:max-w-none pointer-events-none">
+
+                    <!-- Chibi Knight -->
+                    <div class="relative w-24 h-24 md:w-40 md:h-40 z-10 drop-shadow-[0_10px_12px_rgba(60,120,60,0.35)] pointer-events-auto" id="knight-container">
+
+                        <!-- Thanh máu nhỏ trên đầu -->
+                        <div id="health-bar" class="absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 flex gap-0.5 text-sm md:text-lg z-20 drop-shadow-sm"></div>
+
+                        <svg viewBox="0 0 200 200" class="w-full h-full">
+                            <!-- bóng -->
+                            <ellipse cx="100" cy="190" rx="48" ry="8" fill="rgba(50,100,50,0.18)" />
+                            <!-- chân + giày -->
+                            <rect x="80" y="152" width="15" height="26" rx="7" fill="#7dd3fc" />
+                            <rect x="105" y="152" width="15" height="26" rx="7" fill="#7dd3fc" />
+                            <ellipse cx="88" cy="182" rx="13" ry="8" fill="#78716c" />
+                            <ellipse cx="112" cy="182" rx="13" ry="8" fill="#78716c" />
+                            <!-- thân áo giáp -->
+                            <path d="M 68 112 Q 100 100 132 112 L 127 160 Q 100 170 73 160 Z" fill="#60a5fa" stroke="#ffffff" stroke-width="4"/>
+                            <!-- đai lưng -->
+                            <rect x="72" y="142" width="56" height="11" rx="5.5" fill="#fbbf24"/>
+                            <circle cx="100" cy="147" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+                            <!-- tay trái + khiên trái tim -->
+                            <circle cx="60" cy="128" r="10" fill="#93c5fd" stroke="#fff" stroke-width="3"/>
+                            <path d="M 30 116 C 30 104 48 104 48 116 C 48 104 66 104 66 116 C 66 132 48 145 48 145 C 48 145 30 132 30 116 Z" fill="#fb7185" stroke="#ffffff" stroke-width="5"/>
+                            <circle cx="42" cy="115" r="4" fill="#ffffff" opacity="0.7"/>
+                            <!-- tay phải + kiếm -->
+                            <circle cx="140" cy="128" r="10" fill="#93c5fd" stroke="#fff" stroke-width="3"/>
+                            <path d="M 146 120 L 180 66 L 190 73 L 156 127 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2.5" stroke-linejoin="round"/>
+                            <rect x="140" y="115" width="22" height="9" rx="4.5" fill="#fbbf24" transform="rotate(-55 151 119)"/>
+                            <circle cx="183" cy="65" r="5" fill="#fef08a"/>
+                            <!-- đầu -->
+                            <circle cx="100" cy="72" r="40" fill="#ffe4c7"/>
+                            <!-- mũ giáp -->
+                            <path d="M 60 66 Q 100 6 140 66 Z" fill="#cbd5e1" stroke="#ffffff" stroke-width="3.5"/>
+                            <rect x="58" y="58" width="84" height="12" rx="6" fill="#94a3b8"/>
+                            <!-- lông vũ hồng -->
+                            <path d="M 100 16 Q 120 -8 136 6 Q 114 6 106 22 Z" fill="#fb7185"/>
+                            <!-- mắt to tròn -->
+                            <circle cx="85" cy="82" r="7" fill="#334155"/>
+                            <circle cx="115" cy="82" r="7" fill="#334155"/>
+                            <circle cx="87.5" cy="79.5" r="2.5" fill="#ffffff"/>
+                            <circle cx="117.5" cy="79.5" r="2.5" fill="#ffffff"/>
+                            <!-- má hồng -->
+                            <circle cx="72" cy="94" r="6.5" fill="#fda4af" opacity="0.75"/>
+                            <circle cx="128" cy="94" r="6.5" fill="#fda4af" opacity="0.75"/>
+                            <!-- miệng cười -->
+                            <path d="M 91 98 Q 100 107 109 98" stroke="#b45309" stroke-width="3.5" fill="none" stroke-linecap="round"/>
                         </svg>
-                        
-                        <div id="slash-start-point" class="absolute w-1 h-1" style="top: 50%; right: 0%;"></div>
+
+                        <div id="slash-start-point" class="absolute w-1 h-1" style="top: 35%; right: 2%;"></div>
                     </div>
-                    
-                    <!-- Bảng Đá hiển thị phép tính -->
-                    <div class="relative flex flex-col items-center mt-0 md:mt-2 w-full md:w-auto pointer-events-auto">
-                        <div class="stone-tablet px-4 py-3 md:px-10 md:py-4 flex flex-col items-center justify-center relative z-20 w-full min-w-[260px]">
-                            <button onclick="readCurrentQuestion()" title="Nghe đọc phép tính" class="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-9 h-9 md:w-11 md:h-11 bg-sky-600 hover:bg-sky-500 border-2 border-sky-300 rounded-full flex items-center justify-center text-lg md:text-xl shadow-[0_0_12px_rgba(56,189,248,0.7)] btn-press z-30">🔊</button>
-                            <span class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1">Mục tiêu</span>
-                            <span id="math-problem" class="font-black text-white text-3xl md:text-5xl tracking-widest relative z-10 font-mono drop-shadow-[0_0_5px_rgba(56,189,248,0.8)] text-center w-full whitespace-nowrap">2 x 3 = ?</span>
+
+                    <!-- Biển phép tính -->
+                    <div class="relative flex flex-col items-center mt-1 md:mt-2 w-full md:w-auto pointer-events-auto">
+                        <div class="quest-sign px-5 py-2.5 md:px-10 md:py-4 flex items-center justify-center relative z-20 w-full min-w-[240px] md:min-w-[280px]">
+                            <button onclick="readCurrentQuestion()" title="Nghe đọc phép tính" class="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-9 h-9 md:w-11 md:h-11 bg-sky-400 hover:bg-sky-300 border-[3px] border-white rounded-full flex items-center justify-center text-base md:text-xl shadow-[0_4px_10px_rgba(56,150,250,0.5)] btn-press z-30">🔊</button>
+                            <span id="math-problem" class="font-extrabold text-3xl md:text-5xl tracking-wide relative z-10 text-center w-full whitespace-nowrap" style="color:#e56910; text-shadow: 0 2px 0 #fff;">2 × 3 = ?</span>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- SVG Nhát chém năng lượng (Sword Slash) -->
-                <svg id="sword-slash" viewBox="0 0 40 100" class="absolute pointer-events-none z-[60] hidden" style="width: 30px; height: 80px; top: 0; left: 0;">
-                    <path d="M 10 0 Q 40 50 10 100 Q 25 50 5 0 Z" fill="#38bdf8" filter="drop-shadow(0 0 10px #0ea5e9)"/>
-                    <path d="M 12 10 Q 35 50 12 90 Q 20 50 8 10 Z" fill="#ffffff" />
+                <!-- Ngôi sao phép thuật (đòn tấn công) -->
+                <svg id="star-shot" viewBox="0 0 48 48" class="absolute pointer-events-none z-[60] hidden" style="width: 44px; height: 44px; top: 0; left: 0;">
+                    <polygon points="24,2 30,17 46,18 34,29 38,45 24,36 10,45 14,29 2,18 18,17" fill="#fde047" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" filter="drop-shadow(0 0 10px #fbbf24)"/>
+                    <circle cx="24" cy="23" r="5" fill="#fff9c2"/>
                 </svg>
 
-                <!-- SVG Cầu lửa Kẻ địch -->
-                <svg id="enemy-fireball" viewBox="0 0 40 40" class="absolute pointer-events-none z-[60] hidden" style="width: 40px; height: 40px; top: 0; left: 0;">
-                    <circle cx="20" cy="20" r="10" fill="#dc2626" filter="drop-shadow(0 0 8px #ef4444)"/>
-                    <circle cx="20" cy="20" r="5" fill="#fcd34d" />
-                    <!-- Lửa đuôi -->
-                    <path d="M 20 10 L 0 20 L 20 30 Z" fill="#f97316" opacity="0.8" />
+                <!-- Bong bóng nghịch ngợm quái vật bắn trả -->
+                <svg id="enemy-bolt" viewBox="0 0 40 40" class="absolute pointer-events-none z-[60] hidden" style="width: 38px; height: 38px; top: 0; left: 0;">
+                    <circle cx="20" cy="20" r="12" fill="#c084fc" stroke="#ffffff" stroke-width="3" filter="drop-shadow(0 0 8px #a855f7)"/>
+                    <circle cx="16" cy="16" r="4" fill="#f3e8ff"/>
+                    <path d="M 20 6 L 2 20 L 20 34 Z" fill="#d8b4fe" opacity="0.6" />
                 </svg>
 
-                <!-- Vùng chứa Quái vật (Monsters) -->
-                <div id="monsters-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
-                    <!-- JS sẽ sinh 10 con quái vật vào đây và giữ nguyên trên màn hình -->
-                </div>
+                <!-- Vùng chứa Quái vật -->
+                <div id="monsters-container" class="absolute inset-0 w-full h-full pointer-events-none z-40"></div>
             </div>
-
         </div>
 
-        <div class="bg-slate-900 p-3 md:p-5 border-t border-slate-800 flex items-center justify-center z-10 rounded-b-3xl">
-            <div id="feedback-msg" class="text-sm md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
-                Chém quái vật đang ôm kết quả đúng! 🎯
+        <!-- Dòng phản hồi -->
+        <div class="mt-3 mb-1 flex items-center justify-center">
+            <div id="feedback-msg" class="bg-white/90 border-2 border-sky-100 rounded-2xl px-4 py-2 md:px-6 md:py-2.5 shadow-[0_4px_0_0_#cfe3f5] text-sm md:text-xl font-bold text-center text-slate-500 tracking-wide max-w-full">
+                Chạm vào bạn quái đang cầm đáp án đúng nhé! 🎯
             </div>
         </div>
 
     </div>
 
-    <!-- AUDIO -->
-    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
-    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
-    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio>
-    <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio>
-
     <script>
-        // --- ÂM THANH BẬT/TẮT ---
+        // ══════════ ÂM THANH TỨC THÌ (Web Audio - không delay) ══════════
+        let audioCtx = null;
         let soundOn = true;
+
+        function ensureAudio() {
+            if (!soundOn) return;
+            if (!audioCtx) {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (AC) audioCtx = new AC();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // Tiếng "vút" khi hiệp sĩ ra chiêu - phát ngay lập tức
+        function sfxSlash() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const dur = 0.18;
+            const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+            const src = audioCtx.createBufferSource(); src.buffer = buf;
+            const bp = audioCtx.createBiquadFilter();
+            bp.type = 'bandpass'; bp.Q.value = 1.2;
+            bp.frequency.setValueAtTime(700, t);
+            bp.frequency.exponentialRampToValueAtTime(3800, t + dur);
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.55, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + dur);
+            src.connect(bp); bp.connect(g); g.connect(audioCtx.destination);
+            src.start(t);
+        }
+
+        // Tiếng "póc" vui khi trúng quái
+        function sfxPop() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(420, t);
+            o.frequency.exponentialRampToValueAtTime(950, t + 0.1);
+            g.gain.setValueAtTime(0.4, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + 0.16);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(t); o.stop(t + 0.18);
+        }
+
+        // Tiếng "úi" khi trả lời sai
+        function sfxWrong() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sawtooth';
+            o.frequency.setValueAtTime(260, t);
+            o.frequency.exponentialRampToValueAtTime(120, t + 0.32);
+            g.gain.setValueAtTime(0.22, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(t); o.stop(t + 0.38);
+        }
+
+        // Nhạc chuông combo (đô-mi-sol-đô)
+        function sfxCombo() {
+            if (!soundOn || !audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 1046.5];
+            const t0 = audioCtx.currentTime;
+            notes.forEach((f, i) => {
+                const t = t0 + i * 0.09;
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'triangle';
+                o.frequency.setValueAtTime(f, t);
+                g.gain.setValueAtTime(0.3, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t + 0.28);
+            });
+        }
+
+        // Tiếng "tưng" nhẹ khi bấm nút
+        function sfxClick() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sine';
+            o.frequency.setValueAtTime(600, t);
+            g.gain.setValueAtTime(0.25, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(t); o.stop(t + 0.12);
+        }
 
         function toggleSound() {
             soundOn = !soundOn;
-            document.getElementById('sound-label').innerHTML = soundOn 
-                ? '🔊 <span class="hidden md:inline">Âm thanh</span>' 
-                : '🔇 <span class="hidden md:inline">Đã tắt</span>';
+            document.getElementById('sound-label').innerText = soundOn ? '🔊' : '🔇';
             if (!soundOn && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+            if (soundOn) { ensureAudio(); sfxClick(); }
             saveSetting('knight-math-sound', soundOn ? '1' : '0');
         }
 
-        // --- LƯU TRỮ AN TOÀN (kỷ lục, cài đặt) ---
+        // ══════════ LƯU TRỮ AN TOÀN ══════════
         function saveSetting(key, value) { try { localStorage.setItem(key, value); } catch(e) {} }
         function loadSetting(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
 
-        // --- HÀM HỖ TRỢ ĐỌC TTS ---
+        // ══════════ GIỌNG ĐỌC TIẾNG VIỆT ══════════
         function playTTS(text) {
             return new Promise(resolve => {
                 if (soundOn && 'speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
+                    window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = 'vi-VN';
-                    utterance.rate = 0.95; 
-                    utterance.pitch = 1.1; 
-                    
+                    utterance.rate = 0.95;
+                    utterance.pitch = 1.1;
+
                     const voices = window.speechSynthesis.getVoices();
                     const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
                     if (viVoice) utterance.voice = viVoice;
 
                     utterance.onend = resolve;
                     utterance.onerror = resolve;
-                    
+
                     window.speechSynthesis.speak(utterance);
-                    setTimeout(resolve, 5000); 
+                    setTimeout(resolve, 5000);
                 } else {
                     setTimeout(resolve, soundOn ? 1000 : 200);
                 }
@@ -436,10 +542,15 @@
             return words.trim();
         }
 
-        // Game State
+        // Hiển thị phép tính đẹp: × và ÷
+        function fmtEq(text) {
+            return text.replace(' x ', ' × ').replace(' : ', ' ÷ ');
+        }
+
+        // ══════════ TRẠNG THÁI GAME ══════════
         let isPlaying = false;
         let lives = 3;
-        
+
         let expectedAnswer = 0;
         let expectedReadText = '';
         let expectedQuestionRead = '';
@@ -447,51 +558,55 @@
         let streak = 0;
         let bestStreakThisRun = 0;
         let highScore = 0;
-        let isAttacking = false; 
+        let isAttacking = false;
 
-        // Kho Dữ Liệu 160 Câu Hỏi (Nhân & Chia bảng 2-9)
+        // Kho 160 phép tính (Nhân & Chia bảng 2-9)
         let allEquations = [];
-        for(let t = 2; t <= 9; t++) {
-            for(let f = 1; f <= 10; f++) {
-                allEquations.push({ 
-                    t: `${t} x ${f}`, 
-                    a: t * f, 
+        for (let t = 2; t <= 9; t++) {
+            for (let f = 1; f <= 10; f++) {
+                allEquations.push({
+                    t: `${t} x ${f}`,
+                    a: t * f,
                     read: `${numberToWords(t)} nhân ${numberToWords(f)} bằng ${numberToWords(t * f)}`,
                     q: `${numberToWords(t)} nhân ${numberToWords(f)} bằng mấy?`
                 });
-                allEquations.push({ 
-                    t: `${t * f} : ${t}`, 
-                    a: f, 
+                allEquations.push({
+                    t: `${t * f} : ${t}`,
+                    a: f,
                     read: `${numberToWords(t * f)} chia ${numberToWords(t)} bằng ${numberToWords(f)}`,
                     q: `${numberToWords(t * f)} chia ${numberToWords(t)} bằng mấy?`
                 });
             }
         }
 
-        // Quản lý 10 Quái vật cố định trên sân
-        const monsterEmojis = ['🧟', '🧛', '👹', '👺', '👻', '👾', '🕷️', '🦂', '🐉', '🦖'];
+        // ══════════ QUÁI VẬT DỄ THƯƠNG ══════════
+        const monsterEmojis = ['🐙', '🐸', '👾', '🦖', '🐷', '🐨', '🦊', '🐝', '🐲', '🦄', '🐰', '🐌'];
         const monsterColors = [
-            'bg-rose-900 shadow-rose-500', 'bg-purple-900 shadow-purple-500', 
-            'bg-indigo-900 shadow-indigo-500', 'bg-emerald-900 shadow-emerald-500',
-            'bg-amber-900 shadow-amber-500'
+            'background: linear-gradient(180deg, #fbcfe8, #f9a8d4);', // hồng
+            'background: linear-gradient(180deg, #ddd6fe, #c4b5fd);', // tím
+            'background: linear-gradient(180deg, #bae6fd, #7dd3fc);', // xanh trời
+            'background: linear-gradient(180deg, #fde68a, #fcd34d);', // vàng
+            'background: linear-gradient(180deg, #bbf7d0, #86efac);', // xanh lá
+            'background: linear-gradient(180deg, #fed7aa, #fdba74);'  // cam
         ];
-        
+        const pillColors = ['border-pink-300 text-pink-500', 'border-violet-300 text-violet-500', 'border-sky-300 text-sky-500', 'border-amber-300 text-amber-600', 'border-emerald-300 text-emerald-500', 'border-orange-300 text-orange-500'];
+
         let slots = [];
         let basePositions = [];
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Nạp cài đặt & kỷ lục đã lưu
             highScore = parseInt(loadSetting('knight-math-high') || '0', 10) || 0;
-            if (loadSetting('knight-math-sound') === '0') toggleSound();
+            if (loadSetting('knight-math-sound') === '0') { soundOn = false; document.getElementById('sound-label').innerText = '🔇'; }
             updateHighScoreUI();
+            updateLivesUI();
 
             setupPositions();
             initMonstersBoard();
-            
+
             window.addEventListener('resize', () => {
                 setupPositions();
                 if (isPlaying) {
-                    repositionMonsters(); // Xoay màn hình giữa trận: chỉ dời chỗ, giữ nguyên đáp án
+                    repositionMonsters();
                 } else {
                     initMonstersBoard();
                 }
@@ -501,20 +616,18 @@
         function setupPositions() {
             const isMobile = window.innerWidth < 768;
             if (isMobile) {
-                // Mobile: Hiệp sĩ dưới. Quái vật ở nửa trên (top: 8% -> 48% để tránh bảng hoàn toàn)
                 basePositions = [
-                    { top: 8, left: 20 }, { top: 12, left: 50 }, { top: 8, left: 80 },
-                    { top: 22, left: 30 }, { top: 26, left: 70 },
-                    { top: 38, left: 20 }, { top: 42, left: 50 }, { top: 38, left: 80 },
-                    { top: 48, left: 35 }, { top: 48, left: 65 }
+                    { top: 10, left: 20 }, { top: 13, left: 50 }, { top: 10, left: 80 },
+                    { top: 24, left: 32 }, { top: 27, left: 70 },
+                    { top: 39, left: 20 }, { top: 43, left: 50 }, { top: 39, left: 80 },
+                    { top: 52, left: 33 }, { top: 52, left: 67 }
                 ];
             } else {
-                // Desktop: Hiệp sĩ trái. Quái vật bên phải
                 basePositions = [
-                    { top: 15, left: 50 }, { top: 20, left: 75 }, { top: 15, left: 95 },
-                    { top: 40, left: 60 }, { top: 45, left: 85 },
-                    { top: 65, left: 50 }, { top: 70, left: 75 }, { top: 65, left: 95 },
-                    { top: 85, left: 60 }, { top: 85, left: 85 }
+                    { top: 16, left: 48 }, { top: 20, left: 72 }, { top: 16, left: 92 },
+                    { top: 40, left: 58 }, { top: 44, left: 83 },
+                    { top: 63, left: 48 }, { top: 68, left: 72 }, { top: 63, left: 92 },
+                    { top: 84, left: 58 }, { top: 84, left: 82 }
                 ];
             }
         }
@@ -527,15 +640,9 @@
             });
         }
 
-        function playSound(id) { 
-            if (!soundOn) return;
-            const sound = document.getElementById(id); 
-            if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } 
-        }
-
-        function updateScoreBoard() { 
-            document.getElementById('score-display').innerText = score; 
-            document.getElementById('streak-display').innerText = streak; 
+        function updateScoreBoard() {
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('streak-display').innerText = streak;
         }
 
         function updateHighScoreUI() {
@@ -547,19 +654,29 @@
             }
         }
 
+        // Thanh máu: trái tim nhỏ trên đầu hiệp sĩ
         function updateLivesUI() {
             const container = document.getElementById('health-bar');
-            container.innerHTML = '';
-            for(let i = 0; i < 3; i++) {
-                let cellClass = i < lives 
-                    ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] border-emerald-300' 
-                    : 'bg-slate-700 border-slate-600';
-                container.innerHTML += `<div class="w-5 h-4 md:w-6 md:h-5 rounded-sm transform skew-x-[-15deg] border-t border-b border-l-2 ${cellClass}"></div>`;
+            let html = '';
+            for (let i = 0; i < 3; i++) {
+                html += `<span class="${i < lives ? '' : 'opacity-100'}">${i < lives ? '❤️' : '🤍'}</span>`;
             }
+            container.innerHTML = html;
+        }
+
+        function loseHeartAnimation() {
+            // Trái tim vỡ bay lên từ đầu hiệp sĩ
+            const knight = document.getElementById('knight-container');
+            const fly = document.createElement('div');
+            fly.className = 'heart-lost absolute -top-6 left-1/2 -translate-x-1/2 text-xl md:text-2xl pointer-events-none z-30';
+            fly.innerText = '💔';
+            knight.appendChild(fly);
+            setTimeout(() => fly.remove(), 850);
         }
 
         function readCurrentQuestion() {
             if (!isPlaying || !expectedQuestionRead) return;
+            ensureAudio();
             playTTS(expectedQuestionRead);
         }
 
@@ -582,13 +699,14 @@
             const startScreen = document.getElementById('screen-start');
             startScreen.classList.remove('hidden');
             setTimeout(() => { startScreen.classList.remove('opacity-0'); }, 10);
-            
+
             updateHighScoreUI();
             isPlaying = false;
         }
 
         function startGame() {
-            playSound('snd-pop');
+            ensureAudio();
+            sfxClick();
             if (soundOn && 'speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
 
             const goModal = document.getElementById('game-over-modal');
@@ -607,7 +725,7 @@
             startScreen.classList.add('opacity-0');
             setTimeout(() => {
                 startScreen.classList.add('hidden');
-                
+
                 const gameBoard = document.getElementById('game-board');
                 gameBoard.classList.remove('bounce-in');
                 void gameBoard.offsetWidth;
@@ -622,21 +740,20 @@
             isPlaying = false;
             document.getElementById('final-score').innerText = score;
             document.getElementById('final-streak').innerText = bestStreakThisRun;
-            
-            // Kiểm tra kỷ lục mới
+
             const recordBadge = document.getElementById('new-record-badge');
             if (score > highScore) {
                 highScore = score;
                 saveSetting('knight-math-high', String(highScore));
                 recordBadge.classList.remove('hidden');
-                confetti({ particleCount: 150, spread: 120, origin: { y: 0.4 }, zIndex: 200, colors: ['#fbbf24', '#f59e0b', '#fde68a'] });
+                confetti({ particleCount: 150, spread: 120, origin: { y: 0.4 }, zIndex: 200, colors: ['#fbbf24', '#f472b6', '#60a5fa', '#4ade80'] });
             } else {
                 recordBadge.classList.add('hidden');
             }
             updateHighScoreUI();
-            
-            playSound('snd-wrong'); 
-            
+
+            sfxWrong();
+
             const modal = document.getElementById('game-over-modal');
             const content = document.getElementById('game-over-content');
             modal.classList.remove('hidden');
@@ -646,23 +763,22 @@
             }, 10);
         }
 
-        // --- HỆ THỐNG QUÁI VẬT LIÊN TỤC (PERSISTENT BOARD) ---
-        
-        // Lấy một phép tính có đáp án không trùng với các quái vật đang sống
+        // ══════════ HỆ THỐNG QUÁI VẬT ══════════
+
         function getUniqueEquation(excludeAnswers = []) {
             let available = allEquations.filter(eq => !excludeAnswers.includes(eq.a));
-            if (available.length === 0) available = allEquations; // Phòng hờ
+            if (available.length === 0) available = allEquations;
             return available[Math.floor(Math.random() * available.length)];
         }
 
-        function monsterInnerHTML(eq, emoji, colorCls, animDur, animDelay) {
+        function monsterInnerHTML(eq, emoji, colorIdx, animDur, animDelay) {
             return `
                 <div class="pop-in">
                     <div class="relative flex flex-col items-center justify-center monster-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
-                        <div class="monster-aura w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-4xl md:text-5xl ${colorCls} border-2 border-white/20 relative z-10 select-none">
+                        <div class="monster-body w-16 h-16 md:w-[76px] md:h-[76px] flex items-center justify-center text-3xl md:text-4xl relative z-10 no-select" style="${monsterColors[colorIdx]}">
                             ${emoji}
                         </div>
-                        <div class="absolute -bottom-4 z-20 bg-slate-900/90 rounded-md px-3 py-1 font-black font-mono text-sm md:text-lg border border-slate-500 shadow-md text-white">
+                        <div class="answer-pill absolute -bottom-3.5 z-20 px-3 py-0.5 font-extrabold text-base md:text-xl border-[3px] ${pillColors[colorIdx]}">
                             ${eq.a}
                         </div>
                     </div>
@@ -674,19 +790,19 @@
             const container = document.getElementById('monsters-container');
             container.innerHTML = '';
             slots = [];
-            
+
             const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
             let currentAnswers = [];
 
-            for(let i=0; i<10; i++) {
+            for (let i = 0; i < 10; i++) {
                 let eq = getUniqueEquation(currentAnswers);
                 currentAnswers.push(eq.a);
 
                 let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
-                let colorCls = monsterColors[Math.floor(Math.random() * monsterColors.length)];
+                let colorIdx = Math.floor(Math.random() * monsterColors.length);
                 let pos = shuffledPositions[i];
-                
-                let topPercent = pos.top + (Math.random() * 4 - 2); 
+
+                let topPercent = pos.top + (Math.random() * 4 - 2);
                 let leftPercent = pos.left + (Math.random() * 4 - 2);
 
                 let wrap = document.createElement('div');
@@ -694,16 +810,16 @@
                 wrap.className = `monster-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30`;
                 wrap.style.left = `${leftPercent}%`;
                 wrap.style.top = `${topPercent}%`;
-                
+
                 wrap.onclick = () => { checkAnswer(i); };
 
                 let animDelay = Math.random() * 2;
-                let animDur = 2.5 + Math.random() * 1.5; 
+                let animDur = 2.5 + Math.random() * 1.5;
 
-                wrap.innerHTML = monsterInnerHTML(eq, emoji, colorCls, animDur, animDelay);
+                wrap.innerHTML = monsterInnerHTML(eq, emoji, colorIdx, animDur, animDelay);
 
                 container.appendChild(wrap);
-                
+
                 slots.push({
                     id: i,
                     el: wrap,
@@ -719,19 +835,18 @@
         function respawnMonsterAtSlot(index) {
             let otherActiveAnswers = slots.filter((s, idx) => s.isActive && idx !== index).map(s => s.ans);
             let eq = getUniqueEquation(otherActiveAnswers);
-            
+
             let emoji = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
-            let colorCls = monsterColors[Math.floor(Math.random() * monsterColors.length)];
-            
+            let colorIdx = Math.floor(Math.random() * monsterColors.length);
+
             let wrap = slots[index].el;
             wrap.style.display = 'block';
-            wrap.classList.remove('popped');
-            
-            let animDelay = Math.random() * 2;
-            let animDur = 2.5 + Math.random() * 1.5; 
 
-            wrap.innerHTML = monsterInnerHTML(eq, emoji, colorCls, animDur, animDelay);
-            
+            let animDelay = Math.random() * 2;
+            let animDur = 2.5 + Math.random() * 1.5;
+
+            wrap.innerHTML = monsterInnerHTML(eq, emoji, colorIdx, animDur, animDelay);
+
             slots[index].ans = eq.a;
             slots[index].eqText = eq.t;
             slots[index].readText = eq.read;
@@ -743,33 +858,36 @@
             if (!isPlaying) return;
 
             const prob = document.getElementById('math-problem');
-            
+
             let activeSlots = slots.filter(s => s.isActive);
             if (activeSlots.length === 0) {
-                 initMonstersBoard(); 
-                 activeSlots = slots;
+                initMonstersBoard();
+                activeSlots = slots;
             }
-            
+
             let selectedSlot = activeSlots[Math.floor(Math.random() * activeSlots.length)];
-            
+
             expectedAnswer = selectedSlot.ans;
             expectedReadText = selectedSlot.readText;
             expectedQuestionRead = selectedSlot.questionRead;
-            prob.innerText = selectedSlot.eqText + ' = ?';
-            
+            prob.innerText = fmtEq(selectedSlot.eqText) + ' = ?';
+
             const sign = prob.parentElement;
             sign.classList.remove('shake', 'bounce-in');
             void sign.offsetWidth;
             sign.classList.add('bounce-in');
 
-            document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400">Tiêu diệt quái vật mang số <b class="text-emerald-400">đáp án</b> nhé! 👇</span>`;
+            document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-500">Bạn quái nào đang cầm <b class="text-emerald-500">đáp án đúng</b> nè? 👀</span>`;
+
+            // Tự động đọc phép tính mới
+            playTTS(expectedQuestionRead);
         }
 
-        // ANIMATION HIỆP SĨ TUNG CHIÊU
+        // ══════════ HIỆP SĨ RA CHIÊU ══════════
         function shootSlash(slotIndex) {
             isAttacking = true;
-            playSound('snd-shoot'); 
-            
+            sfxSlash(); // Âm thanh phát NGAY tức thì cùng lúc ra chiêu
+
             const knight = document.getElementById('knight-container');
             knight.classList.remove('knight-attack');
             void knight.offsetWidth;
@@ -777,69 +895,64 @@
 
             const board = document.getElementById('game-board');
             const boardRect = board.getBoundingClientRect();
-            
+
             const startPt = document.getElementById('slash-start-point');
             const startRect = startPt.getBoundingClientRect();
-            
+
             const targetWrap = slots[slotIndex].el;
-            const targetBody = targetWrap.querySelector('.monster-aura'); 
+            const targetBody = targetWrap.querySelector('.monster-body');
             const targetRect = targetBody.getBoundingClientRect();
 
-            const startX = (startRect.left + startRect.width/2) - boardRect.left;
-            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+            const startX = (startRect.left + startRect.width / 2) - boardRect.left;
+            const startY = (startRect.top + startRect.height / 2) - boardRect.top;
 
-            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
-            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+            const targetX = (targetRect.left + targetRect.width / 2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height / 2) - boardRect.top;
 
-            const slash = document.getElementById('sword-slash');
-            slash.classList.remove('hidden');
-            
-            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
-            
-            slash.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+            const star = document.getElementById('star-shot');
+            star.classList.remove('hidden');
 
-            const duration = 200; 
+            const duration = 200;
             let animationStartTime = null;
 
             function animateFly(timestamp) {
                 if (!animationStartTime) animationStartTime = timestamp;
                 let progress = Math.min((timestamp - animationStartTime) / duration, 1);
-                
+
                 let currentX = startX + (targetX - startX) * progress;
                 let currentY = startY + (targetY - startY) * progress;
-                
-                slash.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+                let spin = progress * 360;
+
+                star.style.transform = `translate3d(${currentX - 22}px, ${currentY - 22}px, 0) rotate(${spin}deg)`;
 
                 if (progress < 1) {
                     requestAnimationFrame(animateFly);
                 } else {
-                    slash.classList.add('hidden');
-                    
+                    star.classList.add('hidden');
+
                     targetWrap.style.display = 'none';
-                    targetWrap.classList.add('popped');
                     slots[slotIndex].isActive = false;
-                    
-                    playSound('snd-pop'); 
-                    confetti({ particleCount: 70, spread: 90, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#38bdf8', '#e2e8f0', '#94a3b8'] });
-                    
-                    // Cộng điểm + xử lý combo
+
+                    sfxPop();
+                    confetti({ particleCount: 60, spread: 80, origin: { x: targetX / boardRect.width, y: targetY / boardRect.height }, zIndex: 100, colors: ['#fde047', '#f9a8d4', '#7dd3fc', '#86efac'] });
+
+                    // Cộng điểm + combo
                     streak++;
                     if (streak > bestStreakThisRun) bestStreakThisRun = streak;
-                    
+
                     let gained = 10;
                     if (streak > 0 && streak % 5 === 0) {
-                        gained += 30; // Thưởng combo
-                        playSound('snd-correct');
+                        gained += 30;
+                        sfxCombo();
                         showComboBadge(streak, 30);
-                        confetti({ particleCount: 130, spread: 130, origin: { y: 0.5 }, zIndex: 110, colors: ['#fbbf24', '#f97316', '#fde68a'] });
+                        confetti({ particleCount: 120, spread: 130, origin: { y: 0.5 }, zIndex: 110, colors: ['#fbbf24', '#f472b6', '#a78bfa'] });
                     }
                     score += gained;
                     updateScoreBoard();
 
                     let qText = document.getElementById('math-problem').innerText.replace(' = ?', '');
-                    let feedbackText = `Hạ gục! ${qText} = ${expectedAnswer} &nbsp;+${gained} điểm 🗡️`;
-                    document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-400 font-black">${feedbackText}</span>`;
-                    
+                    document.getElementById('feedback-msg').innerHTML = `<span class="text-emerald-500 font-extrabold">Tuyệt vời! ${qText} = ${expectedAnswer} &nbsp;+${gained} ⭐</span>`;
+
                     setTimeout(() => {
                         respawnMonsterAtSlot(slotIndex);
                         generateQuestion();
@@ -851,62 +964,60 @@
             requestAnimationFrame(animateFly);
         }
 
-        // KẺ ĐỊCH PHẢN CÔNG
+        // ══════════ QUÁI VẬT PHẢN CÔNG ══════════
         function enemyAttack(slotIndex) {
             isAttacking = true;
-            playSound('snd-shoot'); 
-            
+            sfxSlash();
+
             const knight = document.getElementById('knight-container');
             const board = document.getElementById('game-board');
             const boardRect = board.getBoundingClientRect();
-            
+
             const shooterSlot = slots[slotIndex];
-            
-            const shooterBody = shooterSlot.el.querySelector('.monster-aura'); 
+
+            const shooterBody = shooterSlot.el.querySelector('.monster-body');
             const startRect = shooterBody.getBoundingClientRect();
             const targetRect = knight.getBoundingClientRect();
 
-            const startX = (startRect.left + startRect.width/2) - boardRect.left;
-            const startY = (startRect.top + startRect.height/2) - boardRect.top;
+            const startX = (startRect.left + startRect.width / 2) - boardRect.left;
+            const startY = (startRect.top + startRect.height / 2) - boardRect.top;
 
-            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
-            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
+            const targetX = (targetRect.left + targetRect.width / 2) - boardRect.left;
+            const targetY = (targetRect.top + targetRect.height / 2) - boardRect.top;
 
-            const fireball = document.getElementById('enemy-fireball');
-            fireball.classList.remove('hidden');
-            
+            const bolt = document.getElementById('enemy-bolt');
+            bolt.classList.remove('hidden');
+
             const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
-            
-            fireball.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
 
-            const duration = 250; 
+            const duration = 250;
             let animationStartTime = null;
 
             function animateEnemyFly(timestamp) {
                 if (!animationStartTime) animationStartTime = timestamp;
                 let progress = Math.min((timestamp - animationStartTime) / duration, 1);
-                
+
                 let currentX = startX + (targetX - startX) * progress;
                 let currentY = startY + (targetY - startY) * progress;
-                
-                fireball.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle - 90}deg)`;
+
+                bolt.style.transform = `translate3d(${currentX - 19}px, ${currentY - 19}px, 0) rotate(${angle}deg)`;
 
                 if (progress < 1) {
                     requestAnimationFrame(animateEnemyFly);
                 } else {
-                    fireball.classList.add('hidden');
-                    playSound('snd-wrong'); 
-                    
+                    bolt.classList.add('hidden');
+                    sfxWrong();
+
                     knight.classList.remove('knight-hit');
                     void knight.offsetWidth;
                     knight.classList.add('knight-hit');
-                    
-                    confetti({ particleCount: 40, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#ef4444', '#f59e0b', '#020617'] });
-                    
+
+                    confetti({ particleCount: 30, spread: 70, origin: { x: targetX / boardRect.width, y: targetY / boardRect.height }, zIndex: 100, colors: ['#c084fc', '#f9a8d4', '#fda4af'] });
+
                     lives--;
                     updateLivesUI();
-                    
-                    // Trả lời sai: mất chuỗi combo
+                    loseHeartAnimation();
+
                     streak = 0;
                     updateScoreBoard();
 
@@ -918,9 +1029,9 @@
                     if (lives <= 0) {
                         setTimeout(gameOver, 600);
                     } else {
-                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Chém hụt! Quái vật phản công! Lắng nghe gợi ý nhé 🎧</span>`;
-                        
-                        let ttsPrompt = "Đáp án đúng là: " + expectedReadText; 
+                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 font-bold">Ui da! Chưa đúng rồi. Nghe gợi ý nhé 🎧</span>`;
+
+                        let ttsPrompt = "Đáp án đúng là: " + expectedReadText;
                         playTTS(ttsPrompt).then(() => {
                             generateQuestion();
                             isAttacking = false;
@@ -934,6 +1045,7 @@
 
         function checkAnswer(slotIndex) {
             if (isAttacking || !isPlaying || !slots[slotIndex].isActive) return;
+            ensureAudio();
 
             let selectedVal = slots[slotIndex].ans;
 
@@ -944,25 +1056,22 @@
             }
         }
 
-        // --- FULLSCREEN ---
+        // ══════════ TOÀN MÀN HÌNH ══════════
         function toggleFullScreen() {
             const doc = document.documentElement;
             const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
             const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
-                if (req) { try { req.call(doc); } catch(e){} } 
-            } else { 
-                if (ext) ext.call(document); 
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) {
+                if (req) { try { req.call(doc); } catch(e){} }
+            } else {
+                if (ext) ext.call(document);
             }
         }
 
-        // Đổi nhãn nút khi vào/thoát toàn màn hình
         ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
             document.addEventListener(evt, () => {
                 const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-                document.getElementById('fullscreen-label').innerHTML = isFull 
-                    ? '❎ <span class="hidden md:inline">Thu nhỏ</span>' 
-                    : '🔲 <span class="hidden md:inline">Phóng to</span>';
+                document.getElementById('fullscreen-label').innerText = isFull ? '❎' : '🔲';
             });
         });
     </script>
