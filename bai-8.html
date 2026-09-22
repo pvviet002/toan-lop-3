@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài 8: Luyện tập chung - Toán lớp 3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #eef2ff; }
+.btn-press:active:not(:disabled){ transform: scale(0.96); }
+.shake { animation: shk .4s; }
+@keyframes shk { 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.pop { animation: pp .3s ease; }
+@keyframes pp { 0%{transform:scale(.85);opacity:.4} 100%{transform:scale(1);opacity:1} }
+table.tf { border-collapse:collapse; }
+table.tf td { border:2px solid #c7d2fe; padding:.35rem 1rem; font-weight:700; text-align:center; }
+table.tf .lbl { background:#eef2ff; color:#3730a3; }
+.brick { display:inline-flex; align-items:center; justify-content:center; width:54px; height:38px; margin:2px; background:linear-gradient(#fb923c,#f97316); color:#fff; font-weight:800; border-radius:6px; border:2px solid #fff; box-shadow:0 2px 4px rgba(0,0,0,.15); font-size:1.05rem; }
+</style>
+</head>
+<body class="p-3 md:p-6 min-h-screen flex flex-col">
+<div class="max-w-3xl mx-auto w-full mb-3 flex justify-between items-center">
+  <div class="flex gap-2">
+    <a href="index.html" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">🏠 Sảnh chính</a>
+    <button onclick="toggleFull()" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">🔲 Phóng to</button>
+  </div>
+  <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 font-bold">
+    <span class="text-amber-500">⭐ <span id="score">0</span></span>
+    <span class="text-orange-500">🔥 <span id="streak">0</span></span>
+  </div>
+</div>
+<div class="max-w-3xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-indigo-100 overflow-hidden flex-grow flex flex-col">
+  <div class="bg-gradient-to-r from-indigo-500 to-violet-600 text-white p-4 md:p-5 text-center">
+    <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">Bài 8: Luyện Tập Chung 🧮</h1>
+    <p class="text-indigo-100 text-sm md:text-base mt-1">Bé chọn một dạng bài rồi luyện tập nhé!</p>
+  </div>
+  <div id="tabs" class="flex flex-wrap bg-slate-100 border-b border-slate-200"></div>
+  <div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-center">
+    <div id="card" class="w-full max-w-xl bg-indigo-50 border-2 border-indigo-100 rounded-2xl p-5 md:p-6 text-center pop">
+      <div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>
+      <div id="answerArea"></div>
+      <div id="feedback" class="mt-3 font-bold" style="min-height:1.6rem"></div>
+    </div>
+    <button onclick="nextQ()" class="mt-4 px-5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-200 btn-press text-sm">Câu khác 🔄</button>
+  </div>
+</div>
+<script>
+var score=0, streak=0, cur=null, topic=0;
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function upd(){ document.getElementById('score').innerText=score; document.getElementById('streak').innerText=streak; }
+var ANIMALS=[['🐻','Gấu'],['🐯','Hổ'],['🐆','Báo'],['🦁','Sư tử'],['🐘','Voi'],['🦏','Tê giác'],['🐊','Cá sấu'],['🐴','Ngựa'],['🦌','Nai'],['🐮','Bò'],['🐷','Lợn'],['🐺','Sói']];
+var TOPICS = [
+ {name:'So sánh số', make:function(){
+   var idx=[]; while(idx.length<4){ var j=rnd(0,ANIMALS.length-1); if(idx.indexOf(j)<0) idx.push(j); }
+   var ws=[]; while(ws.length<4){ var w=rnd(8,60)*5; if(ws.indexOf(w)<0) ws.push(w); }
+   var cards='<div class="flex flex-wrap justify-center gap-2 md:gap-3 mb-3">';
+   for(var i=0;i<4;i++){ cards+='<div class="bg-white border-2 border-indigo-100 rounded-xl px-3 py-2"><div class="text-4xl">'+ANIMALS[idx[i]][0]+'</div><div class="text-xs font-bold text-slate-600">'+ANIMALS[idx[i]][1]+'</div><div class="text-indigo-600 font-extrabold text-sm">'+ws[i]+' kg</div></div>'; }
+   cards+='</div>';
+   var heavy=Math.random()<0.5;
+   var target=heavy?Math.max.apply(null,ws):Math.min.apply(null,ws);
+   return {type:'mcq', q: cards+'<div>Con vật nào <b>'+(heavy?'nặng nhất':'nhẹ nhất')+'</b>?</div>', choices: idx.map(function(j){return ANIMALS[j][1];}), correct: ws.indexOf(target)};
+ }},
+ {name:'Cấu tạo số', make:function(){
+   var t=rnd(1,9),c=rnd(0,9),d=rnd(0,9);
+   var tbl='<table class="tf" style="margin:0 auto 10px"><tr><td class="lbl">Trăm</td><td class="lbl">Chục</td><td class="lbl">Đơn vị</td></tr><tr><td style="font-size:1.6rem;color:#4f46e5">'+t+'</td><td style="font-size:1.6rem;color:#0d9488">'+c+'</td><td style="font-size:1.6rem;color:#d97706">'+d+'</td></tr></table>';
+   return {type:'num', q: tbl+'<div>Bảng trên thể hiện số nào?</div>', ans:t*100+c*10+d};
+ }},
+ {name:'Cộng, trừ', make:function(){
+   var add=Math.random()<0.5, a, b;
+   if(add){ a=rnd(120,760); b=rnd(13,199); } else { a=rnd(320,999); b=rnd(41,a-10); }
+   var op=add?'+':'−';
+   var comp='<div style="display:inline-block;font-family:monospace;font-size:2rem;line-height:1.15;text-align:right;min-width:6ch"><div>'+a+'</div><div>'+op+' '+b+'</div><div style="border-top:3px solid #64748b;margin-top:2px">&nbsp;</div></div>';
+   return {type:'num', q:'<div class="mb-1 text-slate-500 text-base">Đặt tính rồi tính:</div>'+comp, ans: add? a+b : a-b};
+ }},
+ {name:'Tìm thành phần', make:function(){
+   var r=rnd(1,4), rows, ans;
+   if(r===1){ var a=rnd(11,50),b=rnd(11,45); rows=[['Số hạng',a],['Số hạng',b],['Tổng','?']]; ans=a+b; }
+   else if(r===2){ var a=rnd(11,50),s=rnd(a+11,95); rows=[['Số hạng',a],['Số hạng','?'],['Tổng',s]]; ans=s-a; }
+   else if(r===3){ var m=rnd(40,99),s=rnd(11,m-11); rows=[['Số bị trừ',m],['Số trừ',s],['Hiệu','?']]; ans=m-s; }
+   else { var m=rnd(40,99),h=rnd(11,m-11); rows=[['Số bị trừ',m],['Số trừ','?'],['Hiệu',h]]; ans=m-h; }
+   var tb='<table class="tf" style="margin:0 auto 10px">';
+   rows.forEach(function(rw){ tb+='<tr><td class="lbl" style="text-align:left">'+rw[0]+'</td><td style="min-width:4ch;'+(rw[1]==='?'?'color:#dc2626;font-size:1.4rem':'')+'">'+rw[1]+'</td></tr>'; });
+   tb+='</table>';
+   return {type:'num', q: tb+'<div>Tìm số ở ô dấu <b style="color:#dc2626">?</b></div>', ans:ans};
+ }},
+ {name:'Giải toán', make:function(){
+   var a=rnd(130,700), b=rnd(15,120);
+   if(Math.random()<0.5) return {type:'num', q:'<div class="text-5xl mb-2">🏫</div>Trường A có '+a+' học sinh. Trường B có nhiều hơn trường A '+b+' học sinh. Hỏi trường B có bao nhiêu học sinh?', ans:a+b, unit:'học sinh'};
+   return {type:'num', q:'<div class="text-5xl mb-2">🌾</div>Cửa hàng có '+a+' kg gạo, đã bán '+b+' kg. Hỏi cửa hàng còn lại bao nhiêu ki-lô-gam gạo?', ans:a-b, unit:'kg'};
+ }},
+ {name:'Nhân, chia', make:function(){
+   var em=pick(['🍎','⭐','🍊','🐟','🌸','🎈']);
+   if(Math.random()<0.6){ var g=rnd(2,5),k=rnd(2,5); var fig='<div class="mb-2 leading-tight">'; for(var i=0;i<g;i++){ fig+='<div style="font-size:1.5rem">'+em.repeat(k)+'</div>'; } fig+='</div>';
+     return {type:'num', q: fig+'<div>Đếm xem có tất cả bao nhiêu hình? &nbsp;('+g+' × '+k+')</div>', ans:g*k}; }
+   var g=rnd(2,5),k=rnd(2,5),tot=g*k; var fig='<div class="text-2xl mb-2">'+em.repeat(tot)+'</div>';
+   return {type:'num', q: fig+'<div>Chia đều '+tot+' hình vào '+g+' phần bằng nhau. Mỗi phần có mấy hình? &nbsp;('+tot+' : '+g+')</div>', ans:k};
+ }},
+ {name:'Tháp số', make:function(){
+   var a=rnd(3,15),b=rnd(3,15),c=rnd(3,15); var top=a+2*b+c;
+   var P='<div class="mb-2">'
+    +'<div class="flex justify-center"><span class="brick" style="background:#c7d2fe;color:#3730a3">?</span></div>'
+    +'<div class="flex justify-center"><span class="brick" style="background:#c7d2fe;color:#3730a3">?</span><span class="brick" style="background:#c7d2fe;color:#3730a3">?</span></div>'
+    +'<div class="flex justify-center"><span class="brick">'+a+'</span><span class="brick">'+b+'</span><span class="brick">'+c+'</span></div></div>';
+   return {type:'num', q: P+'<div class="text-sm text-slate-500 mb-1">Mỗi ô bằng tổng hai ô ngay dưới nó.</div><div>Số ở <b>đỉnh tháp</b> là bao nhiêu?</div>', ans: top};
+ }}
+];
+function render(){
+  document.getElementById('qhtml').innerHTML = cur.q;
+  var area=document.getElementById('answerArea'); area.innerHTML='';
+  document.getElementById('feedback').innerHTML='';
+  if(cur.type==='num'){
+    var box=document.createElement('div'); box.className='flex items-center justify-center gap-2 flex-wrap';
+    var inp=document.createElement('input'); inp.id='ans'; inp.type='number'; inp.setAttribute('inputmode','numeric');
+    inp.className='w-36 text-center text-2xl font-extrabold border-2 border-indigo-300 rounded-xl py-2 focus:outline-none focus:border-indigo-500';
+    inp.onkeydown=function(e){ if(e.key==='Enter') checkNum(); };
+    box.appendChild(inp);
+    if(cur.unit){ var u=document.createElement('span'); u.className='text-lg text-slate-500 font-semibold'; u.innerText=cur.unit; box.appendChild(u); }
+    area.appendChild(box);
+    var btn=document.createElement('button'); btn.innerHTML='Kiểm tra đáp án ✅';
+    btn.className='mt-4 px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-full btn-press shadow';
+    btn.onclick=checkNum; area.appendChild(btn);
+    setTimeout(function(){ try{inp.focus();}catch(e){} },40);
+  } else {
+    var grid=document.createElement('div'); grid.className='grid grid-cols-2 gap-3 max-w-md mx-auto';
+    cur.choices.forEach(function(ch,i){
+      var b=document.createElement('button'); b.innerHTML=ch;
+      b.className='px-4 py-3 bg-white border-2 border-indigo-200 rounded-xl font-extrabold text-lg btn-press hover:bg-indigo-50';
+      b.onclick=function(){ checkMCQ(i,b); }; grid.appendChild(b);
+    });
+    area.appendChild(grid);
+  }
+}
+function checkNum(){ var inp=document.getElementById('ans'); if(!inp||inp.value==='') return; if(parseInt(inp.value,10)===cur.ans) good(); else bad('Chưa đúng, bé thử lại nhé! 🤔'); }
+function checkMCQ(i,b){ if(i===cur.correct){ b.classList.add('bg-emerald-100','border-emerald-400'); good(); } else { b.classList.add('bg-rose-100','border-rose-400'); bad('Chưa đúng rồi! 🤔'); } }
+function good(){ score+=10; streak++; upd(); try{ confetti({particleCount:60,spread:70,origin:{y:.6}}); }catch(e){} document.getElementById('feedback').innerHTML='<span class="text-emerald-600">Chính xác! 🎉 (+10 ⭐)</span>'; setTimeout(nextQ, 1100); }
+function bad(msg){ streak=0; upd(); var c=document.getElementById('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); document.getElementById('feedback').innerHTML='<span class="text-rose-500">'+msg+'</span>'; }
+function nextQ(){ cur=TOPICS[topic].make(); render(); var c=document.getElementById('card'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
+function setTopic(i){ topic=i; buildTabs(); nextQ(); }
+function buildTabs(){ var t=document.getElementById('tabs'); t.innerHTML=''; TOPICS.forEach(function(tp,i){ var b=document.createElement('button'); b.innerText=tp.name; b.className='flex-1 basis-1/4 py-2.5 px-2 text-xs md:text-sm font-bold border-b-4 '+(i===topic?'text-indigo-700 bg-white border-indigo-500':'text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200'); b.onclick=function(){ setTopic(i); }; t.appendChild(b); }); }
+function toggleFull(){ var d=document.documentElement; if(!document.fullscreenElement){ if(d.requestFullscreen) d.requestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } }
+window.addEventListener('DOMContentLoaded', function(){ buildTabs(); nextQ(); });
+</script>
+</body>
+</html>
