@@ -170,6 +170,7 @@
 
         function renderTable() {
             const tbody = document.getElementById('toc-body');
+      const AVAILABLE = new Set([1, 2, 3, 5, 6, 9, 10, 11, 12]);
             let html = '';
             
             // Theo dõi dòng chẵn/lẻ để tô màu nền
@@ -195,7 +196,7 @@
                         <tr class="${rowClass}">
                             <td class="py-2.5 px-2 text-center"></td>
                             <td class="py-2.5 px-6 pl-8">
-                                <a href="bai-${item.num}.html" class="hover-link block w-full h-full">${item.title}</a>
+                                ${AVAILABLE.has(item.num) ? `<a href="bai-${item.num}.html" class="hover-link block w-full h-full">${item.title}</a>` : `<span class="text-slate-300 cursor-not-allowed block w-full h-full">${item.title}<span class="ml-2 text-xs font-bold text-violet-400 bg-violet-100 border border-violet-200 rounded-full px-2 py-0.5 align-middle whitespace-nowrap">Sắp có</span></span>`}
                             </td>
                             <td class="py-2.5 px-2 text-center font-medium">${item.page}</td>
                         </tr>
