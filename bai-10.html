@@ -1,942 +1,164 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 10: Bảng nhân, chia 7 - Bắn ruồi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        body {
-            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
-            background-color: #020617; /* slate-950 */
-            overscroll-behavior-y: none; 
-            overflow-x: hidden;
-        }
-        
-        .no-select { user-select: none; -webkit-user-select: none; }
-        
-        .btn-press {
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(0);
-        }
-        .btn-press:active:not(:disabled) { 
-            transform: translateY(4px); 
-            box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2) !important;
-        }
-
-        .bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; opacity: 0; transform: scale(0.8); }
-        @keyframes bounceIn { 
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; } 
-        }
-
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-            40%, 60% { transform: translate3d(6px, 0, 0); }
-        }
-
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Bối cảnh Không gian Chuyên nghiệp (Sci-Fi Theme) */
-        .space-container {
-            position: relative;
-            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 40%, #020617 100%);
-            border: 6px solid #1e293b; 
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5);
-            overflow: hidden;
-            border-radius: 2.5rem;
-        }
-
-        /* Lưới không gian (Synthwave Grid) - Optimized */
-        .synthwave-grid {
-            position: absolute;
-            bottom: 0; left: 0; right: 0; height: 50%;
-            background-image: 
-                linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px);
-            background-size: 60px 60px;
-            transform: perspective(600px) rotateX(60deg) translateY(100px) translateZ(-200px);
-            transform-origin: bottom center;
-            animation: gridMove 3s linear infinite;
-            pointer-events: none;
-            z-index: 1;
-            will-change: background-position;
-        }
-        @keyframes gridMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 60px; }
-        }
-
-        /* Bầu trời sao chuyển động (Parallax Stars) */
-        .star-layer { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 0; will-change: background-position; }
-        .star-layer-1 { 
-            background-image: radial-gradient(1px 1px at 20px 30px, white, transparent), radial-gradient(1px 1px at 150px 80px, white, transparent), radial-gradient(1px 1px at 300px 10px, white, transparent), radial-gradient(1px 1px at 450px 120px, white, transparent); 
-            background-size: 500px 200px;
-            animation: moveStars 60s linear infinite; opacity: 0.4;
-        }
-        .star-layer-2 { 
-            background-image: radial-gradient(2px 2px at 80px 70px, #e0f2fe, transparent), radial-gradient(2px 2px at 250px 150px, #bae6fd, transparent), radial-gradient(2px 2px at 500px 40px, #e0f2fe, transparent); 
-            background-size: 600px 250px;
-            animation: moveStars 40s linear infinite; opacity: 0.6;
-        }
-        .star-layer-3 { 
-            background-image: radial-gradient(3px 3px at 120px 180px, #38bdf8, transparent), radial-gradient(3px 3px at 400px 90px, #7dd3fc, transparent); 
-            background-size: 700px 300px;
-            animation: moveStars 25s linear infinite; opacity: 0.9;
-        }
-        @keyframes moveStars { 0% { background-position: 0 0; } 100% { background-position: -1000px 0; } }
-
-        /* Bảng Hologram (Công nghệ tương lai) */
-        .hologram-sign {
-            background: linear-gradient(180deg, rgba(8, 145, 178, 0.4) 0%, rgba(8, 145, 178, 0.1) 100%);
-            border: 2px solid #22d3ee;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), inset 0 0 15px rgba(6, 182, 212, 0.4);
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-        .hologram-sign::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(34, 211, 238, 0.15) 2px, rgba(34, 211, 238, 0.15) 4px);
-            pointer-events: none;
-        }
-        .hologram-text {
-            color: #cffafe; /* cyan-100 */
-            text-shadow: 0 0 8px #22d3ee, 0 0 15px #06b6d4;
-            letter-spacing: 2px;
-        }
-
-        /* Đĩa bay UFO bay lượn */
-        .ufo-float {
-            animation: ufoBuzz ease-in-out infinite alternate;
-            will-change: transform;
-        }
-        @keyframes ufoBuzz {
-            0% { transform: translate3d(-4px, -6px, 0) rotate(-3deg); }
-            33% { transform: translate3d(5px, 3px, 0) rotate(2deg); }
-            66% { transform: translate3d(-5px, 5px, 0) rotate(-2deg); }
-            100% { transform: translate3d(4px, -5px, 0) rotate(3deg); }
-        }
-
-        .alien-wrapper:hover .ufo-float {
-            filter: brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        /* Lửa phản lực tàu vũ trụ */
-        .thruster {
-            animation: thrust 0.05s infinite alternate;
-            transform-origin: left center;
-            will-change: transform;
-        }
-        @keyframes thrust {
-            0% { transform: scaleX(0.8); opacity: 0.6; }
-            100% { transform: scaleX(1.1); opacity: 1; }
-        }
-
-        /* Tàu vũ trụ giật lùi khi bắn - Áp dụng vào inner div để bảo toàn transform gốc của parent */
-        .ship-recoil {
-            animation: recoil 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes recoil {
-            0% { transform: translate3d(0, 0, 0); }
-            50% { transform: translate3d(-20px, 0, 0); }
-            100% { transform: translate3d(0, 0, 0); }
-        }
-
-        /* Tàu vũ trụ nháy đỏ khi bị bắn trúng */
-        .ship-hit {
-            animation: flashRed 0.5s ease-in-out;
-        }
-        @keyframes flashRed {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); transform: translate3d(-10px, 0, 0) rotate(-5deg); }
-        }
-
-        #laser-beam, #enemy-laser {
-            will-change: transform;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài 10: Bảng nhân 7, bảng chia 7 - Toán lớp 3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #fff7ed; }
+.btn-press:active:not(:disabled){ transform: scale(0.96); }
+.shake { animation: shk .4s; }
+@keyframes shk { 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.pop { animation: pp .3s ease; }
+@keyframes pp { 0%{transform:scale(.85);opacity:.4} 100%{transform:scale(1);opacity:1} }
+</style>
 </head>
-<body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen relative bg-slate-900">
-
-    <!-- Header Global -->
-    <div class="max-w-5xl mx-auto w-full mb-4 flex justify-between items-center z-20 relative">
-        <div class="flex items-center space-x-2 md:space-x-3">
-            <a href="index.html" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
-                <span class="hidden md:inline">🏠 Sảnh chính</span><span class="md:hidden">🏠</span>
-            </a>
-            <button onclick="toggleFullScreen()" id="btn-fullscreen" class="inline-flex items-center space-x-2 bg-slate-800 text-slate-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-slate-600 hover:bg-slate-700 btn-press font-bold text-sm transition-colors">
-                <span>🔲 Phóng to</span>
-            </button>
-        </div>
-        
-        <div class="bg-slate-800 px-3 py-2 md:px-5 md:py-2.5 rounded-xl shadow-[0_4px_0_0_#0f172a] border border-cyan-800 flex items-center space-x-3 md:space-x-5">
-            <div class="flex items-center space-x-1">
-                <span class="text-lg md:text-xl">🎯</span>
-                <span id="score-display" class="font-black text-cyan-400 text-lg md:text-xl">0</span>
-            </div>
-            <div class="w-1 h-5 md:h-6 bg-slate-600 rounded-full"></div>
-            <div class="flex items-center space-x-1">
-                <span class="text-lg md:text-xl">🔥</span>
-                <span id="streak-display" class="font-black text-orange-400 text-lg md:text-xl">0</span>
-            </div>
-        </div>
+<body class="p-3 md:p-6 min-h-screen flex flex-col">
+<div class="max-w-3xl mx-auto w-full mb-3 flex justify-between items-center">
+  <div class="flex gap-2">
+    <a href="index.html" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">🏠 Sảnh chính</a>
+    <button onclick="toggleFull()" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">🔲 Phóng to</button>
+  </div>
+  <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 font-bold">
+    <span class="text-amber-500">⭐ <span id="score">0</span></span>
+    <span class="text-orange-500">🔥 <span id="streak">0</span></span>
+  </div>
+</div>
+<div class="max-w-3xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden flex-grow flex flex-col">
+  <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 md:p-5 text-center">
+    <h1 class="text-xl md:text-3xl font-extrabold tracking-wide">Bài 10: Bảng Nhân 7, Bảng Chia 7</h1>
+    <p class="text-amber-100 text-sm md:text-base mt-1">Bé chọn một hoạt động rồi luyện tập nhé!</p>
+  </div>
+  <div id="tabs" class="flex flex-wrap bg-slate-100 border-b border-slate-200"></div>
+  <div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-center">
+    <div id="secname" class="text-orange-600 font-extrabold text-sm mb-2"></div>
+    <div id="card" class="w-full max-w-xl bg-amber-50 border-2 border-amber-100 rounded-2xl p-5 md:p-6 text-center pop">
+      <div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>
+      <div id="answerArea"></div>
+      <div id="feedback" class="mt-3 font-bold" style="min-height:1.6rem"></div>
     </div>
-
-    <!-- MAIN APP CONTAINER -->
-    <div class="max-w-5xl mx-auto w-full bg-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-700 overflow-hidden flex flex-col flex-grow relative">
-        
-        <!-- MÀN HÌNH BẮT ĐẦU -->
-        <div id="screen-start" class="absolute inset-0 z-50 bg-gradient-to-b from-indigo-900 via-slate-900 to-black flex flex-col items-center justify-center p-6 text-white transition-opacity duration-300">
-            <!-- Nền sao -->
-            <div class="star-layer star-layer-1"></div>
-            <div class="star-layer star-layer-2"></div>
-            <div class="star-layer star-layer-3"></div>
-            
-            <!-- Icon Tàu vũ trụ Lớn -->
-            <div class="w-24 h-24 md:w-40 md:h-40 mb-6 drop-shadow-[0_0_40px_rgba(34,211,238,0.8)] bounce-in flex items-center justify-center bg-slate-800/90 rounded-full border-4 border-cyan-400 relative z-10" style="animation-delay: 0.1s">
-                <span class="text-5xl md:text-8xl transform translate-x-1 -rotate-45">🚀</span>
-            </div>
-
-            <h1 class="text-3xl md:text-6xl font-black tracking-wide mb-4 text-center drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] bounce-in text-cyan-300 relative z-10" style="animation-delay: 0.2s; text-shadow: 0 0 20px rgba(34,211,238,0.6);">
-                BẮN RUỒI KHÔNG GIAN
-            </h1>
-            
-            <div class="bg-slate-800/90 p-5 md:p-8 rounded-3xl border border-cyan-500/50 max-w-lg text-center mb-8 md:mb-10 bounce-in shadow-xl relative z-10" style="animation-delay: 0.3s">
-                <p class="text-base md:text-xl font-bold mb-2 md:mb-3 text-cyan-200 uppercase tracking-widest">Nhiệm vụ:</p>
-                <p class="text-sm md:text-lg mb-4 font-medium leading-relaxed text-slate-300">Bé hãy nhấp vào Đĩa bay UFO mang khiên số là <b class="text-white bg-indigo-600 px-2 py-1 rounded">đáp án đúng</b> để khai hỏa Laser nhé!</p>
-                
-                <div class="flex items-center justify-center gap-2 md:gap-3 mt-4 mb-2">
-                    <label class="text-indigo-200 font-bold text-xs md:text-base">Thời gian mỗi câu:</label>
-                    <select id="time-select" class="bg-slate-900 text-cyan-300 border-2 border-cyan-600 rounded-xl px-2 py-1 md:px-4 md:py-2 outline-none font-bold text-sm md:text-lg cursor-pointer hover:border-cyan-400 transition-colors">
-                        <option value="10">10 giây</option>
-                        <option value="20">20 giây</option>
-                        <option value="30" selected>30 giây</option>
-                    </select>
-                </div>
-
-                <div class="inline-flex items-center gap-2 bg-black/50 rounded-xl p-3 font-medium text-[11px] md:text-base border border-slate-600 shadow-inner mt-2 text-indigo-200 text-left">
-                    <span>⚠️ <b>Chú ý:</b> Trả lời chậm sẽ bị UFO bắn trúng và <b class="text-rose-400">mất máu</b> đấy! Bật âm thanh để nghe đọc kết quả khi lỡ chọn sai nha!</span>
-                </div>
-            </div>
-            
-            <button onclick="startGame()" class="btn-press px-10 py-4 md:px-12 md:py-5 bg-gradient-to-b from-cyan-400 to-blue-600 text-white font-black rounded-full text-xl md:text-3xl w-full max-w-[320px] transition-all duration-200 bounce-in border-4 border-cyan-200 shadow-[0_0_25px_rgba(34,211,238,0.8)] relative z-10" style="animation-delay: 0.4s">
-                XUẤT PHÁT 🚀
-            </button>
-        </div>
-
-        <!-- MÀN HÌNH GAME OVER -->
-        <div id="game-over-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-rose-950/80 hidden opacity-0 transition-opacity duration-300">
-            <div class="bg-slate-900 p-6 md:p-8 rounded-[2rem] border-4 border-rose-600 shadow-[0_0_50px_rgba(225,29,72,0.6)] transform scale-95 transition-transform duration-300 max-w-md w-full mx-4 text-center" id="game-over-content">
-                <div class="text-6xl md:text-7xl mb-4 animate-bounce">💥</div>
-                <h2 class="text-2xl md:text-4xl font-black text-rose-500 mb-2 drop-shadow-md">TÀU BỊ PHÁ HỦY!</h2>
-                <p class="text-slate-300 mb-6 font-medium text-sm md:text-lg">Bé đã hết máu. Hãy thử lại để bảo vệ phi thuyền nhé!</p>
-                <div class="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700">
-                    <span class="text-slate-400 block mb-1 text-sm md:text-base">Điểm đạt được</span>
-                    <span class="text-4xl md:text-5xl font-black text-cyan-400" id="final-score">0</span>
-                </div>
-                <button onclick="showStartScreen()" class="btn-press px-6 py-3 md:px-8 md:py-4 bg-gradient-to-b from-rose-500 to-rose-700 text-white font-black rounded-full text-lg md:text-xl w-full shadow-[0_0_20px_rgba(225,29,72,0.5)]">
-                    CHƠI LẠI TỪ ĐẦU 🔄
-                </button>
-            </div>
-        </div>
-
-        <!-- Header Bài học 
-        <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-4 md:p-6 text-center shadow-md relative z-10 border-b border-indigo-900/50">
-            <h1 class="text-xl md:text-4xl font-black tracking-wide drop-shadow-lg mb-1 text-cyan-400" style="text-shadow: 0 0 15px rgba(34,211,238,0.5);">Bắn Ruồi Không Gian 🛸</h1>
-            <p id="game-subtitle" class="text-indigo-300 text-xs md:text-base font-medium transition-colors duration-300">Hệ thống vũ khí đang khởi động...</p>
-        </div>
-        -->
-        <!-- Khung Game Chính -->
-        <div class="flex-grow flex items-center justify-center p-2 md:p-6 relative bg-slate-900 overflow-hidden">
-            
-            <!-- Khu vực Vũ Trụ (Game Board) -->
-            <div id="game-board" class="space-container w-full max-w-[500px] md:max-w-[800px] aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] relative bounce-in mx-auto">
-                
-                <!-- TRẠNG THÁI SINH TỒN (Thanh máu & Thời gian) -->
-                <div class="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-start z-30 pointer-events-none">
-                    <!-- Thanh Máu -->
-                    <div class="flex items-center gap-1 md:gap-2 bg-slate-900/90 border border-rose-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] scale-90 md:scale-100 origin-top-left">
-                        <span class="text-rose-500 font-bold tracking-widest text-[10px] md:text-sm mr-1">HP</span>
-                        <div class="flex gap-1 md:gap-1.5" id="health-bar">
-                            <!-- JS sinh thanh máu -->
-                        </div>
-                    </div>
-                    
-                    <!-- Đồng hồ đếm ngược -->
-                    <div class="bg-slate-900/90 border border-cyan-500/50 rounded-full px-2 py-1 md:px-4 md:py-2 flex items-center gap-2 md:gap-3 w-32 md:w-48 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 scale-90 md:scale-100 origin-top-right" id="timer-wrapper">
-                        <span class="text-cyan-400 font-bold text-xs md:text-base">⏱️</span>
-                        <div class="h-1.5 md:h-2.5 flex-grow bg-slate-700 rounded-full overflow-hidden">
-                            <div id="timer-bar" class="h-full bg-cyan-400 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
-                        </div>
-                        <span id="timer-text" class="text-cyan-400 font-mono font-bold text-sm md:text-lg min-w-[20px] md:min-w-[24px] text-right">30</span>
-                    </div>
-                </div>
-
-                <!-- Bầu trời sao Parallax -->
-                <div class="star-layer star-layer-1"></div>
-                <div class="star-layer star-layer-2"></div>
-                <div class="star-layer star-layer-3"></div>
-                
-                <!-- Hành tinh trang trí -->
-                <div class="absolute top-[12%] right-[15%] w-16 h-16 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-indigo-500 to-purple-900 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.6),_0_0_30px_rgba(99,102,241,0.4)] z-0">
-                    <div class="absolute top-1/2 left-1/2 w-[140%] h-[30%] border-[4px] md:border-[6px] border-indigo-300/50 rounded-[50%] transform -translate-x-1/2 -translate-y-1/2 -rotate-12 shadow-[0_0_15px_rgba(165,180,252,0.6)]"></div>
-                </div>
-                
-                <div class="absolute bottom-[25%] right-[35%] w-8 h-8 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-300 to-orange-600 shadow-[0_0_50px_rgba(245,158,11,0.8),_inset_-5px_-5px_10px_rgba(0,0,0,0.3)] z-0 animate-pulse"></div>
-                
-                <!-- Lưới hiển thị 3D cho không gian -->
-                <div class="synthwave-grid"></div>
-
-                <!-- Tàu Vũ Trụ Chuyên Nghiệp -->
-                <!-- Trên mobile: xoay -90deg để súng hướng lên trên, đặt ở dưới cùng -->
-                <!-- Trên Desktop: Không xoay, đặt ở dưới cùng bên trái -->
-                <div class="absolute bottom-[75px] md:bottom-[20%] left-1/2 md:left-6 transform -translate-x-1/2 md:translate-x-0 -rotate-90 md:rotate-0 z-20 w-24 h-24 md:w-40 md:h-40 drop-shadow-[0_0_20px_rgba(34,211,238,0.4)]">
-                    <div id="spaceship-container" class="w-full h-full relative">
-                        <svg viewBox="0 0 200 200" class="w-full h-full">
-                            <!-- Engine Flames -->
-                            <path class="thruster" d="M 15 90 Q -15 100 15 110 Q 5 100 15 90" fill="#0ea5e9"/>
-                            <path class="thruster" style="animation-delay: 0.1s; transform-origin: 20px 100px;" d="M 25 93 Q -5 100 25 107 Q 15 100 25 93" fill="#bae6fd"/>
-                            
-                            <!-- Wings -->
-                            <path d="M 35 100 L 80 20 L 125 100 Z" fill="#1e3a8a"/>
-                            <path d="M 35 100 L 80 180 L 125 100 Z" fill="#1e3a8a"/>
-                            
-                            <!-- Wing Details -->
-                            <path d="M 75 30 L 120 100 L 90 100 L 60 45 Z" fill="#3b82f6"/>
-                            <path d="M 75 170 L 120 100 L 90 100 L 60 155 Z" fill="#3b82f6"/>
-
-                            <!-- Main Hull -->
-                            <path d="M 25 85 L 140 85 Q 185 100 140 115 L 25 115 Z" fill="#94a3b8"/>
-                            <path d="M 25 85 L 140 85 Q 185 100 140 100 L 25 100 Z" fill="#cbd5e1"/>
-                            
-                            <!-- Cockpit Glass -->
-                            <ellipse cx="120" cy="100" rx="35" ry="12" fill="#22d3ee" opacity="0.8"/>
-                            <path d="M 95 95 Q 120 88 145 98 Q 120 95 95 95" fill="#ffffff" opacity="0.6"/>
-
-                            <!-- Weapon / Cannons -->
-                            <rect x="150" y="96" width="35" height="8" fill="#334155" rx="3"/>
-                            <rect x="175" y="94" width="15" height="12" fill="#06b6d4" rx="2"/>
-                            <!-- Weapon Glow -->
-                            <circle cx="190" cy="100" r="4" fill="#cffafe" class="animate-pulse" filter="drop-shadow(0 0 5px #cffafe)"/>
-                        </svg>
-                        
-                        <!-- Điểm mỏ neo để xuất phát tia Laser -->
-                        <div id="laser-start-point" class="absolute w-1 h-1" style="top: 50%; right: -2%;"></div>
-                    </div>
-                </div>
-
-                <!-- Bảng Hologram hiển thị phép tính (Tách biệt khỏi Tàu vũ trụ) -->
-                <!-- Mobile: Dưới cùng ở giữa. Desktop: Dưới cùng bên trái -->
-                <div class="absolute bottom-2 md:bottom-6 left-1/2 md:left-6 transform -translate-x-1/2 md:translate-x-0 z-30 w-[95%] md:w-auto max-w-[320px] md:max-w-none">
-                    <div class="hologram-sign bg-slate-900/90 px-3 py-2 md:px-8 md:py-3 flex items-center justify-center relative w-full rounded-xl">
-                        <span id="math-problem" class="font-black hologram-text text-3xl md:text-5xl tracking-widest relative z-10 font-mono text-center w-full">7 x ? = ?</span>
-                    </div>
-                </div>
-
-                <!-- SVG Tia Laser Phi thuyền -->
-                <svg id="laser-beam" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 20px; top: 0; left: 0; will-change: transform;">
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#06b6d4" stroke-width="12" stroke-linecap="round" opacity="0.4" />
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#22d3ee" stroke-width="6" stroke-linecap="round" />
-                    <line x1="10" y1="10" x2="100" y2="10" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-
-                <!-- SVG Tia Laser Kẻ Địch bắn trả -->
-                <svg id="enemy-laser" viewBox="0 0 100 20" class="absolute pointer-events-none z-50 hidden" style="width: 100px; height: 20px; top: 0; left: 0; will-change: transform;">
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#f43f5e" stroke-width="14" stroke-linecap="round" opacity="0.4" />
-                    <line x1="0" y1="10" x2="100" y2="10" stroke="#fb7185" stroke-width="8" stroke-linecap="round" />
-                    <line x1="0" y1="10" x2="90" y2="10" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-
-                <!-- Vùng chứa Đĩa bay (UFOs) -->
-                <div id="aliens-container" class="absolute inset-0 w-full h-full pointer-events-none z-40">
-                    <!-- Sinh mục tiêu bằng JS -->
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Thanh Tương Tác Cố Định Dưới Cùng -->
-        <div class="bg-slate-900 p-3 md:p-5 border-t border-slate-800 flex items-center justify-center z-10 rounded-b-3xl">
-            <div id="feedback-msg" class="text-sm md:text-2xl font-black text-center flex-grow text-slate-400 tracking-wide drop-shadow-sm">
-                Bảo vệ Phi thuyền! Bắn mục tiêu mang đáp án nhé 🎯
-            </div>
-        </div>
-
-    </div>
-
-    <!-- AUDIO -->
-    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
-    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3" preload="auto"></audio>
-    <audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/3104/3104-preview.mp3" preload="auto"></audio> <!-- Tiếng nổ mục tiêu -->
-    <audio id="snd-shoot" src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" preload="auto"></audio> <!-- Tiếng súng Laser -->
-
-    <script>
-        // --- HÀM HỖ TRỢ ĐỌC TTS GỐC CỦA TRÌNH DUYỆT ---
-        function playTTS(text) {
-            return new Promise(resolve => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'vi-VN';
-                    utterance.rate = 0.95; 
-                    utterance.pitch = 1.1; 
-                    
-                    const voices = window.speechSynthesis.getVoices();
-                    const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
-                    if (viVoice) utterance.voice = viVoice;
-
-                    utterance.onend = resolve;
-                    utterance.onerror = resolve;
-                    
-                    window.speechSynthesis.speak(utterance);
-                    setTimeout(resolve, 5000); 
-                } else {
-                    setTimeout(resolve, 1000);
-                }
-            });
-        }
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
-        }
-
-        // TỪ ĐIỂN ĐỌC SỐ
-        const numWords = {
-            1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 6: 'sáu', 7: 'bảy', 8: 'tám', 9: 'chín', 10: 'mười',
-            14: 'mười bốn', 21: 'hai mươi mốt', 28: 'hai mươi tám', 35: 'ba mươi lăm',
-            42: 'bốn mươi hai', 49: 'bốn mươi chín', 56: 'năm mươi sáu', 63: 'sáu mươi ba', 70: 'bảy mươi'
-        };
-
-        // Game State Core
-        let isPlaying = false;
-        let lives = 3;
-        let GAME_TIME = 30;
-        let timeLeft = 30;
-        let timerInterval = null;
-
-        // Math State
-        let expectedAnswer = 7;
-        let expectedReadText = '';
-        let score = 0;
-        let streak = 0;
-        let isShooting = false; 
-        let recentQuestions = [];
-
-        // Ngân hàng 20 câu hỏi (Nhân & Chia bảng 7)
-        const allQuestions = [
-            { t: '7 x 1', a: 7, read: 'Bảy nhân một bằng bảy' },
-            { t: '7 x 2', a: 14, read: 'Bảy nhân hai bằng mười bốn' },
-            { t: '7 x 3', a: 21, read: 'Bảy nhân ba bằng hai mươi mốt' },
-            { t: '7 x 4', a: 28, read: 'Bảy nhân bốn bằng hai mươi tám' },
-            { t: '7 x 5', a: 35, read: 'Bảy nhân năm bằng ba mươi lăm' },
-            { t: '7 x 6', a: 42, read: 'Bảy nhân sáu bằng bốn mươi hai' },
-            { t: '7 x 7', a: 49, read: 'Bảy nhân bảy bằng bốn mươi chín' },
-            { t: '7 x 8', a: 56, read: 'Bảy nhân tám bằng năm mươi sáu' },
-            { t: '7 x 9', a: 63, read: 'Bảy nhân chín bằng sáu mươi ba' },
-            { t: '7 x 10', a: 70, read: 'Bảy nhân mười bằng bảy mươi' },
-            { t: '7 : 7', a: 1, read: 'Bảy chia bảy bằng một' },
-            { t: '14 : 7', a: 2, read: 'Mười bốn chia bảy bằng hai' },
-            { t: '21 : 7', a: 3, read: 'Hai mươi mốt chia bảy bằng ba' },
-            { t: '28 : 7', a: 4, read: 'Hai mươi tám chia bảy bằng bốn' },
-            { t: '35 : 7', a: 5, read: 'Ba mươi lăm chia bảy bằng năm' },
-            { t: '42 : 7', a: 6, read: 'Bốn mươi hai chia bảy bằng sáu' },
-            { t: '49 : 7', a: 7, read: 'Bốn mươi chín chia bảy bằng bảy' },
-            { t: '56 : 7', a: 8, read: 'Năm mươi sáu chia bảy bằng tám' },
-            { t: '63 : 7', a: 9, read: 'Sáu mươi ba chia bảy bằng chín' },
-            { t: '70 : 7', a: 10, read: 'Bảy mươi chia bảy bằng mười' }
-        ];
-        
-        // Cấu hình màu cho Đĩa bay (UFO)
-        const ufoColors = [
-            { dome: 'rgba(52, 211, 153, 0.4)', base: 'bg-emerald-700', light: 'bg-emerald-300', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.8)]' }, 
-            { dome: 'rgba(251, 113, 133, 0.4)', base: 'bg-rose-700', light: 'bg-rose-300', glow: 'shadow-[0_0_20px_rgba(225,29,72,0.8)]' }, 
-            { dome: 'rgba(192, 132, 252, 0.4)', base: 'bg-purple-700', light: 'bg-purple-300', glow: 'shadow-[0_0_20px_rgba(126,34,206,0.8)]' }, 
-            { dome: 'rgba(250, 204, 21, 0.4)', base: 'bg-amber-700', light: 'bg-amber-300', glow: 'shadow-[0_0_20px_rgba(217,119,6,0.8)]' }, 
-            { dome: 'rgba(45, 212, 191, 0.4)', base: 'bg-cyan-700', light: 'bg-cyan-300', glow: 'shadow-[0_0_20px_rgba(8,145,178,0.8)]' }  
-        ];
-        
-        const alienEmojis = ['👾', '👽', '👁️'];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initAliens();
-            
-            // Xử lý màn hình xoay (Resize)
-            window.addEventListener('resize', () => {
-                if(!isPlaying) {
-                    initAliens();
-                }
-            });
-        });
-
-        function playSound(id) { const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.play().catch(e=>{}); } }
-        function updateScoreBoard() { 
-            document.getElementById('score-display').innerText = score; 
-            document.getElementById('streak-display').innerText = streak; 
-        }
-
-        // =====================================
-        // HỆ THỐNG SINH TỒN (THỜI GIAN & MÁU)
-        // =====================================
-        function updateLivesUI() {
-            const container = document.getElementById('health-bar');
-            container.innerHTML = '';
-            for(let i = 0; i < 3; i++) {
-                let cellClass = i < lives 
-                    ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)] border-rose-300' 
-                    : 'bg-slate-700 border-slate-600';
-                container.innerHTML += `<div class="w-4 h-3 md:w-8 md:h-5 rounded-sm transform skew-x-[-15deg] border-t border-b border-l-2 ${cellClass}"></div>`;
-            }
-        }
-
-        function updateTimerUI() {
-            document.getElementById('timer-text').innerText = timeLeft;
-            const pct = (timeLeft / GAME_TIME) * 100;
-            const bar = document.getElementById('timer-bar');
-            const wrapper = document.getElementById('timer-wrapper');
-            bar.style.width = pct + '%';
-            
-            if (timeLeft <= 5) {
-                bar.className = 'h-full bg-rose-500 transition-all duration-1000 ease-linear shadow-[0_0_10px_rgba(244,63,94,0.8)]';
-                wrapper.classList.remove('border-cyan-500/50', 'shadow-[0_0_15px_rgba(6,182,212,0.4)]');
-                wrapper.classList.add('border-rose-500/80', 'shadow-[0_0_20px_rgba(244,63,94,0.6)]', 'animate-pulse');
-            } else {
-                bar.className = 'h-full bg-cyan-400 transition-all duration-1000 ease-linear';
-                wrapper.classList.remove('border-rose-500/80', 'shadow-[0_0_20px_rgba(244,63,94,0.6)]', 'animate-pulse');
-                wrapper.classList.add('border-cyan-500/50', 'shadow-[0_0_15px_rgba(6,182,212,0.4)]');
-            }
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timeLeft = GAME_TIME;
-            updateTimerUI();
-            
-            timerInterval = setInterval(() => {
-                if(isShooting || !isPlaying) return; 
-                
-                timeLeft--;
-                updateTimerUI();
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    enemyAttack();
-                }
-            }, 1000);
-        }
-
-        function showStartScreen() {
-            const goModal = document.getElementById('game-over-modal');
-            goModal.classList.add('opacity-0');
-            setTimeout(() => { goModal.classList.add('hidden'); }, 300);
-
-            const startScreen = document.getElementById('screen-start');
-            startScreen.classList.remove('hidden');
-            setTimeout(() => { startScreen.classList.remove('opacity-0'); }, 10);
-            
-            isPlaying = false;
-        }
-
-        function startGame() {
-            playSound('snd-pop');
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
-            }
-
-            GAME_TIME = parseInt(document.getElementById('time-select').value) || 30;
-
-            const goModal = document.getElementById('game-over-modal');
-            if (!goModal.classList.contains('hidden')) {
-                goModal.classList.add('opacity-0');
-                document.getElementById('game-over-content').classList.add('scale-95');
-                setTimeout(() => goModal.classList.add('hidden'), 300);
-            }
-
-            score = 0; streak = 0; updateScoreBoard();
-            lives = 3; updateLivesUI();
-            isPlaying = true;
-            isShooting = false;
-            recentQuestions = [];
-
-            const startScreen = document.getElementById('screen-start');
-            startScreen.classList.add('opacity-0');
-            setTimeout(() => {
-                startScreen.classList.add('hidden');
-                
-                const gameBoard = document.getElementById('game-board');
-                gameBoard.classList.remove('bounce-in');
-                void gameBoard.offsetWidth;
-                gameBoard.classList.add('bounce-in');
-
-                initAliens();
-                generateQuestion();
-            }, 300);
-        }
-
-        function gameOver() {
-            isPlaying = false;
-            clearInterval(timerInterval);
-            document.getElementById('final-score').innerText = score;
-            
-            playSound('snd-wrong'); 
-            
-            const modal = document.getElementById('game-over-modal');
-            const content = document.getElementById('game-over-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-            }, 10);
-        }
-
-        function initAliens() {
-            const container = document.getElementById('aliens-container');
-            container.innerHTML = '';
-            
-            let shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 10);
-            
-            const isMobile = window.innerWidth < 768;
-            let basePositions = [];
-
-            if (isMobile) {
-                // Trên Mobile: Phi thuyền ở dưới cùng. Mục tiêu trải đều nửa trên (top: 8% -> 55%)
-                basePositions = [
-                    { top: 8, left: 20 }, { top: 12, left: 50 }, { top: 8, left: 80 },
-                    { top: 22, left: 30 }, { top: 26, left: 70 },
-                    { top: 38, left: 20 }, { top: 40, left: 50 }, { top: 38, left: 80 },
-                    { top: 52, left: 30 }, { top: 55, left: 70 }
-                ];
-            } else {
-                // Trên Desktop: Phi thuyền ở trái. Mục tiêu ở khu vực bên phải (x: 45-90%, y: 15-80%)
-                basePositions = [
-                    { top: 15, left: 50 }, { top: 20, left: 75 }, { top: 15, left: 95 },
-                    { top: 40, left: 60 }, { top: 45, left: 85 },
-                    { top: 65, left: 50 }, { top: 70, left: 75 }, { top: 65, left: 95 },
-                    { top: 85, left: 60 }, { top: 85, left: 85 }
-                ];
-            }
-
-            const shuffledPositions = [...basePositions].sort(() => Math.random() - 0.5);
-
-            shuffledQuestions.forEach((q, index) => {
-                const pos = shuffledPositions[index];
-                
-                let topPercent = pos.top + (Math.random() * 4 - 2); 
-                let leftPercent = pos.left + (Math.random() * 4 - 2);
-                
-                const emoji = alienEmojis[Math.floor(Math.random() * alienEmojis.length)];
-                const color = ufoColors[Math.floor(Math.random() * ufoColors.length)];
-                
-                const wrap = document.createElement('div');
-                wrap.className = `alien-wrapper absolute pointer-events-auto cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-30 transition-transform duration-200`;
-                wrap.style.left = `${leftPercent}%`;
-                wrap.style.top = `${topPercent}%`;
-                
-                wrap.dataset.val = q.a;
-                wrap.dataset.text = q.t;
-                
-                wrap.onclick = function() { checkAnswer(this); };
-
-                let animDelay = Math.random() * 2;
-                let animDur = 2 + Math.random() * 1.5; 
-
-                wrap.innerHTML = `
-                    <div class="relative flex flex-col items-center justify-center ufo-float" style="animation-duration: ${animDur}s; animation-delay: ${animDelay}s;">
-                        
-                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white/40 relative z-10 flex items-end justify-center pb-1.5 md:pb-2 overflow-hidden ${color.glow}" style="background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6), ${color.dome});">
-                            <span class="text-3xl md:text-5xl relative z-10 select-none">${emoji}</span>
-                            <div class="absolute top-1 left-2 w-4 h-2 md:w-5 md:h-3 bg-white/50 rounded-full transform -rotate-45 pointer-events-none"></div>
-                        </div>
-                        
-                        <div class="w-16 h-4 md:w-24 md:h-6 rounded-[50%] ${color.base} -mt-3 md:-mt-4 z-20 flex items-center justify-around px-2 border-b-2 border-black/40 shadow-[0_5px_10px_rgba(0,0,0,0.5)]">
-                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse"></div>
-                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.2s"></div>
-                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.4s"></div>
-                            <div class="w-1 h-1 md:w-2 md:h-2 rounded-full ${color.light} animate-pulse" style="animation-delay: 0.6s"></div>
-                        </div>
-                        
-                        <div class="absolute -bottom-5 md:-bottom-6 z-30 bg-slate-900/95 rounded-lg w-8 h-6 md:w-12 md:h-10 flex items-center justify-center font-black font-mono text-xs md:text-xl border border-cyan-400/50 shadow-[0_0_10px_rgba(34,211,238,0.5)] text-cyan-300">
-                            ${q.a}
-                        </div>
-                    </div>
-                `;
-
-                container.appendChild(wrap);
-            });
-        }
-
-        function generateQuestion() {
-            if (!isPlaying) return;
-
-            const prob = document.getElementById('math-problem');
-            
-            let availableAliens = Array.from(document.querySelectorAll('.alien-wrapper:not(.popped)'));
-            
-            if (availableAliens.length === 0) {
-                initAliens();
-                availableAliens = Array.from(document.querySelectorAll('.alien-wrapper:not(.popped)'));
-                recentQuestions = [];
-                playSound('snd-pop');
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 font-bold">Đợt tấn công mới đã xuất hiện! Cảnh giác! 👇</span>`;
-            } else {
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 text-sm md:text-xl">Nhấp vào đĩa bay mang số <b class="text-cyan-400">đáp án</b> nhé! 👇</span>`;
-            }
-
-            let randomFactor;
-            if (availableAliens.length > 1) {
-                let validAliens = availableAliens.filter(a => !recentQuestions.includes(a.dataset.text));
-                if (validAliens.length > 0) {
-                    let selectedAlien = validAliens[Math.floor(Math.random() * validAliens.length)];
-                    let qText = selectedAlien.dataset.text;
-                    expectedAnswer = parseInt(selectedAlien.dataset.val);
-                    
-                    let qData = allQuestions.find(q => q.t === qText);
-                    expectedReadText = qData.read;
-
-                    recentQuestions.push(qText);
-                    if (recentQuestions.length > 5) recentQuestions.shift();
-
-                    prob.innerText = qText + ' = ?';
-                } else {
-                    let selectedAlien = availableAliens[Math.floor(Math.random() * availableAliens.length)];
-                    let qText = selectedAlien.dataset.text;
-                    expectedAnswer = parseInt(selectedAlien.dataset.val);
-                    
-                    let qData = allQuestions.find(q => q.t === qText);
-                    expectedReadText = qData.read;
-
-                    recentQuestions.push(qText);
-                    if (recentQuestions.length > 5) recentQuestions.shift();
-
-                    prob.innerText = qText + ' = ?';
-                }
-            } else {
-                let selectedAlien = availableAliens[0];
-                let qText = selectedAlien.dataset.text;
-                expectedAnswer = parseInt(selectedAlien.dataset.val);
-                
-                let qData = allQuestions.find(q => q.t === qText);
-                expectedReadText = qData.read;
-
-                prob.innerText = qText + ' = ?';
-            }
-            
-            const sign = prob.parentElement;
-            sign.classList.remove('shake', 'bounce-in');
-            void sign.offsetWidth;
-            sign.classList.add('bounce-in');
-
-            // Bắt đầu đếm ngược cho câu hỏi mới
-            startTimer();
-        }
-
-        function shootLaser(targetElement) {
-            isShooting = true;
-            clearInterval(timerInterval); // Dừng đếm giờ khi bắn
-            playSound('snd-shoot'); 
-            
-            const shipContainer = document.getElementById('spaceship-container');
-            shipContainer.classList.remove('ship-recoil');
-            void shipContainer.offsetWidth;
-            shipContainer.classList.add('ship-recoil');
-
-            const board = document.getElementById('game-board');
-            const boardRect = board.getBoundingClientRect();
-            
-            const startPt = document.getElementById('laser-start-point');
-            const startRect = startPt.getBoundingClientRect();
-            
-            // Tìm tâm thân đĩa bay
-            const targetBody = targetElement.querySelector('.rounded-\\[50\\%\\]'); 
-            const targetRect = targetBody.getBoundingClientRect();
-
-            const startX = (startRect.left + startRect.width/2) - boardRect.left;
-            const startY = (startRect.top + startRect.height/2) - boardRect.top;
-
-            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
-            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
-
-            const laser = document.getElementById('laser-beam');
-            laser.classList.remove('hidden');
-            
-            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
-            
-            // Đặt điểm bắt đầu
-            laser.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle}deg)`;
-
-            const duration = 150; // Laser bay cực nhanh
-            let animationStartTime = null;
-
-            function animateFly(timestamp) {
-                if (!animationStartTime) animationStartTime = timestamp;
-                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
-                
-                let currentX = startX + (targetX - startX) * progress;
-                let currentY = startY + (targetY - startY) * progress;
-                
-                laser.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle}deg)`;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateFly);
-                } else {
-                    // Trúng đích
-                    laser.classList.add('hidden');
-                    
-                    targetElement.style.display = 'none';
-                    targetElement.classList.add('popped');
-                    
-                    playSound('snd-pop'); 
-                    confetti({ particleCount: 70, spread: 90, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#22d3ee', '#818cf8', '#38bdf8', '#f8fafc'] });
-                    
-                    score += 10;
-                    streak++;
-                    updateScoreBoard();
-
-                    let qText = document.getElementById('math-problem').innerText.replace(' = ?', '');
-                    let feedbackText = `Chính xác! ${qText} = ${expectedAnswer} 🎉`;
-                    document.getElementById('feedback-msg').innerHTML = `<span class="text-cyan-400 text-sm md:text-xl font-black">${feedbackText}</span>`;
-                    
-                    setTimeout(() => {
-                        generateQuestion();
-                        isShooting = false;
-                    }, 400);
-                }
-            }
-
-            requestAnimationFrame(animateFly);
-        }
-
-        function enemyAttack() {
-            isShooting = true;
-            playSound('snd-shoot'); // Âm thanh laser địch
-            
-            const shipContainer = document.getElementById('spaceship-container');
-            const board = document.getElementById('game-board');
-            const boardRect = board.getBoundingClientRect();
-            
-            const aliens = Array.from(document.querySelectorAll('.alien-wrapper:not(.popped)'));
-            if (aliens.length === 0) {
-                generateQuestion();
-                isShooting = false;
-                return;
-            }
-            const shooterElement = aliens[Math.floor(Math.random() * aliens.length)];
-            
-            const shooterBody = shooterElement.querySelector('.rounded-\\[50\\%\\]'); 
-            const startRect = shooterBody.getBoundingClientRect();
-            const targetRect = shipContainer.getBoundingClientRect();
-
-            const startX = (startRect.left + startRect.width/2) - boardRect.left;
-            const startY = (startRect.top + startRect.height/2) - boardRect.top;
-
-            const targetX = (targetRect.left + targetRect.width/2) - boardRect.left;
-            const targetY = (targetRect.top + targetRect.height/2) - boardRect.top;
-
-            const laser = document.getElementById('enemy-laser');
-            laser.classList.remove('hidden');
-            
-            const angle = Math.atan2(targetY - startY, targetX - startX) * 180 / Math.PI;
-            
-            laser.style.transform = `translate3d(${startX}px, ${startY}px, 0) translateY(-50%) rotate(${angle}deg)`;
-
-            const duration = 200; 
-            let animationStartTime = null;
-
-            function animateEnemyFly(timestamp) {
-                if (!animationStartTime) animationStartTime = timestamp;
-                let progress = Math.min((timestamp - animationStartTime) / duration, 1);
-                
-                let currentX = startX + (targetX - startX) * progress;
-                let currentY = startY + (targetY - startY) * progress;
-                
-                laser.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translateY(-50%) rotate(${angle}deg)`;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateEnemyFly);
-                } else {
-                    // Kẻ địch bắn trúng phi thuyền
-                    laser.classList.add('hidden');
-                    playSound('snd-wrong'); 
-                    
-                    shipContainer.classList.remove('ship-hit');
-                    void shipContainer.offsetWidth;
-                    shipContainer.classList.add('ship-hit');
-                    
-                    confetti({ particleCount: 40, spread: 80, origin: { x: targetX/boardRect.width, y: targetY/boardRect.height }, zIndex: 100, colors: ['#ef4444', '#f59e0b', '#020617'] });
-                    
-                    lives--;
-                    updateLivesUI();
-                    
-                    streak = 0; updateScoreBoard();
-
-                    if (lives <= 0) {
-                        setTimeout(gameOver, 600);
-                    } else {
-                        document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-500 text-sm md:text-xl font-bold">Hết giờ! Tàu bị trúng đạn! Tải mục tiêu mới... 🛡️</span>`;
-                        setTimeout(() => {
-                            generateQuestion();
-                            isShooting = false;
-                        }, 1500);
-                    }
-                }
-            }
-
-            requestAnimationFrame(animateEnemyFly);
-        }
-
-        async function checkAnswer(targetElement) {
-            if (isShooting || targetElement.classList.contains('popped') || !isPlaying) return;
-
-            let selectedVal = parseInt(targetElement.dataset.val);
-
-            if (selectedVal === expectedAnswer) {
-                shootLaser(targetElement);
-            } else {
-                playSound('snd-wrong');
-                streak = 0;
-                updateScoreBoard();
-
-                const sign = document.getElementById('math-problem').parentElement;
-                sign.classList.remove('bounce-in', 'shake');
-                void sign.offsetWidth;
-                sign.classList.add('shake');
-
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-rose-400 text-sm md:text-xl font-bold">Trượt rồi! Đang phân tích mục tiêu... 🎧</span>`;
-                
-                isShooting = true;
-                clearInterval(timerInterval); // Dừng đồng hồ trong lúc đọc gợi ý
-                
-                let ttsPrompt = "Đáp án đúng là: " + expectedReadText; 
-                
-                await playTTS(ttsPrompt);
-                
-                document.getElementById('feedback-msg').innerHTML = `<span class="text-slate-400 text-sm md:text-xl font-bold">Mục tiêu đã đổi, chuẩn bị khai hỏa! 🔄</span>`;
-
-                setTimeout(() => {
-                    generateQuestion(); 
-                    isShooting = false;
-                }, 300);
-            }
-        }
-
-        // --- FULLSCREEN ---
-        function toggleFullScreen() {
-            const doc = document.documentElement;
-            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
-            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) { 
-                if (req) { try { req.call(doc); } catch(e){} } 
-            } else { 
-                if (ext) ext.call(document); 
-            }
-        }
-    </script>
+    <button onclick="nextQ()" class="mt-4 px-5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-200 btn-press text-sm">Câu khác 🔄</button>
+  </div>
+</div>
+<script>
+var score=0, streak=0, cur=null, topic=0;
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function upd(){ document.getElementById('score').innerText=score; document.getElementById('streak').innerText=streak; }
+function kids(rows){ var s='<div class="mb-2">'; for(var r=0;r<rows;r++){ s+='<div style="font-size:1.5rem;line-height:1.25">'+'🧒'.repeat(7)+'</div>'; } s+='</div>'; return s; }
+function arrowBox(inp, op){
+  return '<div class="flex items-center justify-center gap-2 my-3 flex-wrap">'
+   +'<span style="width:60px;height:60px" class="inline-flex items-center justify-center rounded-full bg-amber-400 text-white font-extrabold text-2xl">'+inp+'</span>'
+   +'<span class="text-slate-500 font-extrabold text-lg">'+op+' →</span>'
+   +'<span style="width:60px;height:60px" class="inline-flex items-center justify-center rounded-xl bg-white border-2 border-amber-400 text-amber-600 font-extrabold text-2xl">?</span>'
+   +'</div>';
+}
+function ball(expr){
+  return '<div style="display:inline-block;position:relative;width:86px;height:86px">'
+   +'<svg width="86" height="86" viewBox="0 0 86 86">'
+   +'<circle cx="43" cy="43" r="40" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>'
+   +'<path d="M43 3 A40 40 0 0 1 83 43 L43 43 Z" fill="#93c5fd"/>'
+   +'<path d="M43 83 A40 40 0 0 1 3 43 L43 43 Z" fill="#86efac"/>'
+   +'<circle cx="43" cy="43" r="40" fill="none" stroke="#f59e0b" stroke-width="2"/>'
+   +'<circle cx="43" cy="43" r="15" fill="#fff" opacity="0.85"/></svg>'
+   +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#1f2937;font-size:0.95rem">'+expr+'</div></div>';
+}
+var TOPICS = [
+ {name:'Khám phá', sec:'Khám phá — Phép nhân 7 là phép cộng các số 7', make:function(){
+   var n=rnd(2,4); var add=[]; for(var i=0;i<n;i++) add.push('7');
+   return {type:'num', q: kids(n)
+     +'<div class="text-slate-600 text-base mb-2">Mỗi đội kéo co có 7 bạn. Có '+n+' đội chơi.</div>'
+     +'<div class="text-xl">'+add.join(' + ')+' = ?</div>'
+     +'<div class="text-slate-500 text-base mt-1">(tức là 7 × '+n+')</div>', ans:7*n, unit:'bạn'};
+ }},
+ {name:'Mũi tên', sec:'Hoạt động 1 — Số?', make:function(){
+   if(Math.random()<0.5){ var k=rnd(2,10); return {type:'num', q: arrowBox(7, '× '+k)+'<div>Số ở ô <b class="text-amber-600">?</b> là bao nhiêu?</div>', ans:7*k}; }
+   var k=rnd(2,10); return {type:'num', q: arrowBox(7*k, ': 7')+'<div>Số ở ô <b class="text-amber-600">?</b> là bao nhiêu?</div>', ans:k};
+ }},
+ {name:'Chọn bóng', sec:'Hoạt động 2 — Chọn phép tính theo điều kiện', make:function(){
+   function mk(){ if(Math.random()<0.5){ var k=rnd(1,10); return {t:'7 × '+k, v:7*k}; } var k=rnd(1,10); return {t:(7*k)+' : 7', v:k}; }
+   var pool=[]; while(pool.length<4){ var e=mk(); if(!pool.some(function(p){return p.v===e.v;})) pool.push(e); }
+   var vals=pool.map(function(p){return p.v;}).slice().sort(function(a,b){return a-b;});
+   var N=vals[1]; var correctVal=vals[0];
+   var order=pool.slice(); shuffle(order);
+   return {type:'mcq', figFn:ball, q:'<div>Quả bóng nào ghi phép tính có <b>kết quả bé hơn '+N+'</b>?</div>', choices:order.map(function(o){return o.t;}), correct:order.findIndex(function(o){return o.v===correctVal;})};
+ }},
+ {name:'Số còn thiếu', sec:'Luyện tập — Nêu các số còn thiếu', make:function(){
+   var up=Math.random()<0.5; var seq=[]; for(var i=1;i<=8;i++) seq.push(7*i); if(!up) seq.reverse();
+   var hi=rnd(1,6); var ans=seq[hi];
+   var chips='<div class="flex flex-wrap justify-center items-center gap-2 mb-3">';
+   for(var i=0;i<seq.length;i++){
+     if(up){ chips+= (i===hi)
+        ? '<span style="width:48px;height:48px" class="inline-flex items-center justify-center rounded-full bg-white border-2 border-amber-400 text-amber-600 font-extrabold text-xl">?</span>'
+        : '<span style="width:48px;height:48px" class="inline-flex items-center justify-center rounded-full bg-amber-400 text-white font-extrabold text-base">'+seq[i]+'</span>';
+     } else { chips+= (i===hi)
+        ? '<span style="width:44px;height:44px;transform:rotate(45deg)" class="inline-flex items-center justify-center bg-white border-2 border-sky-400 text-sky-600 font-extrabold"><span style="transform:rotate(-45deg)">?</span></span>'
+        : '<span style="width:44px;height:44px;transform:rotate(45deg)" class="inline-flex items-center justify-center bg-sky-400 text-white font-extrabold"><span style="transform:rotate(-45deg);font-size:.9rem">'+seq[i]+'</span></span>';
+     }
+   }
+   chips+='</div>';
+   return {type:'num', q: chips+'<div>Dãy số đếm '+(up?'thêm':'bớt')+' 7. Số còn thiếu ở ô <b class="'+(up?'text-amber-600':'text-sky-600')+'">?</b> là bao nhiêu?</div>', ans:ans};
+ }},
+ {name:'Lập bảng', sec:'Khám phá — Hoàn thành bảng nhân 7', make:function(){
+   var k=rnd(2,10);
+   var rows='<div class="text-center text-orange-600 font-extrabold mb-1">Bảng nhân 7</div>';
+   for(var i=1;i<=10;i++){ rows+='<div class="'+(i===k?'bg-amber-200 rounded font-extrabold':'')+'">7 × '+i+' = '+(i===k?'<span class="text-amber-700">?</span>':(7*i))+'</div>'; }
+   var tbl='<div style="display:inline-block;text-align:left"><div style="border:2px solid #fcd34d;border-radius:12px;background:#fff;padding:8px 18px;font-weight:700;line-height:1.5">'+rows+'</div></div>';
+   return {type:'num', q: tbl+'<div class="mt-2">Số còn thiếu ở <b class="text-amber-600">7 × '+k+'</b> là bao nhiêu?</div>', ans:7*k};
+ }},
+ {name:'So sánh', sec:'Luyện tập — So sánh (>, <, =)', make:function(){
+   function mk(){ var r=rnd(1,3); if(r===1){ var k=rnd(1,10); return {t:'7 × '+k, v:7*k}; } if(r===2){ var k=rnd(1,10); return {t:(7*k)+' : 7', v:k}; } var k=rnd(1,10); return {t:k+' × 7', v:7*k}; }
+   var A=mk(), B=mk();
+   if(Math.random()<0.3){ var k=rnd(2,10); A={t:'7 × '+k, v:7*k}; B={t:k+' × 7', v:7*k}; }
+   var correct = A.v>B.v ? '>' : (A.v<B.v ? '<' : '=');
+   return {type:'mcq', q:'<div class="text-2xl font-extrabold text-orange-600 my-2">'+A.t+' &nbsp; ? &nbsp; '+B.t+'</div><div>Điền dấu thích hợp:</div>', choices:['>','<','='], correct:['>','<','='].indexOf(correct)};
+ }},
+ {name:'Giải toán', sec:'Luyện tập — Giải toán', make:function(){
+   var n=rnd(2,9);
+   if(Math.random()<0.5) return {type:'num', q:'<div class="text-5xl mb-2">📅</div>Mỗi tuần lễ có 7 ngày. Bố của Mai đi công tác '+n+' tuần lễ. Hỏi bố của Mai đi công tác bao nhiêu ngày?', ans:7*n, unit:'ngày'};
+   var tot=7*n; return {type:'num', q:'<div class="text-5xl mb-2">🥤</div>Có '+tot+' cái cốc xếp đều vào 7 hộp. Hỏi mỗi hộp có mấy cái cốc?', ans:n, unit:'cái'};
+ }}
+];
+function render(){
+  document.getElementById('secname').innerText = TOPICS[topic].sec || '';
+  document.getElementById('qhtml').innerHTML = cur.q;
+  var area=document.getElementById('answerArea'); area.innerHTML='';
+  document.getElementById('feedback').innerHTML='';
+  if(cur.type==='num'){
+    var box=document.createElement('div'); box.className='flex items-center justify-center gap-2 flex-wrap';
+    var inp=document.createElement('input'); inp.id='ans'; inp.type='number'; inp.setAttribute('inputmode','numeric');
+    inp.className='w-36 text-center text-2xl font-extrabold border-2 border-amber-300 rounded-xl py-2 focus:outline-none focus:border-amber-500';
+    inp.onkeydown=function(e){ if(e.key==='Enter') checkNum(); };
+    box.appendChild(inp);
+    if(cur.unit){ var u=document.createElement('span'); u.className='text-lg text-slate-500 font-semibold'; u.innerText=cur.unit; box.appendChild(u); }
+    area.appendChild(box);
+    var btn=document.createElement('button'); btn.innerHTML='Kiểm tra đáp án ✅';
+    btn.className='mt-4 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full btn-press shadow';
+    btn.onclick=checkNum; area.appendChild(btn);
+    setTimeout(function(){ try{inp.focus();}catch(e){} },40);
+  } else {
+    var grid=document.createElement('div'); grid.className='grid grid-cols-2 gap-3 max-w-lg mx-auto';
+    cur.choices.forEach(function(ch,i){
+      var b=document.createElement('button');
+      b.innerHTML = cur.figFn ? cur.figFn(ch) : ch;
+      b.className='px-2 py-2 bg-white border-2 border-amber-200 rounded-xl font-extrabold text-lg btn-press hover:bg-amber-50 flex items-center justify-center';
+      b.onclick=function(){ checkMCQ(i,b); }; grid.appendChild(b);
+    });
+    area.appendChild(grid);
+  }
+}
+function checkNum(){ var inp=document.getElementById('ans'); if(!inp||inp.value==='') return; if(parseInt(inp.value,10)===cur.ans) good(); else bad('Chưa đúng, bé thử lại nhé! 🤔'); }
+function checkMCQ(i,b){ if(i===cur.correct){ b.classList.add('bg-emerald-100','border-emerald-400'); good(); } else { b.classList.add('bg-rose-100','border-rose-400'); bad('Chưa đúng rồi! 🤔'); } }
+function good(){ score+=10; streak++; upd(); try{ confetti({particleCount:60,spread:70,origin:{y:.6}}); }catch(e){} document.getElementById('feedback').innerHTML='<span class="text-emerald-600">Chính xác! 🎉 (+10 ⭐)</span>'; setTimeout(nextQ, 1100); }
+function bad(msg){ streak=0; upd(); var c=document.getElementById('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); document.getElementById('feedback').innerHTML='<span class="text-rose-500">'+msg+'</span>'; }
+function nextQ(){ cur=TOPICS[topic].make(); render(); var c=document.getElementById('card'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
+function setTopic(i){ topic=i; buildTabs(); nextQ(); }
+function buildTabs(){ var t=document.getElementById('tabs'); t.innerHTML=''; TOPICS.forEach(function(tp,i){ var b=document.createElement('button'); b.innerText=tp.name; b.className='flex-1 basis-1/3 py-2.5 px-2 text-xs md:text-sm font-bold border-b-4 whitespace-nowrap '+(i===topic?'text-orange-700 bg-white border-orange-500':'text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200'); b.onclick=function(){ setTopic(i); }; t.appendChild(b); }); }
+function toggleFull(){ var d=document.documentElement; if(!document.fullscreenElement){ if(d.requestFullscreen) d.requestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } }
+window.addEventListener('DOMContentLoaded', function(){ buildTabs(); nextQ(); });
+</script>
 </body>
 </html>
