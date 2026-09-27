@@ -20,6 +20,7 @@
 
   var score=0, streak=0, topic=0, cur=null;
   var sesCorrect=0, sesMiss=0, finished=false;
+  var tabMaxH=0;  /* khoá chiều cao thẻ theo câu cao nhất của tab (chống nhảy khung) */
 
   function byId(x){ return document.getElementById(x); }
 
@@ -64,7 +65,7 @@
     h+=    '<span class="text-xs font-bold text-emerald-600 whitespace-nowrap"><span id="sesC">0</span>/'+goal+'</span>';
     h+=   '</div>';
     h+=  '</div>';
-    h+=  '<div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-center">';
+    h+=  '<div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-start">';
     h+=   '<div id="secname" class="text-orange-600 font-extrabold text-sm mb-2"></div>';
     h+=   '<div id="card" class="w-full max-w-xl bg-amber-50 border-2 border-amber-100 rounded-2xl p-5 md:p-6 text-center pop">';
     h+=    '<div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>';
@@ -99,7 +100,7 @@
   /* ----- Nút Hiển thị: cỡ chữ + loại thiết bị ----- */
   var SIZES={sm:0.85, md:1, lg:1.2};
   var DEVS={auto:'48rem', phone:'26rem', tablet:'45rem', desktop:'60rem'};
-  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=SIZES[CFG.size]||1; }catch(e){} w.style.maxWidth=DEVS[CFG.device]||'48rem'; }
+  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=SIZES[CFG.size]||1; }catch(e){} w.style.maxWidth=DEVS[CFG.device]||'48rem'; tabMaxH=0; if(cur) lockHeight(); }
   function seg(k,v,label){ var on=CFG[k]===v; return '<button data-k="'+k+'" data-v="'+v+'" class="w-full px-2 py-1.5 rounded-lg text-xs font-bold border btn-press '+(on?'bg-amber-500 text-white border-amber-500':'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')+'">'+label+'</button>'; }
   function buildDispPanel(){
     var sizes=[['sm','Nhỏ'],['md','Vừa'],['lg','Lớn']];
@@ -128,7 +129,7 @@
   function updateHUD(){ byId('score').innerText=score; byId('streak').innerText=streak; }
   function updateProg(){ byId('sesC').innerText=sesCorrect; byId('progbar').style.width=Math.min(100,Math.round(sesCorrect/goal*100))+'%'; }
 
-  function setTopic(i){ topic=i; sesCorrect=0; sesMiss=0; finished=false; hideEnd(); buildTabs(); updateProg(); nextQ(); }
+  function setTopic(i){ topic=i; sesCorrect=0; sesMiss=0; finished=false; tabMaxH=0; hideEnd(); buildTabs(); updateProg(); nextQ(); }
 
   function render(){
     byId('secname').innerText = topics[topic].sec || '';
@@ -146,7 +147,7 @@
       var btn=document.createElement('button'); btn.innerHTML='Kiểm tra đáp án &#9989;';
       btn.className='mt-4 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full btn-press shadow';
       btn.onclick=checkNum; area.appendChild(btn);
-      setTimeout(function(){ try{inp.focus();}catch(e){} },40);
+      setTimeout(function(){ try{inp.focus({preventScroll:true});}catch(e){} },40);
     } else {
       var grid=document.createElement('div'); grid.className='grid grid-cols-2 gap-3 max-w-lg mx-auto';
       cur.choices.forEach(function(ch,i){
@@ -172,7 +173,9 @@
   }
   function bad(msg){ streak=0; sesMiss++; updateHUD(); sBad(); var c=byId('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); byId('feedback').innerHTML='<span class="text-rose-500">'+msg+'</span>'; }
   function milestone(){ if(streak===3||streak===5||streak===10||(streak>10&&streak%10===0)) toast('&#128293; Chuỗi '+streak+'! Giỏi quá!'); }
-  function nextQ(){ if(finished) return; cur=topics[topic].make(); render(); var c=byId('card'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
+  /* Khoá chiều cao thẻ: chỉ tăng, không co lại trong một tab -> khung đứng yên khi làm bài */
+  function lockHeight(){ var c=byId('card'); if(!c) return; c.style.minHeight='0px'; var nat=c.offsetHeight; if(nat>tabMaxH) tabMaxH=nat; c.style.minHeight=tabMaxH+'px'; }
+  function nextQ(){ if(finished) return; cur=topics[topic].make(); render(); lockHeight(); var c=byId('card'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
 
   function finishSession(){
     finished=true;
