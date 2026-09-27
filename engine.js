@@ -247,6 +247,7 @@
 
   var rzT=null;
   function onResize(){ if(!fitOn) return; if(rzT) clearTimeout(rzT); rzT=setTimeout(refit, 150); }
-  function start(){ build(); applyDisplay(); updateHUD(); setTopic(0); window.addEventListener('resize', onResize); document.addEventListener('fullscreenchange', function(){ if(fitOn) refit(); }); }
+  function loadCounter(){ try{ if(document.getElementById('siteCounter')||window.__cnt) return; window.__cnt=1; var s=document.createElement('script'); s.src='counter.js'; s.async=true; document.body.appendChild(s); }catch(e){} }
+  function start(){ build(); applyDisplay(); updateHUD(); setTopic(0); window.addEventListener('resize', onResize); document.addEventListener('fullscreenchange', function(){ if(fitOn) refit(); }); loadCounter(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
