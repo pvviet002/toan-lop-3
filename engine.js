@@ -1,7 +1,8 @@
 /* engine.js — Engine v2 DÙNG CHUNG cho mọi bài luyện Toán tiểu học.
    Đọc biến toàn cục BAI = { n, title, sub, goal, topics:[{name, sec, make, check?}] }
    và dựng TOÀN BỘ giao diện + chấm điểm + game layer (mục tiêu buổi, thanh tiến trình,
-   màn kết thúc chấm sao, mốc streak, âm thanh, lưu tiến trình localStorage).
+   màn kết thúc chấm sao, mốc streak, âm thanh, lưu tiến trình localStorage) + nút
+   Hiển thị (chọn cỡ chữ + loại thiết bị).
    QUY TẮC: nối chuỗi, KHÔNG backtick và KHÔNG template literal (để chèn được editor GitHub). */
 (function(){
   var BAI = window.BAI || { n:0, title:'', topics:[] };
@@ -11,6 +12,9 @@
   function load(k,d){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
   function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
   var CFG = load('toanlop3-cfg', {sound:true});
+  if(CFG.sound===undefined) CFG.sound=true;
+  if(!CFG.size) CFG.size='md';
+  if(!CFG.device) CFG.device='auto';
   var PKEY = 'toanlop3-bai-'+BAI.n;
   var PROG = load(PKEY, {stars:{}});
 
@@ -34,38 +38,51 @@
   /* ----- Dựng khung giao diện ----- */
   function build(){
     var h='';
-    h+='<div class="max-w-3xl mx-auto w-full mb-3 flex justify-between items-center">';
-    h+= '<div class="flex gap-2">';
-    h+=  '<a href="index.html" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#127968; Sảnh chính</a>';
-    h+=  '<button id="btnFull" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128306; Phóng to</button>';
-    h+=  '<button id="btnSound" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
+    h+='<div id="appwrap" class="w-full flex-grow flex flex-col" style="margin:0 auto">';
+    h+= '<div class="w-full mb-3 flex justify-between items-center gap-2">';
+    h+=  '<div class="flex flex-wrap gap-2">';
+    h+=   '<a href="index.html" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#127968; Sảnh chính</a>';
+    h+=   '<button id="btnFull" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128306; Phóng to</button>';
+    h+=   '<button id="btnDisp" title="Hiển thị" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128421;</button>';
+    h+=   '<button id="btnSound" title="Âm thanh" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
+    h+=  '</div>';
+    h+=  '<div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 font-bold shrink-0">';
+    h+=   '<span class="text-amber-500">&#11088; <span id="score">0</span></span>';
+    h+=   '<span class="text-orange-500">&#128293; <span id="streak">0</span></span>';
+    h+=  '</div>';
     h+= '</div>';
-    h+= '<div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 font-bold">';
-    h+=  '<span class="text-amber-500">&#11088; <span id="score">0</span></span>';
-    h+=  '<span class="text-orange-500">&#128293; <span id="streak">0</span></span>';
+    h+= '<div class="w-full bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden flex-grow flex flex-col">';
+    h+=  '<div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 md:p-5 text-center">';
+    h+=   '<h1 class="text-xl md:text-3xl font-extrabold tracking-wide">Bài '+BAI.n+': '+BAI.title+'</h1>';
+    h+=   '<p class="text-amber-100 text-sm md:text-base mt-1">'+(BAI.sub||'Bé chọn một hoạt động rồi luyện tập nhé!')+'</p>';
+    h+=  '</div>';
+    h+=  '<div id="tabs" class="flex flex-wrap bg-slate-100 border-b border-slate-200"></div>';
+    h+=  '<div class="px-4 md:px-6 pt-3">';
+    h+=   '<div class="flex items-center gap-2">';
+    h+=    '<span class="text-xs font-bold text-slate-400 whitespace-nowrap">Mục tiêu</span>';
+    h+=    '<div class="flex-grow h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200"><div id="progbar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-300" style="width:0%"></div></div>';
+    h+=    '<span class="text-xs font-bold text-emerald-600 whitespace-nowrap"><span id="sesC">0</span>/'+goal+'</span>';
+    h+=   '</div>';
+    h+=  '</div>';
+    h+=  '<div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-center">';
+    h+=   '<div id="secname" class="text-orange-600 font-extrabold text-sm mb-2"></div>';
+    h+=   '<div id="card" class="w-full max-w-xl bg-amber-50 border-2 border-amber-100 rounded-2xl p-5 md:p-6 text-center pop">';
+    h+=    '<div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>';
+    h+=    '<div id="answerArea"></div>';
+    h+=    '<div id="feedback" class="mt-3 font-bold" style="min-height:1.6rem"></div>';
+    h+=   '</div>';
+    h+=   '<button id="btnNext" class="mt-4 px-5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-200 btn-press text-sm">Câu khác &#128260;</button>';
+    h+=  '</div>';
     h+= '</div>';
     h+='</div>';
-    h+='<div class="max-w-3xl mx-auto w-full bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden flex-grow flex flex-col">';
-    h+= '<div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 md:p-5 text-center">';
-    h+=  '<h1 class="text-xl md:text-3xl font-extrabold tracking-wide">Bài '+BAI.n+': '+BAI.title+'</h1>';
-    h+=  '<p class="text-amber-100 text-sm md:text-base mt-1">'+(BAI.sub||'Bé chọn một hoạt động rồi luyện tập nhé!')+'</p>';
-    h+= '</div>';
-    h+= '<div id="tabs" class="flex flex-wrap bg-slate-100 border-b border-slate-200"></div>';
-    h+= '<div class="px-4 md:px-6 pt-3">';
-    h+=  '<div class="flex items-center gap-2">';
-    h+=   '<span class="text-xs font-bold text-slate-400 whitespace-nowrap">Mục tiêu</span>';
-    h+=   '<div class="flex-grow h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200"><div id="progbar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-300" style="width:0%"></div></div>';
-    h+=   '<span class="text-xs font-bold text-emerald-600 whitespace-nowrap"><span id="sesC">0</span>/'+goal+'</span>';
-    h+=  '</div>';
-    h+= '</div>';
-    h+= '<div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-center">';
-    h+=  '<div id="secname" class="text-orange-600 font-extrabold text-sm mb-2"></div>';
-    h+=  '<div id="card" class="w-full max-w-xl bg-amber-50 border-2 border-amber-100 rounded-2xl p-5 md:p-6 text-center pop">';
-    h+=   '<div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>';
-    h+=   '<div id="answerArea"></div>';
-    h+=   '<div id="feedback" class="mt-3 font-bold" style="min-height:1.6rem"></div>';
-    h+=  '</div>';
-    h+=  '<button id="btnNext" class="mt-4 px-5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-200 btn-press text-sm">Câu khác &#128260;</button>';
+    h+='<div id="dispPanel" class="hidden fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">';
+    h+= '<div id="dispBackdrop" class="absolute inset-0 bg-slate-900/30"></div>';
+    h+= '<div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 w-72 max-w-full end-in">';
+    h+=  '<div class="flex items-center justify-between mb-3"><span class="font-extrabold text-slate-700">&#128421; Hiển thị</span><button id="dispClose" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2 btn-press">&#10005;</button></div>';
+    h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Cỡ chữ</div>';
+    h+=  '<div id="sizeRow" class="grid grid-cols-3 gap-1 mb-3"></div>';
+    h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Thiết bị</div>';
+    h+=  '<div id="deviceRow" class="grid grid-cols-2 gap-1"></div>';
     h+= '</div>';
     h+='</div>';
     h+='<div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"></div>';
@@ -74,7 +91,26 @@
     byId('btnFull').onclick=toggleFull;
     byId('btnSound').onclick=toggleSound;
     byId('btnNext').onclick=nextQ;
+    byId('btnDisp').onclick=function(){ buildDispPanel(); byId('dispPanel').classList.remove('hidden'); };
+    byId('dispClose').onclick=closeDisp;
+    byId('dispBackdrop').onclick=closeDisp;
   }
+
+  /* ----- Nút Hiển thị: cỡ chữ + loại thiết bị ----- */
+  var SIZES={sm:0.85, md:1, lg:1.2};
+  var DEVS={auto:'48rem', phone:'26rem', tablet:'45rem', desktop:'60rem'};
+  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=SIZES[CFG.size]||1; }catch(e){} w.style.maxWidth=DEVS[CFG.device]||'48rem'; }
+  function seg(k,v,label){ var on=CFG[k]===v; return '<button data-k="'+k+'" data-v="'+v+'" class="w-full px-2 py-1.5 rounded-lg text-xs font-bold border btn-press '+(on?'bg-amber-500 text-white border-amber-500':'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')+'">'+label+'</button>'; }
+  function buildDispPanel(){
+    var sizes=[['sm','Nhỏ'],['md','Vừa'],['lg','Lớn']];
+    var devs=[['auto','Tự động'],['phone','Điện thoại'],['tablet','Máy tính bảng'],['desktop','Máy tính']];
+    byId('sizeRow').innerHTML = sizes.map(function(s){ return seg('size', s[0], s[1]); }).join('');
+    byId('deviceRow').innerHTML = devs.map(function(d){ return seg('device', d[0], d[1]); }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('#dispPanel [data-k]'), function(b){
+      b.onclick=function(){ CFG[b.getAttribute('data-k')]=b.getAttribute('data-v'); save('toanlop3-cfg',CFG); applyDisplay(); buildDispPanel(); };
+    });
+  }
+  function closeDisp(){ byId('dispPanel').classList.add('hidden'); }
 
   function buildTabs(){
     var t=byId('tabs'); t.innerHTML='';
@@ -179,6 +215,6 @@
   function toggleFull(){ var d=document.documentElement; if(!document.fullscreenElement){ if(d.requestFullscreen) d.requestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } }
   function toggleSound(){ CFG.sound=!CFG.sound; save('toanlop3-cfg',CFG); byId('btnSound').innerHTML=CFG.sound?'&#128266;':'&#128263;'; if(CFG.sound) sGood(); }
 
-  function start(){ build(); updateHUD(); setTopic(0); }
+  function start(){ build(); applyDisplay(); updateHUD(); setTopic(0); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
