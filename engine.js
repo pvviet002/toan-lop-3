@@ -21,6 +21,7 @@
   var score=0, streak=0, topic=0, cur=null;
   var sesCorrect=0, sesMiss=0, finished=false;
   var tabMaxH=0;  /* khoá chiều cao thẻ theo câu cao nhất của tab (chống nhảy khung) */
+  var fitOn=false, fitScale=1;  /* Vừa màn hình: co bằng CSS cho lọt một màn hình thiết bị */
 
   function byId(x){ return document.getElementById(x); }
 
@@ -43,7 +44,7 @@
     h+= '<div class="w-full mb-3 flex justify-between items-center gap-2">';
     h+=  '<div class="flex flex-wrap gap-2">';
     h+=   '<a href="index.html" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#127968; Sảnh chính</a>';
-    h+=   '<button id="btnFull" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128306; Phóng to</button>';
+    h+=   '<button id="btnFull" title="Vừa màn hình" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128306; Vừa màn hình</button>';
     h+=   '<button id="btnDisp" title="Hiển thị" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128421;</button>';
     h+=   '<button id="btnSound" title="Âm thanh" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
     h+=  '</div>';
@@ -89,7 +90,7 @@
     h+='<div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"></div>';
     h+='<div id="endscreen" class="hidden fixed inset-0 z-40 bg-slate-900/50 flex items-center justify-center p-4"></div>';
     document.body.innerHTML=h;
-    byId('btnFull').onclick=toggleFull;
+    byId('btnFull').onclick=toggleFit;
     byId('btnSound').onclick=toggleSound;
     byId('btnNext').onclick=nextQ;
     byId('btnDisp').onclick=function(){ buildDispPanel(); byId('dispPanel').classList.remove('hidden'); };
@@ -100,7 +101,20 @@
   /* ----- Nút Hiển thị: cỡ chữ + loại thiết bị ----- */
   var SIZES={sm:0.85, md:1, lg:1.2};
   var DEVS={auto:'48rem', phone:'26rem', tablet:'45rem', desktop:'60rem'};
-  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=SIZES[CFG.size]||1; }catch(e){} w.style.maxWidth=DEVS[CFG.device]||'48rem'; tabMaxH=0; if(cur) lockHeight(); }
+  function applyZoom(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=(SIZES[CFG.size]||1)*(fitOn?fitScale:1); }catch(e){} }
+  /* Vừa màn hình: đo chiều cao cần rồi co để lọt viewport (sàn 0.5 giữ chữ đọc được; dài quá thì cuộn) */
+  function refit(){
+    var w=byId('appwrap'); if(!w || !fitOn){ fitScale=1; applyZoom(); return; }
+    var base=SIZES[CFG.size]||1;
+    try{ w.style.zoom=base; }catch(e){}
+    var top=Math.max(0, Math.round(w.getBoundingClientRect().top));
+    var avail=window.innerHeight - top*2;
+    var need=w.scrollHeight;
+    if(avail<120 || need<=0){ fitScale=1; applyZoom(); return; }  /* viewport chưa sẵn -> không co bậy */
+    fitScale = Math.max(0.5, Math.min(1, avail/need));
+    applyZoom();
+  }
+  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; w.style.maxWidth=DEVS[CFG.device]||'48rem'; tabMaxH=0; if(cur) lockHeight(); if(fitOn) refit(); else applyZoom(); }
   function seg(k,v,label){ var on=CFG[k]===v; return '<button data-k="'+k+'" data-v="'+v+'" class="w-full px-2 py-1.5 rounded-lg text-xs font-bold border btn-press '+(on?'bg-amber-500 text-white border-amber-500':'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')+'">'+label+'</button>'; }
   function buildDispPanel(){
     var sizes=[['sm','Nhỏ'],['md','Vừa'],['lg','Lớn']];
@@ -174,7 +188,7 @@
   function bad(msg){ streak=0; sesMiss++; updateHUD(); sBad(); var c=byId('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); byId('feedback').innerHTML='<span class="text-rose-500">'+msg+'</span>'; }
   function milestone(){ if(streak===3||streak===5||streak===10||(streak>10&&streak%10===0)) toast('&#128293; Chuỗi '+streak+'! Giỏi quá!'); }
   /* Khoá chiều cao thẻ: chỉ tăng, không co lại trong một tab -> khung đứng yên khi làm bài */
-  function lockHeight(){ var c=byId('card'); if(!c) return; c.style.minHeight='0px'; var nat=c.offsetHeight; if(nat>tabMaxH) tabMaxH=nat; c.style.minHeight=tabMaxH+'px'; }
+  function lockHeight(){ var c=byId('card'); if(!c) return; c.style.minHeight='0px'; var nat=c.offsetHeight; var grew=nat>tabMaxH; if(grew) tabMaxH=nat; c.style.minHeight=tabMaxH+'px'; if(fitOn && grew) refit(); }
   function nextQ(){ if(finished) return; cur=topics[topic].make(); render(); lockHeight(); var c=byId('card'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
 
   function finishSession(){
@@ -215,9 +229,24 @@
     toastT=setTimeout(function(){ t.innerHTML=''; }, 1800);
   }
 
-  function toggleFull(){ var d=document.documentElement; if(!document.fullscreenElement){ if(d.requestFullscreen) d.requestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } }
+  function toggleFit(){
+    fitOn=!fitOn;
+    var btn=byId('btnFull');
+    if(fitOn){
+      if(btn){ btn.classList.add('bg-amber-100','border-amber-300','text-amber-700'); btn.classList.remove('bg-white','text-slate-600'); }
+      var d=document.documentElement;
+      if(d.requestFullscreen){ try{ d.requestFullscreen(); }catch(e){} }
+      refit();
+    } else {
+      if(btn){ btn.classList.remove('bg-amber-100','border-amber-300','text-amber-700'); btn.classList.add('bg-white','text-slate-600'); }
+      try{ if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); }catch(e){}
+      fitScale=1; applyZoom();
+    }
+  }
   function toggleSound(){ CFG.sound=!CFG.sound; save('toanlop3-cfg',CFG); byId('btnSound').innerHTML=CFG.sound?'&#128266;':'&#128263;'; if(CFG.sound) sGood(); }
 
-  function start(){ build(); applyDisplay(); updateHUD(); setTopic(0); }
+  var rzT=null;
+  function onResize(){ if(!fitOn) return; if(rzT) clearTimeout(rzT); rzT=setTimeout(refit, 150); }
+  function start(){ build(); applyDisplay(); updateHUD(); setTopic(0); window.addEventListener('resize', onResize); document.addEventListener('fullscreenchange', function(){ if(fitOn) refit(); }); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
