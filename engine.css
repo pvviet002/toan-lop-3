@@ -1,0 +1,13 @@
+/* Engine v2 — style dùng chung cho mọi bài luyện Toán tiểu học */
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #fff7ed; }
+.btn-press:active:not(:disabled){ transform: scale(0.96); }
+.shake { animation: shk .4s; }
+@keyframes shk { 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.pop { animation: pp .3s ease; }
+@keyframes pp { 0%{transform:scale(.85);opacity:.4} 100%{transform:scale(1);opacity:1} }
+.toast-in { animation: tin .4s ease; }
+@keyframes tin { 0%{transform:translateY(-14px) scale(.9);opacity:0} 100%{transform:translateY(0) scale(1);opacity:1} }
+.star-pop { animation: sp .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes sp { 0%{transform:scale(0) rotate(-40deg);opacity:0} 100%{transform:scale(1) rotate(0);opacity:1} }
+.end-in { animation: ein .3s ease; }
+@keyframes ein { 0%{opacity:0} 100%{opacity:1} }
