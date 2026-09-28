@@ -15,6 +15,12 @@
   if(CFG.sound===undefined) CFG.sound=true;
   if(!CFG.size) CFG.size='md';
   if(!CFG.device) CFG.device='auto';
+  if(!CFG.theme) CFG.theme='light';
+  /* Giao diện: Sáng / Tối / Dịu mắt — đặt data-theme trên <html>, màu đổi trong engine.css */
+  var THEMES=[['light','Sáng','&#9728;&#65039;'],['dark','Tối','&#127769;'],['sepia','Dịu mắt','&#128214;']];
+  function themeIdx(){ for(var i=0;i<THEMES.length;i++) if(THEMES[i][0]===CFG.theme) return i; return 0; }
+  function applyTheme(){ try{ document.documentElement.setAttribute('data-theme', CFG.theme); }catch(e){} var b=document.getElementById('btnTheme'); if(b) b.innerHTML=THEMES[themeIdx()][2]; }
+  applyTheme();
   var PKEY = 'toanlop3-bai-'+BAI.n;
   var PROG = load(PKEY, {stars:{}});
 
@@ -42,13 +48,14 @@
     var h='';
     h+='<div id="appwrap" class="w-full flex-grow flex flex-col" style="margin:0 auto">';
     h+= '<div class="w-full mb-3 flex justify-between items-center gap-2">';
-    h+=  '<div class="flex flex-wrap gap-2">';
-    h+=   '<a href="index.html" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#127968; Sảnh chính</a>';
-    h+=   '<button id="btnFull" title="Vừa màn hình" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128306; Vừa màn hình</button>';
-    h+=   '<button id="btnDisp" title="Hiển thị" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128421;</button>';
-    h+=   '<button id="btnSound" title="Âm thanh" class="bg-white text-slate-600 px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
+    h+=  '<div class="flex flex-wrap gap-1.5 sm:gap-2">';
+    h+=   '<a href="index.html" class="bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#127968;<span class="hidden sm:inline"> Sảnh chính</span></a>';
+    h+=   '<button id="btnFull" title="Vừa màn hình" class="bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128306;<span class="hidden sm:inline"> Vừa màn hình</span></button>';
+    h+=   '<button id="btnDisp" title="Hiển thị" class="bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">&#128421;</button>';
+    h+=   '<button id="btnTheme" title="Đổi giao diện (Sáng / Tối / Dịu mắt)" class="bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+THEMES[themeIdx()][2]+'</button>';
+    h+=   '<button id="btnSound" title="Âm thanh" class="bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
     h+=  '</div>';
-    h+=  '<div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 font-bold shrink-0">';
+    h+=  '<div class="bg-white px-3 sm:px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 font-bold shrink-0">';
     h+=   '<span class="text-amber-500">&#11088; <span id="score">0</span></span>';
     h+=   '<span class="text-orange-500">&#128293; <span id="streak">0</span></span>';
     h+=  '</div>';
@@ -81,6 +88,8 @@
     h+= '<div id="dispBackdrop" class="absolute inset-0 bg-slate-900/30"></div>';
     h+= '<div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 w-72 max-w-full end-in">';
     h+=  '<div class="flex items-center justify-between mb-3"><span class="font-extrabold text-slate-700">&#128421; Hiển thị</span><button id="dispClose" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2 btn-press">&#10005;</button></div>';
+    h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Giao diện</div>';
+    h+=  '<div id="themeRow" class="grid grid-cols-3 gap-1 mb-3"></div>';
     h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Cỡ chữ</div>';
     h+=  '<div id="sizeRow" class="grid grid-cols-3 gap-1 mb-3"></div>';
     h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Thiết bị</div>';
@@ -92,6 +101,7 @@
     document.body.innerHTML=h;
     byId('btnFull').onclick=toggleFit;
     byId('btnSound').onclick=toggleSound;
+    byId('btnTheme').onclick=cycleTheme;
     byId('btnNext').onclick=nextQ;
     byId('btnDisp').onclick=function(){ buildDispPanel(); byId('dispPanel').classList.remove('hidden'); };
     byId('dispClose').onclick=closeDisp;
@@ -119,10 +129,11 @@
   function buildDispPanel(){
     var sizes=[['sm','Nhỏ'],['md','Vừa'],['lg','Lớn']];
     var devs=[['auto','Tự động'],['phone','Điện thoại'],['tablet','Máy tính bảng'],['desktop','Máy tính']];
+    byId('themeRow').innerHTML = THEMES.map(function(t){ return seg('theme', t[0], t[2]+' '+t[1]); }).join('');
     byId('sizeRow').innerHTML = sizes.map(function(s){ return seg('size', s[0], s[1]); }).join('');
     byId('deviceRow').innerHTML = devs.map(function(d){ return seg('device', d[0], d[1]); }).join('');
     Array.prototype.forEach.call(document.querySelectorAll('#dispPanel [data-k]'), function(b){
-      b.onclick=function(){ CFG[b.getAttribute('data-k')]=b.getAttribute('data-v'); save('toanlop3-cfg',CFG); applyDisplay(); buildDispPanel(); };
+      b.onclick=function(){ CFG[b.getAttribute('data-k')]=b.getAttribute('data-v'); save('toanlop3-cfg',CFG); applyTheme(); applyDisplay(); buildDispPanel(); };
     });
   }
   function closeDisp(){ byId('dispPanel').classList.add('hidden'); }
@@ -243,6 +254,7 @@
       fitScale=1; applyZoom();
     }
   }
+  function cycleTheme(){ CFG.theme=THEMES[(themeIdx()+1)%THEMES.length][0]; save('toanlop3-cfg',CFG); applyTheme(); toast('Giao diện: '+THEMES[themeIdx()][1]); }
   function toggleSound(){ CFG.sound=!CFG.sound; save('toanlop3-cfg',CFG); byId('btnSound').innerHTML=CFG.sound?'&#128266;':'&#128263;'; if(CFG.sound) sGood(); }
 
   var rzT=null;
