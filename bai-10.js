@@ -12,15 +12,16 @@ function arrowBox(inp, op){
    +'<span style="width:60px;height:60px" class="inline-flex items-center justify-center rounded-xl bg-white border-2 border-amber-400 text-amber-600 font-extrabold text-2xl">?</span>'
    +'</div>';
 }
+/* Quả bóng: múi màu nhạt, phép tính nằm trên nhãn trắng đủ rộng -> chữ đen đọc rõ */
 function ball(expr){
-  return '<div style="display:inline-block;position:relative;width:86px;height:86px">'
-   +'<svg width="86" height="86" viewBox="0 0 86 86">'
-   +'<circle cx="43" cy="43" r="40" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>'
-   +'<path d="M43 3 A40 40 0 0 1 83 43 L43 43 Z" fill="#93c5fd"/>'
-   +'<path d="M43 83 A40 40 0 0 1 3 43 L43 43 Z" fill="#86efac"/>'
-   +'<circle cx="43" cy="43" r="40" fill="none" stroke="#f59e0b" stroke-width="2"/>'
-   +'<circle cx="43" cy="43" r="15" fill="#fff" opacity="0.85"/></svg>'
-   +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#1f2937;font-size:0.95rem">'+expr+'</div></div>';
+  return '<svg width="104" height="104" viewBox="0 0 104 104" style="display:block">'
+   +'<circle cx="52" cy="52" r="48" fill="#fef3c7"/>'
+   +'<path d="M52 4 A48 48 0 0 1 100 52 L52 52 Z" fill="#bfdbfe"/>'
+   +'<path d="M52 100 A48 48 0 0 1 4 52 L52 52 Z" fill="#bbf7d0"/>'
+   +'<circle cx="52" cy="52" r="48" fill="none" stroke="#f59e0b" stroke-width="3"/>'
+   +'<rect x="9" y="37" width="86" height="30" rx="15" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>'
+   +'<text x="52" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#111827" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
+   +'</svg>';
 }
 
 var BAI = {
