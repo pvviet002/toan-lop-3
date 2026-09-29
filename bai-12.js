@@ -1,12 +1,14 @@
-/* bai-12.js — NỘI DUNG Bài 12 (Bảng nhân 9, bảng chia 9), bám SGK trang in 36-38.
-   Chỉ khai báo BAI; khung + chấm điểm + game do engine.js lo. Hình từ figures.js.
-   Mỗi topic có thể kèm check(q) trả về true/false để kiemtra.js xác nhận bất biến.
+/* bai-12.js — NỘI DUNG Bài 12 (Bảng nhân 9, bảng chia 9), bám SGK trang in 36-38. Engine v2, THÍCH ỨNG 3 mức.
+   Chỉ khai báo BAI; khung + chấm điểm + thích ứng do engine.js lo. Hình + bộ sinh câu dùng chung ở figures.js.
    QUY TẮC: nối chuỗi, KHÔNG backtick và KHÔNG template literal. */
 
-/* Các phép tính và giá trị (dùng cho tab Cùng kết quả) */
-var MAP={'9 × 1':9,'9 × 2':18,'9 × 3':27,'9 × 4':36,'9 × 5':45,'9 × 6':54,
- '45 : 9':5,'54 : 9':6,'18 : 9':2,'27 : 9':3,'90 : 9':10,'81 : 9':9,
- '2 × 3':6,'3 × 6':18,'18 : 2':9,'20 : 4':5,'4 × 5':20,'6 × 6':36,'2 × 5':10,'5 × 5':25};
+/* Phép tính (bảng 2–5) có kết quả bằng v — cho dạng "Cùng kết quả" (như SGK: 45 : 9 và 20 : 4) */
+function btBang25(v){
+  var o=[];
+  for(var x=2;x<=5;x++){ if(v%x===0 && v/x<=10 && v/x>=1) o.push(x+' × '+(v/x)); if(v*x<=50) o.push((v*x)+' : '+x); }
+  return o;
+}
+function kiemCung(q){ var n=q.choices.filter(function(c){ return tinhBT(c)===q._v; }).length; return n===1 && tinhBT(q.choices[q.correct])===q._v && tinhBT(q._target)===q._v; }
 
 var BAI = {
  n: 12,
@@ -14,98 +16,83 @@ var BAI = {
  sub: 'Bé chọn một hoạt động rồi luyện tập nhé!',
  goal: 10,
  topics: [
-  {name:'Khám phá', sec:'Khám phá — Phép nhân 9 từ phép cộng', make:function(){
-    var n=rnd(2,4); var dr=''; for(var i=0;i<n;i++) dr+=dragon();
-    var add=[]; for(var i=0;i<n;i++) add.push('9');
-    return {type:'num', _n:n, q:'<div class="flex justify-center gap-1 mb-2 flex-wrap">'+dr+'</div>'
+  {name:'Khám phá', sec:'Khám phá — Phép nhân 9 từ phép cộng', levels:3,
+   muc:['Đếm số người của 2–3 đội múa rồng bằng phép cộng các số 9.', 'Cộng nhiều số 9 (4 đội) mà không cần gợi ý phép nhân.', 'Làm ngược lại: biết tổng số người, tìm số đội múa rồng.'],
+   make:function(lv){
+    if(lv>=3){ var m=rnd(3,9);
+      return {type:'num', _n:m, _nguoc:true, q:'<div class="flex justify-center mb-2">'+dragon()+'</div><div>Mỗi đội múa rồng có 9 người. Có tất cả '+(9*m)+' người múa rồng.</div><div class="mt-1">Hỏi có mấy đội múa rồng?</div>', ans:m, unit:'đội'}; }
+    var n = lv<=1 ? rnd(2,3) : 4, dr='', add=[];
+    for(var i=0;i<n;i++){ dr+=dragon(); add.push('9'); }
+    return {type:'num', _n:n, _nguoc:false, q:'<div class="flex justify-center gap-1 mb-2 flex-wrap">'+dr+'</div>'
       +'<div class="text-slate-600 text-base mb-2">Mỗi đội múa rồng có 9 người. Có '+n+' đội múa rồng như thế.</div>'
       +'<div class="text-xl">'+add.join(' + ')+' = ?</div>'
-      +'<div class="text-slate-500 text-base mt-1">(tức là 9 × '+n+')</div>', ans:9*n, unit:'người'};
-  }, check:function(q){ return q.ans===9*q._n; }},
+      +(lv<=1 ? '<div class="text-slate-500 text-base mt-1">(tức là 9 × '+n+')</div>' : ''), ans:9*n, unit:'người'};
+  }, check:function(q){ return q._nguoc ? q.ans===q._n : q.ans===9*q._n; }},
 
-  {name:'Lập bảng', sec:'Khám phá — Hoàn thành bảng nhân 9, bảng chia 9', make:function(){
-    var k=rnd(2,10);
-    if(Math.random()<0.5){
-      var rows='<div class="text-center text-orange-600 font-extrabold mb-1">Bảng nhân 9</div>';
-      for(var i=1;i<=10;i++){ rows+='<div class="'+(i===k?'bg-amber-200 rounded font-extrabold':'')+'">9 × '+i+' = '+(i===k?'<span class="text-amber-700">?</span>':(9*i))+'</div>'; }
-      var tbl='<div style="display:inline-block;text-align:left"><div style="border:2px solid #fcd34d;border-radius:12px;background:#fff;padding:8px 18px;font-weight:700;line-height:1.5">'+rows+'</div></div>';
-      return {type:'num', _k:k, _div:false, q: tbl+'<div class="mt-2">Số còn thiếu ở <b class="text-amber-600">9 × '+k+'</b> là bao nhiêu?</div>', ans:9*k};
-    } else {
-      var rows2='<div class="text-center text-sky-600 font-extrabold mb-1">Bảng chia 9</div>';
-      for(var i=1;i<=10;i++){ rows2+='<div class="'+(i===k?'bg-sky-100 rounded font-extrabold':'')+'">'+(9*i)+' : 9 = '+(i===k?'<span class="text-sky-700">?</span>':i)+'</div>'; }
-      var tbl2='<div style="display:inline-block;text-align:left"><div style="border:2px solid #7dd3fc;border-radius:12px;background:#fff;padding:8px 18px;font-weight:700;line-height:1.5">'+rows2+'</div></div>';
-      return {type:'num', _k:k, _div:true, q: tbl2+'<div class="mt-2">Số còn thiếu ở <b class="text-sky-600">'+(9*k)+' : 9</b> là bao nhiêu?</div>', ans:k};
-    }
-  }, check:function(q){ return q._div ? q.ans===q._k : q.ans===9*q._k; }},
+  {name:'Lập bảng', sec:'Khám phá — Hoàn thành bảng nhân 9, bảng chia 9', levels:3,
+   muc:['Điền các dòng đầu của bảng nhân 9.', 'Điền các dòng cuối của bảng nhân 9 hoặc bảng chia 9.', 'Điền khi các dòng bên cạnh cũng bị che — phải nhớ, không đếm thêm.'],
+   make:function(lv){ return bnBang(9, lv, true); }, check:bnKiemBang},
 
-  {name:'Tính nhẩm', sec:'Hoạt động 1 — Tính nhẩm', make:function(){
-    var r=Math.random();
-    if(r<0.55){ var k=rnd(0,10); return {type:'num', ans:9*k, q:'<div class="text-slate-500 mb-1">Tính nhẩm</div><div class="text-4xl font-extrabold text-orange-600">9 × '+k+' = ?</div>'}; }
-    if(r<0.8){ var k=rnd(0,10); return {type:'num', ans:9*k, q:'<div class="text-slate-500 mb-1">Tính nhẩm</div><div class="text-4xl font-extrabold text-orange-600">'+k+' × 9 = ?</div>'}; }
-    var k=rnd(2,10); return {type:'num', ans:k, q:'<div class="text-slate-500 mb-1">Tính nhẩm</div><div class="text-4xl font-extrabold text-sky-600">'+(9*k)+' : 9 = ?</div>'};
-  }, check:function(q){ return Number.isInteger(q.ans) && q.ans>=0; }},
+  {name:'Tính nhẩm', sec:'Hoạt động 1 — Tính nhẩm', levels:3,
+   muc:['Nhớ 9 × 1 đến 9 × 5.', 'Nhớ cả bảng nhân 9 và bảng chia 9, đổi chỗ các thừa số.', 'Tìm số chưa biết trong phép nhân, phép chia với 9.'],
+   make:function(lv){ return bnTinh(9, lv); }, check:bnKiemTinh},
 
-  {name:'Cùng kết quả', sec:'Hoạt động 2 — Hai phép tính cùng kết quả', make:function(){
-    var groups=[
-      {v:9, ex:['9 × 1','81 : 9','18 : 2']},
-      {v:18, ex:['9 × 2','3 × 6']},
-      {v:5, ex:['45 : 9','20 : 4']},
-      {v:6, ex:['54 : 9','2 × 3']},
-      {v:36, ex:['9 × 4','6 × 6']},
-      {v:10, ex:['90 : 9','2 × 5']}
-    ];
-    var g=pick(groups);
-    var ex=shuffle(g.ex.slice()); var target=ex[0], partner=ex[1];
-    var keys=Object.keys(MAP).filter(function(k){ return MAP[k]!==g.v && k!==target && k!==partner; });
-    shuffle(keys);
-    var ds=[], usedVals=[g.v]; var gi=0;
-    while(ds.length<2 && gi<keys.length){ var kk=keys[gi++]; if(usedVals.indexOf(MAP[kk])<0){ ds.push(kk); usedVals.push(MAP[kk]); } }
-    var choices=shuffle([partner].concat(ds));
-    return {type:'mcq', figFn:melon, _target:target, _v:g.v,
-      q:'<div class="mb-1">Phép tính nào có cùng kết quả với</div><div class="flex justify-center my-2">'+melon(target)+'</div>',
-      choices:choices, correct:choices.indexOf(partner)};
-  }, check:function(q){ var same=q.choices.filter(function(c){ return MAP[c]===q._v; }); return same.length===1 && MAP[q.choices[q.correct]]===q._v && MAP[q._target]===q._v; }},
+  {name:'Cùng kết quả', sec:'Hoạt động 2 — Hai phép tính cùng kết quả', levels:3,
+   muc:['Nhận ra đổi chỗ hai thừa số thì kết quả không đổi (9 × 4 = 4 × 9).',
+        'Tìm phép tính ở bảng khác có cùng kết quả (45 : 9 = 20 : 4).',
+        'Hiểu cấu tạo bảng nhân: 9 × 5 = 9 × 4 + 9.'],
+   make:function(lv){
+    var target, V, dung, ds=[], them=function(t){ var v=tinhBT(t); if(v!==V && v>0 && ds.every(function(x){ return tinhBT(x)!==v; })) ds.push(t); };
+    if(lv<=1){ var a=rnd(2,9); target='9 × '+a; V=9*a; dung=a+' × 9'; them('9 × '+(a>3?a-2:a+2)); them('9 × '+(a>4?a-3:a+3)); them((a>5?a-4:a+4)+' × 9'); }
+    else if(lv===2){ var a2=rnd(2,10); target=(9*a2)+' : 9'; V=a2; dung=pick(btBang25(a2));
+      [a2-1,a2+1,a2+2,a2-2,a2+3].forEach(function(w){ if(w>=1){ var o=btBang25(w); if(o.length) them(pick(o)); } }); }
+    else { var a3=rnd(3,9); target='9 × '+a3; V=9*a3; dung='9 × '+(a3-1)+' + 9'; them('9 × '+(a3-1)+' + 1'); them('9 × '+(a3+1)+' + 9'); them('9 × '+a3+' + 9'); them('8 × '+a3+' + 9'); }
+    shuffle(ds); var ch=[dung].concat(ds.slice(0, lv<=1?2:3)); shuffle(ch);
+    return {type:'mcq', figFn:melon, _target:target, _v:V,
+      q:'<div class="mb-1">Phép tính nào có cùng kết quả với</div><div class="flex justify-center my-2">'+melon(target)+'</div>', choices:ch, correct:ch.indexOf(dung)};
+  }, check:kiemCung},
 
-  {name:'Số còn thiếu', sec:'Luyện tập — Nêu các số còn thiếu', make:function(){
-    var up=Math.random()<0.5; var seq=[]; for(var i=1;i<=9;i++) seq.push(9*i); if(!up) seq.reverse();
-    var hi=rnd(1,7); var ans=seq[hi];
-    var chips='<div class="flex flex-wrap justify-center items-center gap-2 mb-3">';
-    for(var i=0;i<seq.length;i++){
-      if(up){ chips+= (i===hi)
-         ? '<span style="width:46px;height:46px" class="inline-flex items-center justify-center rounded-lg bg-white border-2 border-emerald-400 text-emerald-600 font-extrabold text-xl">?</span>'
-         : '<span style="width:46px;height:46px" class="inline-flex items-center justify-center rounded-lg bg-emerald-400 text-white font-extrabold text-base">'+seq[i]+'</span>';
-      } else { chips+= (i===hi)
-         ? '<span style="width:46px;height:46px" class="inline-flex items-center justify-center rounded-md bg-white border-2 border-amber-400 text-amber-600 font-extrabold text-xl">?</span>'
-         : '<span style="width:46px;height:46px" class="inline-flex items-center justify-center rounded-md bg-amber-400 text-white font-extrabold text-base">'+seq[i]+'</span>';
-      }
-    }
-    chips+='</div>';
-    return {type:'num', _hi:hi, _seq:seq, q: chips+'<div>Dãy số đếm '+(up?'thêm':'bớt')+' 9. Số còn thiếu ở ô <b class="'+(up?'text-emerald-600':'text-amber-600')+'">?</b> là bao nhiêu?</div>', ans:ans};
-  }, check:function(q){ return q.ans===q._seq[q._hi] && q.ans%9===0; }},
+  {name:'Số còn thiếu', sec:'Luyện tập — Nêu các số còn thiếu', levels:3,
+   muc:['Đếm thêm 9 từ 9, tìm số ở đầu dãy.', 'Đếm thêm hoặc bớt 9, tìm số ở giữa dãy.', 'Dãy không bắt đầu từ 9 và ô bên cạnh bị che — dùng bước đếm 9.'],
+   make:function(lv){ return bnDaySo(9, lv, 'vuong', 'tron'); }, check:bnKiemDay},
 
-  {name:'Sơ đồ', sec:'Luyện tập — Số?', make:function(){
-    var p=rnd(2,6); var mid=9*p;
-    var divs=[]; for(var q=2;q<=9;q++){ if(mid%q===0) divs.push(q); }
+  {name:'Sơ đồ', sec:'Luyện tập — Số?', levels:3,
+   muc:['Nhân 9 với 2 hoặc 3 rồi chia cho 3 hoặc 9.', 'Nhân 9 rồi chia cho một số trong bảng chia đã học.', 'Số lớn hơn: nhân 9 với số tới 10 rồi chia cho 4, 5, 6, 8.'],
+   make:function(lv){
+    var p = lv<=1 ? rnd(2,3) : (lv===2 ? rnd(2,6) : rnd(4,10)), mid=9*p, divs=[];
+    for(var q2=2;q2<=9;q2++){ if(mid%q2!==0 || mid/q2>10 && lv<3) continue; if(lv<=1 && [3,9].indexOf(q2)<0) continue; if(lv>=3 && (q2===9 || q2<4)) continue; divs.push(q2); }
+    if(!divs.length) divs=[9];
     var qd=pick(divs);
     return {type:'num', _mid:mid, _qd:qd, q: arrow2(9, '× '+p, ': '+qd)+'<div>Số ở ô cuối cùng là bao nhiêu?</div>', ans: mid/qd};
-  }, check:function(q){ return q._mid%q._qd===0 && q.ans===q._mid/q._qd && Number.isInteger(q.ans); }},
+  }, check:function(q){ return q._mid%q._qd===0 && q.ans===q._mid/q._qd; }},
 
-  {name:'So với 10', sec:'Luyện tập — Kết quả lớn hơn hay bé hơn 10?', make:function(){
-    var pool=['9 × 2','9 × 3','9 × 4','9 × 5','9 × 6','9 × 1','54 : 9','45 : 9','18 : 9','27 : 9','81 : 9','36 : 9','63 : 9','90 : 9','9 × 9','9 × 8'];
-    var e=pick(pool); var v; var parts;
-    if(e.indexOf('×')>=0){ parts=e.split(' × '); v=parseInt(parts[0],10)*parseInt(parts[1],10); }
-    else { parts=e.split(' : '); v=parseInt(parts[0],10)/parseInt(parts[1],10); }
-    var correct = v>10 ? 0 : (v<10 ? 1 : 2);
-    return {type:'mcq', _v:v,
+  {name:'So với 10', sec:'Luyện tập — Kết quả lớn hơn hay bé hơn 10?', levels:3,
+   muc:['So kết quả với 10 khi kết quả khác xa 10.', 'So kết quả với 10 khi kết quả rất gần 10 (9, 10, 11…).', 'So kết quả phép tính hai bước với 10.'],
+   make:function(lv){
+    var e;
+    if(lv<=1) e=pick(['9 × 3','9 × 4','9 × 5','9 × 6','9 × 8','9 × 9','18 : 9','27 : 9','36 : 9','45 : 9']);
+    else if(lv===2) e=pick(['9 × 1','9 × 2','90 : 9','90 : 9','81 : 9','63 : 9','72 : 9','54 : 9']);
+    else e=pick(['9 × 2 − 9','9 × 2 − 7','81 : 9 + 1','81 : 9 + 2','72 : 9 + 2','90 : 9 − 1','9 × 3 − 18','63 : 9 + 3','45 : 9 + 6','36 : 9 + 5']);
+    var v=tinhBT(e), correct = v>10 ? 0 : (v<10 ? 1 : 2);
+    return {type:'mcq', _e:e,
       q:'<div class="mb-1">Kết quả của phép tính trên bông hoa so với <b>10</b> thế nào?</div><div class="flex justify-center my-2">'+flower(e)+'</div>',
       choices:['Lớn hơn 10','Bé hơn 10','Bằng 10'], correct:correct};
-  }, check:function(q){ var exp=q._v>10?0:(q._v<10?1:2); return exp===q.correct; }},
+  }, check:function(q){ var v=tinhBT(q._e); return q.correct===(v>10?0:(v<10?1:2)) && Number.isInteger(v); }},
 
-  {name:'Giải toán', sec:'Luyện tập — Giải toán', make:function(){
-    var r=Math.random(); var n=rnd(2,9);
-    if(r<0.34) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
-    if(r<0.68) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#127823;</div>Mỗi túi có 9 quả cam. Hỏi '+n+' túi như thế có bao nhiêu quả cam?', ans:9*n, unit:'quả'};
-    return {type:'num', _e:n, q:'<div class="text-5xl mb-2">&#129706;</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi mỗi can có bao nhiêu lít nước mắm?', ans:n, unit:'lít'};
-  }, check:function(q){ return q.ans===q._e && Number.isInteger(q.ans) && q.ans>0; }}
+  {name:'Giải toán', sec:'Luyện tập — Giải toán', levels:3,
+   muc:['Bài toán một phép nhân với số nhỏ.', 'Bài toán một phép nhân hoặc phép chia với 9.', 'Bài toán hai bước (nhân rồi trừ, chia rồi nhân).'],
+   make:function(lv){
+    var r=Math.random(), n = lv<=1 ? rnd(2,5) : rnd(2,9);
+    if(lv<=1) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
+    if(lv===2){
+      if(r<0.34) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
+      if(r<0.68) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#127818;</div>Mỗi túi có 9 quả cam. Hỏi '+n+' túi như thế có bao nhiêu quả cam?', ans:9*n, unit:'quả'};
+      return {type:'num', _e:n, q:'<div class="text-5xl mb-2">&#129371;</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi mỗi can có bao nhiêu lít nước mắm?', ans:n, unit:'lít'};
+    }
+    if(r<0.5){ var m=rnd(2,9*n-2);
+      return {type:'num', _e:9*n-m, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Có '+n+' thuyền cập bến, đã có '+m+' người lên bờ. Hỏi còn bao nhiêu người trên thuyền?', ans:9*n-m, unit:'người'}; }
+    var h=rnd(2,5);
+    return {type:'num', _e:n*h, q:'<div class="text-5xl mb-2">&#129371;</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi '+h+' can như thế có bao nhiêu lít nước mắm?', ans:n*h, unit:'lít'};
+  }, check:function(q){ return q.ans===q._e && q.ans>0; }}
  ]
 };
