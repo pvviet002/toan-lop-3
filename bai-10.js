@@ -14,7 +14,7 @@ function arrowBox(inp, op){
 }
 /* Quả bóng: múi màu nhạt, phép tính nằm trên nhãn trắng đủ rộng -> chữ đen đọc rõ */
 function ball(expr){
-  return '<svg width="104" height="104" viewBox="0 0 104 104" style="display:block">'
+  return '<svg width="104" height="104" viewBox="0 0 104 104" style="max-width:100%;height:auto;display:block">'
    +'<circle cx="52" cy="52" r="48" fill="#fef3c7"/>'
    +'<path d="M52 4 A48 48 0 0 1 100 52 L52 52 Z" fill="#bfdbfe"/>'
    +'<path d="M52 100 A48 48 0 0 1 4 52 L52 52 Z" fill="#bbf7d0"/>'

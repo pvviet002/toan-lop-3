@@ -56,25 +56,25 @@
     h+=   '<button id="btnSound" title="Âm thanh" class="bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
     h+=  '</div>';
     h+=  '<div class="bg-white px-3 sm:px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 font-bold shrink-0">';
-    h+=   '<span class="text-amber-500">&#11088; <span id="score">0</span></span>';
-    h+=   '<span class="text-orange-500">&#128293; <span id="streak">0</span></span>';
+    h+=   '<span class="text-amber-700">&#11088; <span id="score">0</span></span>';
+    h+=   '<span class="text-orange-700">&#128293; <span id="streak">0</span></span>';
     h+=  '</div>';
     h+= '</div>';
     h+= '<div class="w-full bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden flex-grow flex flex-col">';
-    h+=  '<div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 md:p-5 text-center">';
+    h+=  '<div class="bg-gradient-to-r from-amber-600 to-orange-700 text-white p-4 md:p-5 text-center">';
     h+=   '<h1 class="text-xl md:text-3xl font-extrabold tracking-wide">Bài '+BAI.n+': '+BAI.title+'</h1>';
-    h+=   '<p class="text-amber-100 text-sm md:text-base mt-1">'+(BAI.sub||'Bé chọn một hoạt động rồi luyện tập nhé!')+'</p>';
+    h+=   '<p class="text-white font-medium text-sm md:text-base mt-1">'+(BAI.sub||'Bé chọn một hoạt động rồi luyện tập nhé!')+'</p>';
     h+=  '</div>';
     h+=  '<div id="tabs" class="flex flex-wrap bg-slate-100 border-b border-slate-200"></div>';
     h+=  '<div class="px-4 md:px-6 pt-3">';
     h+=   '<div class="flex items-center gap-2">';
-    h+=    '<span class="text-xs font-bold text-slate-400 whitespace-nowrap">Mục tiêu</span>';
+    h+=    '<span class="text-xs font-bold text-slate-500 whitespace-nowrap">Mục tiêu</span>';
     h+=    '<div class="flex-grow h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200"><div id="progbar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-300" style="width:0%"></div></div>';
-    h+=    '<span class="text-xs font-bold text-emerald-600 whitespace-nowrap"><span id="sesC">0</span>/'+goal+'</span>';
+    h+=    '<span class="text-xs font-bold text-emerald-700 whitespace-nowrap"><span id="sesC">0</span>/'+goal+'</span>';
     h+=   '</div>';
     h+=  '</div>';
     h+=  '<div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-start">';
-    h+=   '<div id="secname" class="text-orange-600 font-extrabold text-sm mb-2"></div>';
+    h+=   '<div id="secname" class="text-orange-700 font-extrabold text-sm mb-2"></div>';
     h+=   '<div id="card" class="w-full max-w-xl bg-amber-50 border-2 border-amber-100 rounded-2xl p-5 md:p-6 text-center pop">';
     h+=    '<div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>';
     h+=    '<div id="answerArea"></div>';
@@ -88,11 +88,11 @@
     h+= '<div id="dispBackdrop" class="absolute inset-0 bg-slate-900/30"></div>';
     h+= '<div class="relative bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 w-72 max-w-full end-in">';
     h+=  '<div class="flex items-center justify-between mb-3"><span class="font-extrabold text-slate-700">&#128421; Hiển thị</span><button id="dispClose" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2 btn-press">&#10005;</button></div>';
-    h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Giao diện</div>';
+    h+=  '<div class="text-xs font-bold text-slate-500 mb-1">Giao diện</div>';
     h+=  '<div id="themeRow" class="grid grid-cols-3 gap-1 mb-3"></div>';
-    h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Cỡ chữ</div>';
+    h+=  '<div class="text-xs font-bold text-slate-500 mb-1">Cỡ chữ</div>';
     h+=  '<div id="sizeRow" class="grid grid-cols-3 gap-1 mb-3"></div>';
-    h+=  '<div class="text-xs font-bold text-slate-400 mb-1">Thiết bị</div>';
+    h+=  '<div class="text-xs font-bold text-slate-500 mb-1">Thiết bị</div>';
     h+=  '<div id="deviceRow" class="grid grid-cols-2 gap-1"></div>';
     h+= '</div>';
     h+='</div>';
@@ -125,7 +125,7 @@
     applyZoom();
   }
   function applyDisplay(){ var w=byId('appwrap'); if(!w) return; w.style.maxWidth=DEVS[CFG.device]||'48rem'; tabMaxH=0; if(cur) lockHeight(); if(fitOn) refit(); else applyZoom(); }
-  function seg(k,v,label){ var on=CFG[k]===v; return '<button data-k="'+k+'" data-v="'+v+'" class="w-full px-2 py-1.5 rounded-lg text-xs font-bold border btn-press '+(on?'bg-amber-500 text-white border-amber-500':'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')+'">'+label+'</button>'; }
+  function seg(k,v,label){ var on=CFG[k]===v; return '<button data-k="'+k+'" data-v="'+v+'" class="w-full px-2 py-1.5 rounded-lg text-xs font-bold border btn-press '+(on?'bg-amber-500 text-amber-950 border-amber-500':'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')+'">'+label+'</button>'; }
   function buildDispPanel(){
     var sizes=[['sm','Nhỏ'],['md','Vừa'],['lg','Lớn']];
     var devs=[['auto','Tự động'],['phone','Điện thoại'],['tablet','Máy tính bảng'],['desktop','Máy tính']];
@@ -145,7 +145,7 @@
       var badge = st>0 ? '<span class="ml-1 text-amber-400 text-[10px]">'+ new Array(st+1).join('★') +'</span>' : '';
       var b=document.createElement('button');
       b.innerHTML=tp.name+badge;
-      b.className='flex-1 basis-1/3 py-2.5 px-2 text-xs md:text-sm font-bold border-b-4 whitespace-nowrap '+(i===topic?'text-orange-700 bg-white border-orange-500':'text-slate-400 bg-slate-100 border-transparent hover:bg-slate-200');
+      b.className='flex-1 basis-1/3 py-2.5 px-2 text-xs md:text-sm font-bold border-b-4 whitespace-nowrap '+(i===topic?'text-orange-700 bg-white border-orange-500':'text-slate-600 bg-slate-100 border-transparent hover:bg-slate-200');
       b.onclick=function(){ setTopic(i); };
       t.appendChild(b);
     });
@@ -170,7 +170,7 @@
       if(cur.unit){ var u=document.createElement('span'); u.className='text-lg text-slate-500 font-semibold'; u.innerText=cur.unit; box.appendChild(u); }
       area.appendChild(box);
       var btn=document.createElement('button'); btn.innerHTML='Kiểm tra đáp án &#9989;';
-      btn.className='mt-4 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full btn-press shadow';
+      btn.className='mt-4 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold rounded-full btn-press shadow';
       btn.onclick=checkNum; area.appendChild(btn);
       setTimeout(function(){ try{inp.focus({preventScroll:true});}catch(e){} },40);
     } else {
@@ -217,12 +217,12 @@
     var praise = st>=3 ? 'Tuyệt vời!' : (st>=2 ? 'Làm tốt lắm!' : 'Hoàn thành rồi!');
     var e=byId('endscreen');
     var h='<div class="bg-white rounded-3xl shadow-2xl border-2 border-amber-200 max-w-sm w-full p-6 text-center end-in">';
-    h+='<div class="text-lg font-extrabold text-orange-600 mb-1">'+topics[topic].name+'</div>';
+    h+='<div class="text-lg font-extrabold text-orange-700 mb-1">'+topics[topic].name+'</div>';
     h+='<div class="mb-2">'+starRow(st,true)+'</div>';
     h+='<div class="text-2xl font-extrabold text-slate-700 mb-1">'+praise+'</div>';
     h+='<div class="text-slate-500 text-sm mb-5">Bé làm đúng '+goal+' câu'+(sesMiss>0?(', sai '+sesMiss+' lần'):' liền một mạch'+'')+'.</div>';
     h+='<div class="flex flex-col gap-2">';
-    h+='<button id="btnAgain" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full btn-press shadow">Chơi lại &#128260;</button>';
+    h+='<button id="btnAgain" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold rounded-full btn-press shadow">Chơi lại &#128260;</button>';
     h+='<button id="btnOther" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl border border-slate-200 btn-press">Chọn hoạt động khác</button>';
     h+='<a href="index.html" class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-500 font-bold rounded-xl border border-slate-200 btn-press">&#127968; Về sảnh chính</a>';
     h+='</div></div>';

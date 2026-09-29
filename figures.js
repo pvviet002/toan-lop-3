@@ -20,17 +20,15 @@ function ladybug(){
    +'<circle cx="42" cy="80" r="5" fill="#1f2937"/><circle cx="58" cy="80" r="5" fill="#1f2937"/>'
    +'</svg>';
 }
-/* ---- Xe tải chở một phép tính ---- */
+/* ---- Xe tải chở một phép tính (SVG thuần: chữ nằm gọn trong thùng xe, tự co theo khung) ---- */
 function truck(expr){
-  return '<div style="display:inline-block;position:relative">'
-   +'<svg width="150" height="72" viewBox="0 0 150 72">'
-   +'<rect x="4" y="12" width="96" height="40" rx="5" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>'
+  return '<svg width="150" height="72" viewBox="0 0 150 72" style="max-width:100%;height:auto;display:block">'
+   +'<rect x="4" y="12" width="96" height="40" rx="5" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>'
    +'<path d="M100 22 h26 l16 16 v14 h-42 z" fill="#f87171" stroke="#dc2626" stroke-width="2"/>'
    +'<rect x="106" y="26" width="20" height="14" rx="2" fill="#bae6fd"/>'
    +'<circle cx="32" cy="58" r="9" fill="#374151"/><circle cx="112" cy="58" r="9" fill="#374151"/>'
-   +'</svg>'
-   +'<div style="position:absolute;left:4px;top:12px;width:96px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#b45309;font-size:1.1rem">'+expr+'</div>'
-   +'</div>';
+   +'<text x="52" y="39" text-anchor="middle" font-size="19" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
+   +'</svg>';
 }
 /* ---- Đồng hồ kim ---- */
 function clockSVG(h,m){
@@ -55,30 +53,28 @@ function dragon(){
    +'<path d="M24 24 l1 -9 l5 8 z" fill="#f59e0b"/>'
    +'</svg>';
 }
-/* ---- Quả dưa hấu chở một phép tính ---- */
+/* ---- Quả dưa hấu chở một phép tính (nhãn trắng — chữ không đè lên sọc) ---- */
 function melon(expr){
-  return '<div style="display:inline-block;position:relative">'
-   +'<svg width="132" height="70" viewBox="0 0 132 70">'
+  return '<svg width="132" height="70" viewBox="0 0 132 70" style="max-width:100%;height:auto;display:block">'
    +'<ellipse cx="64" cy="38" rx="58" ry="27" fill="#4ade80" stroke="#16a34a" stroke-width="3"/>'
    +'<path d="M30 15 Q40 38 30 61" stroke="#15803d" stroke-width="2.5" fill="none"/>'
    +'<path d="M64 12 Q74 38 64 64" stroke="#15803d" stroke-width="2.5" fill="none"/>'
    +'<path d="M98 15 Q88 38 98 61" stroke="#15803d" stroke-width="2.5" fill="none"/>'
    +'<path d="M120 24 q9 -3 12 -10" stroke="#15803d" stroke-width="3" fill="none" stroke-linecap="round"/>'
-   +'</svg>'
-   +'<div style="position:absolute;left:0;top:0;width:132px;height:70px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1.05rem;text-shadow:0 1px 2px rgba(0,0,0,.4)">'+expr+'</div>'
-   +'</div>';
+   +'<rect x="21" y="24" width="86" height="28" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>'
+   +'<text x="64" y="44" text-anchor="middle" font-size="18" font-weight="800" fill="#14532d" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
+   +'</svg>';
 }
-/* ---- Bông hoa hướng dương chở một phép tính ---- */
+/* ---- Bông hoa hướng dương chở một phép tính (nhãn trắng giữa nhuỵ) ---- */
 function flower(expr){
-  var s='<div style="display:inline-block;position:relative">'
-   +'<svg width="118" height="118" viewBox="0 0 120 120">'
+  var s='<svg width="118" height="118" viewBox="0 0 120 120" style="max-width:100%;height:auto;display:block">'
    +'<g fill="#facc15" stroke="#eab308" stroke-width="1.5">';
   for(var i=0;i<12;i++){ var a=i*30; var r=a*Math.PI/180; var x=60+34*Math.cos(r), y=60+34*Math.sin(r);
     s+='<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="9" ry="17" transform="rotate('+a+' '+x.toFixed(1)+' '+y.toFixed(1)+')"/>'; }
   s+='</g><circle cx="60" cy="60" r="26" fill="#b45309"/>'
-   +'</svg>'
-   +'<div style="position:absolute;left:0;top:0;width:118px;height:118px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1.05rem;text-shadow:0 1px 2px rgba(0,0,0,.5)">'+expr+'</div>'
-   +'</div>';
+   +'<rect x="20" y="46" width="80" height="28" rx="14" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>'
+   +'<text x="60" y="66" text-anchor="middle" font-size="18" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
+   +'</svg>';
   return s;
 }
 /* ---- Sơ đồ hai bước: [a] op1-> (?) op2-> [?] ---- */
