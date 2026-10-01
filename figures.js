@@ -239,6 +239,64 @@ function thanhGo(n, dai){
   for(var i=1;i<n;i++){ var x=(10+i*240/n).toFixed(1); s+='<line x1="'+x+'" y1="29" x2="'+x+'" y2="65" stroke="'+HM.goDam+'" stroke-width="2.2" stroke-dasharray="4 3"/>'; }
   return s+'</svg>';
 }
+/* ---- Đội kéo co: mỗi đội một hàng 7 bạn (trai/gái xen kẽ) nắm sợi dây — đếm được 7 bạn mỗi đội (SGK bài 10) ---- */
+function doiKeoCo(soDoi, moiDoi){
+  moiDoi=moiDoi||7; var W=moiDoi*42+56, out='<div class="flex flex-col items-center gap-1 mb-2">';
+  for(var d=0;d<soDoi;d++){
+    var s=svgHinh(W,58)+'<path d="M4 45 H'+(W-4)+'" stroke="'+HM.go+'" stroke-width="5" stroke-linecap="round"/>'
+      +'<path d="M4 45 H'+(W-4)+'" stroke="'+HM.goNhat+'" stroke-width="2" stroke-dasharray="5 5"/>';
+    for(var i=0;i<moiDoi;i++){ var cx=28+i*42;   /* mặt bạn nhỏ + hai bàn tay nắm dây */
+      s+=anhSVG((i+d)%2 ? 'girl' : 'boy', cx-20, 4, 40)
+        +'<circle cx="'+(cx-9)+'" cy="45" r="4.5" fill="#FFC83D"/><circle cx="'+(cx+9)+'" cy="45" r="4.5" fill="#FFC83D"/>'; }
+    out+=s+'</svg>';
+  }
+  return out+'</div>';
+}
+/* ---- Sơ đồ mũi tên kiểu SGK: (ô) —phép→ [ô] … ; nut = [{v: số hoặc null, h:'tron'|'vuong'}], phep = ['× 4', …].
+   v null -> ô "?" trắng viền hổ phách. Phép tính dùng currentColor -> đổi màu theo giao diện. ---- */
+function soDo(nut, phep){
+  var D=56, A=74, W=nut.length*D+(nut.length-1)*A+8, phong = nut.length<=2 ? 1.25 : 1, x=4;
+  var s='<svg class="text-slate-700" width="'+Math.round(W*phong)+'" height="'+Math.round(72*phong)+'" viewBox="0 0 '+W+' 72" style="max-width:100%;height:auto;display:inline-block">';
+  for(var i=0;i<nut.length;i++){
+    var o=nut[i], hoi=(o.v===null || o.v===undefined), f=hoi ? '#fff' : HM.vang, vien=hoi ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '';
+    if(o.h==='tron') s+='<circle cx="'+(x+D/2)+'" cy="44" r="'+(D/2-1.5)+'" fill="'+f+'"'+vien+'/>';
+    else s+='<rect x="'+(x+1.5)+'" y="17.5" width="'+(D-3)+'" height="'+(D-3)+'" rx="12" fill="'+f+'"'+vien+'/>';
+    s+=chuSo(x+D/2, 44, hoi ? '?' : o.v, hoi ? 24 : (String(o.v).length>2 ? 18 : 22));
+    x+=D;
+    if(i<phep.length){
+      s+='<text x="'+(x+A/2)+'" y="30" text-anchor="middle" font-size="17" '+HFONT+' fill="currentColor">'+phep[i]+'</text>'
+       +'<path d="M'+(x+8)+' 44 H'+(x+A-8)+' M'+(x+A-15)+' 38 L'+(x+A-8)+' 44 L'+(x+A-15)+' 50" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>';
+      x+=A;
+    }
+  }
+  return '<div class="flex justify-center my-2">'+s+'</svg></div>';
+}
+/* ---- Quả bóng mang phép tính: 6 múi màu HM (nhìn từ trên), nhãn trắng ngang giữa ---- */
+function bong(expr){
+  var s=svgHinh(104,104), c=52, r=48, mau=[HM.do,HM.vang,HM.troi,HM.do,HM.vang,HM.troi];
+  for(var i=0;i<6;i++){ var a0=(i*60-90)*Math.PI/180, a1=((i+1)*60-90)*Math.PI/180;
+    s+='<path d="M'+c+' '+c+' L'+(c+r*Math.cos(a0)).toFixed(1)+' '+(c+r*Math.sin(a0)).toFixed(1)+' A'+r+' '+r+' 0 0 1 '+(c+r*Math.cos(a1)).toFixed(1)+' '+(c+r*Math.sin(a1)).toFixed(1)+' Z" fill="'+mau[i]+'"/>'; }
+  return s+'<path d="M22 34 A34 34 0 0 1 44 15" stroke="#fff" stroke-opacity=".6" stroke-width="5" fill="none" stroke-linecap="round"/>'
+    +nhanVien(52, 54, 88, 30, expr, coChu(expr,18))+'</svg>';
+}
+/* ---- Tuần lễ = một dải 7 ô ngày (T2 … CN); soTuan dải xếp chồng — đếm được 7 ngày mỗi tuần ---- */
+var THU=['T2','T3','T4','T5','T6','T7','CN'];
+function tuanLe(soTuan){
+  var out='<div class="flex flex-col items-center gap-1 mb-2">';
+  for(var t=0;t<soTuan;t++){ var s=svgHinh(296,40);
+    for(var i=0;i<7;i++) s+='<rect x="'+(2+i*42)+'" y="2" width="38" height="36" rx="8" fill="'+(i===6 ? HM.cam : HM.troi)+'"/>'+chuSo(21+i*42, 20, THU[i], 14);
+    out+=s+'</svg>'; }
+  return out+'</div>';
+}
+/* ---- Các hộp đựng cốc: đếm được số hộp; mặt hộp in hình cái cốc (không vẽ cốc rời để khỏi đếm nhầm) ---- */
+function hopCoc(soHop){
+  var s=svgHinh(soHop*44+4, 48);
+  for(var i=0;i<soHop;i++){ var x=2+i*44;
+    s+='<rect x="'+(x+2)+'" y="12" width="36" height="34" rx="4" fill="'+HM.goNhat+'"/>'
+     +'<rect x="'+x+'" y="6" width="40" height="10" rx="3" fill="'+HM.go+'"/>'   /* nắp phẳng (không vát — vát trông như mái nhà) */
+     +'<path d="M'+(x+13)+' 22 H'+(x+27)+' L'+(x+25)+' 38 H'+(x+15)+' Z" fill="#fff" fill-opacity=".9"/>'; }
+  return s+'</svg>';
+}
 /* ---- Bảng nhiều cột kiểu SGK: nhan = 3 nhãn dòng; cot = mảng cột [a,b,c]; o = {c:cột, r:dòng} ô "?" ---- */
 function bangCot(nhan, cot, o){
   var bd='style="border:1px solid #fcd34d"', s='<table class="mx-auto border-collapse my-2" style="border:2px solid #fcd34d">';

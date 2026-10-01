@@ -1,28 +1,10 @@
 /* bai-10.js — NỘI DUNG Bài 10 (Bảng nhân 7, bảng chia 7). Engine v2, THÍCH ỨNG 3 mức (levels:3, make(lv)).
-   Hình riêng của bài: kids (kéo co), arrowBox (mũi tên), ball (quả bóng). Bộ sinh câu dùng chung ở figures.js.
+   Hình: doiKeoCo, soDo (qua arrowBox), bong, daySo, tuanLe, hopCoc — đều ở figures.js. Bộ sinh câu dùng chung ở figures.js.
    QUY TẮC: nối chuỗi, KHÔNG backtick và KHÔNG template literal. */
 
-/* ---- Hình riêng Bài 10 ---- */
-function kids(rows){ var s='<div class="mb-2">'; for(var r=0;r<rows;r++){ s+='<div style="font-size:1.5rem;line-height:1.25">'+'🧒'.repeat(7)+'</div>'; } s+='</div>'; return s; }
-/* Sơ đồ mũi tên: [vào] op -> [ra]; ô chưa biết (null) hiện "?" */
-function arrowBox(inp, op, out){
-  function o(v, tron){ return v===null
-    ? '<span style="width:60px;height:60px" class="inline-flex items-center justify-center '+(tron?'rounded-full':'rounded-xl')+' bg-white border-2 border-amber-500 text-amber-700 font-extrabold text-2xl">?</span>'
-    : '<span style="width:60px;height:60px" class="inline-flex items-center justify-center '+(tron?'rounded-full':'rounded-xl')+' bg-amber-300 text-slate-900 font-extrabold text-2xl">'+v+'</span>'; }
-  return '<div class="flex items-center justify-center gap-2 my-3 flex-wrap">'+o(inp,true)
-   +'<span class="text-slate-600 font-extrabold text-lg">'+op+' &#8594;</span>'+o(out===undefined?null:out,false)+'</div>';
-}
-/* Quả bóng: múi màu nhạt, phép tính nằm trên nhãn trắng đủ rộng -> chữ đen đọc rõ */
-function ball(expr){
-  return '<svg width="104" height="104" viewBox="0 0 104 104" style="max-width:100%;height:auto;display:block">'
-   +'<circle cx="52" cy="52" r="48" fill="#fef3c7"/>'
-   +'<path d="M52 4 A48 48 0 0 1 100 52 L52 52 Z" fill="#bfdbfe"/>'
-   +'<path d="M52 100 A48 48 0 0 1 4 52 L52 52 Z" fill="#bbf7d0"/>'
-   +'<circle cx="52" cy="52" r="48" fill="none" stroke="#f59e0b" stroke-width="3"/>'
-   +'<rect x="9" y="37" width="86" height="30" rx="15" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>'
-   +'<text x="52" y="58" text-anchor="middle" font-size="'+coChu(expr,18)+'" font-weight="800" fill="#111827" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
-   +'</svg>';
-}
+/* ---- Hình riêng Bài 10: dùng hình chung của figures.js (doiKeoCo, soDo, bong, tuanLe, hopCoc) ---- */
+/* Sơ đồ mũi tên: (vào) op -> [ra]; ô chưa biết (null) hiện "?" */
+function arrowBox(inp, op, out){ return soDo([{v:inp, h:'tron'}, {v:(out===undefined ? null : out), h:'vuong'}], [op]); }
 function bt7(lv){   /* một phép tính với 7 (Mức 1: 7 × 1..5) */
   if(lv<=1){ var k=rnd(1,5); return Math.random()<0.5 ? '7 × '+k : k+' × 7'; }
   var k2=rnd(1,10); return Math.random()<0.5 ? '7 × '+k2 : (7*k2)+' : 7';
@@ -38,9 +20,9 @@ var BAI = {
    muc:['Đếm số bạn của 2–3 đội bằng phép cộng các số 7.', 'Cộng nhiều số 7 (4–5 đội) mà không cần gợi ý phép nhân.', 'Làm ngược lại: biết tổng số bạn, tìm số đội.'],
    make:function(lv){
     if(lv>=3){ var m=rnd(3,9);
-      return {type:'num', _n:m, _nguoc:true, q:'<div class="text-4xl mb-2">&#129490;&#129490;&#129490;</div><div>Mỗi đội kéo co có 7 bạn. Có tất cả '+(7*m)+' bạn chơi kéo co.</div><div class="mt-1">Hỏi có mấy đội?</div>', ans:m, unit:'đội'}; }
+      return {type:'num', _n:m, _nguoc:true, q:doiKeoCo(1)+'<div>Mỗi đội kéo co có 7 bạn. Có tất cả '+(7*m)+' bạn chơi kéo co.</div><div class="mt-1">Hỏi có mấy đội?</div>', ans:m, unit:'đội'}; }
     var n = lv<=1 ? rnd(2,3) : rnd(4,5), add=[]; for(var i=0;i<n;i++) add.push('7');
-    return {type:'num', _n:n, _nguoc:false, q: kids(n)
+    return {type:'num', _n:n, _nguoc:false, q: doiKeoCo(n)
       +'<div class="text-slate-600 text-base mb-2">Mỗi đội kéo co có 7 bạn. Có '+n+' đội chơi.</div>'
       +'<div class="text-xl">'+add.join(' + ')+' = ?</div>'
       +(lv<=1 ? '<div class="text-slate-500 text-base mt-1">(tức là 7 × '+n+')</div>' : ''), ans:7*n, unit:'bạn'};
@@ -66,9 +48,9 @@ var BAI = {
     while(pool.length<cnt && g<300){ g++; var t=bt7(lv), v=tinhBT(t); if(!pool.some(function(p){ return p.v===v; }) && (lv>1 || pool.every(function(p){ return Math.abs(p.v-v)>=5; }))) pool.push({t:t, v:v}); }
     var vals=pool.map(function(p){ return p.v; }).sort(function(a,b){ return a-b; }), order=pool.slice(); shuffle(order);
     if(lv>=3){ var i=rnd(1,cnt-2), lo=vals[i-1], hi=vals[i+1];
-      return {type:'mcq', figFn:ball, _lo:lo, _hi:hi, q:'<div>Quả bóng nào có kết quả <b>lớn hơn '+lo+'</b> và <b>bé hơn '+hi+'</b>?</div>', choices:order.map(function(o){ return o.t; }), correct:order.findIndex(function(o){ return o.v===vals[i]; })}; }
+      return {type:'mcq', figFn:bong, _lo:lo, _hi:hi, q:'<div>Quả bóng nào có kết quả <b>lớn hơn '+lo+'</b> và <b>bé hơn '+hi+'</b>?</div>', choices:order.map(function(o){ return o.t; }), correct:order.findIndex(function(o){ return o.v===vals[i]; })}; }
     var N=vals[1];
-    return {type:'mcq', figFn:ball, _lo:-1, _hi:N, q:'<div>Quả bóng nào ghi phép tính có <b>kết quả bé hơn '+N+'</b>?</div>', choices:order.map(function(o){ return o.t; }), correct:order.findIndex(function(o){ return o.v===vals[0]; })};
+    return {type:'mcq', figFn:bong, _lo:-1, _hi:N, q:'<div>Quả bóng nào ghi phép tính có <b>kết quả bé hơn '+N+'</b>?</div>', choices:order.map(function(o){ return o.t; }), correct:order.findIndex(function(o){ return o.v===vals[0]; })};
   }, check:function(q){ var ok=q.choices.filter(function(c){ var v=tinhBT(c); return v>q._lo && v<q._hi; }); return ok.length===1 && ok[0]===q.choices[q.correct]; }},
 
   {name:'Số còn thiếu', sec:'Luyện tập — Nêu các số còn thiếu', levels:3,
@@ -94,12 +76,12 @@ var BAI = {
    muc:['Bài toán một phép nhân với số nhỏ.', 'Bài toán một phép nhân hoặc phép chia với 7.', 'Bài toán hai bước (tuần lễ và ngày lẻ, chia rồi nhân).'],
    make:function(lv){
     var n = lv<=1 ? rnd(2,5) : rnd(2,9);
-    if(lv<=1 || (lv===2 && Math.random()<0.5)) return {type:'num', _e:7*n, q:'<div class="text-5xl mb-2">&#128197;</div>Mỗi tuần lễ có 7 ngày. Bố của Mai đi công tác '+n+' tuần lễ. Hỏi bố của Mai đi công tác bao nhiêu ngày?', ans:7*n, unit:'ngày'};
-    if(lv===2) return {type:'num', _e:n, q:'<div class="text-5xl mb-2">&#129380;</div>Có '+(7*n)+' cái cốc xếp đều vào 7 hộp. Hỏi mỗi hộp có mấy cái cốc?', ans:n, unit:'cái'};
+    if(lv<=1 || (lv===2 && Math.random()<0.5)) return {type:'num', _e:7*n, q:tuanLe(lv<=1 ? n : 1)+'Mỗi tuần lễ có 7 ngày. Bố của Mai đi công tác '+n+' tuần lễ. Hỏi bố của Mai đi công tác bao nhiêu ngày?', ans:7*n, unit:'ngày'};
+    if(lv===2) return {type:'num', _e:n, q:'<div class="flex justify-center mb-2">'+hopCoc(7)+'</div>Có '+(7*n)+' cái cốc xếp đều vào 7 hộp. Hỏi mỗi hộp có mấy cái cốc?', ans:n, unit:'cái'};
     if(Math.random()<0.5){ var d=rnd(1,6);
-      return {type:'num', _e:7*n+d, q:'<div class="text-5xl mb-2">&#128197;</div>Bố của Mai đi công tác '+n+' tuần lễ và '+d+' ngày. Hỏi bố của Mai đi công tác tất cả bao nhiêu ngày?', ans:7*n+d, unit:'ngày'}; }
+      return {type:'num', _e:7*n+d, q:tuanLe(1)+'Bố của Mai đi công tác '+n+' tuần lễ và '+d+' ngày. Hỏi bố của Mai đi công tác tất cả bao nhiêu ngày?', ans:7*n+d, unit:'ngày'}; }
     var p=rnd(2,5), h=rnd(2,6);
-    return {type:'num', _e:p*h, q:'<div class="text-5xl mb-2">&#129380;</div>Có '+(7*p)+' cái cốc xếp đều vào 7 hộp. Hỏi '+h+' hộp như thế có bao nhiêu cái cốc?', ans:p*h, unit:'cái'};
+    return {type:'num', _e:p*h, q:'<div class="flex justify-center mb-2">'+hopCoc(7)+'</div>Có '+(7*p)+' cái cốc xếp đều vào 7 hộp. Hỏi '+h+' hộp như thế có bao nhiêu cái cốc?', ans:p*h, unit:'cái'};
   }, check:function(q){ return q.ans===q._e && q.ans>0; }}
  ]
 };
