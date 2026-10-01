@@ -7,29 +7,60 @@ function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
 
-/* ---- Con bọ rùa (đổi số chấm nếu cần) ---- */
-function ladybug(){
-  return '<svg width="54" height="54" viewBox="0 0 100 100" style="display:inline-block">'
-   +'<ellipse cx="50" cy="90" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>'
-   +'<circle cx="50" cy="30" r="15" fill="#1f2937"/>'
-   +'<circle cx="44" cy="27" r="3" fill="#fff"/><circle cx="56" cy="27" r="3" fill="#fff"/>'
-   +'<circle cx="50" cy="62" r="30" fill="#dc2626"/>'
-   +'<line x1="50" y1="34" x2="50" y2="92" stroke="#1f2937" stroke-width="3"/>'
-   +'<circle cx="37" cy="52" r="5" fill="#1f2937"/><circle cx="63" cy="52" r="5" fill="#1f2937"/>'
-   +'<circle cx="33" cy="66" r="5" fill="#1f2937"/><circle cx="67" cy="66" r="5" fill="#1f2937"/>'
-   +'<circle cx="42" cy="80" r="5" fill="#1f2937"/><circle cx="58" cy="80" r="5" fill="#1f2937"/>'
-   +'</svg>';
+/* =====================================================================================
+   QUY CHUẨN HÌNH (skill sk-ve-hinh-tieuhoc) — phong cách PHẲNG kiểu Fluent Emoji:
+   mảng màu đặc, KHÔNG viền đen, bo tròn, mỗi vật thêm tối đa một sắc đậm hơn để tạo khối.
+   Số trên hình: nhãn TRẮNG, chữ #212121 đậm; ô "?" chữ #B45309.
+   Nhân vật / đồ vật trang trí: ảnh có sẵn trong hinh/ (Fluent Emoji, giấy phép MIT — xem hinh/LICENSE-fluentui-emoji.txt).
+   Vật mà học sinh phải ĐẾM (chấm bọ rùa, số bút…): TỰ VẼ ở đây để đếm được đúng.
+   ===================================================================================== */
+var HM = {do:'#F8312F', doDam:'#CA0B4A', cam:'#FF822D', camDam:'#FF6723', vang:'#FCD53F', vangDam:'#FFB02E',
+  la:'#86D72F', xanhLa:'#00D26A', troi:'#26C9FC', troiDam:'#00A6ED', hong:'#FF6DC6', tim:'#8D65C5', timDam:'#321B41',
+  den:'#212121', goNhat:'#F3AD61', go:'#D37034', goDam:'#7D4533', xam:'#E6E6E6', chu:'#212121', hoi:'#B45309', day:'#CBD5E1'};
+var HFONT = 'font-family="system-ui,Segoe UI,Roboto,sans-serif" font-weight="800"';
+/* Mở thẻ SVG tự co theo khung (max-width:100%); px = bề rộng hiển thị (mặc định = w) */
+function svgHinh(w, h, px){ px=px||w; return '<svg width="'+px+'" height="'+Math.round(px*h/w)+'" viewBox="0 0 '+w+' '+h+'" style="max-width:100%;height:auto;display:inline-block;vertical-align:middle">'; }
+/* Ảnh trong kho hinh/: anh() dùng thẳng trong câu hỏi; anhSVG() đặt bên trong một SVG ghép (để gắn nhãn số) */
+function anh(ten, px, alt){ return '<img src="hinh/'+ten+'.svg" width="'+px+'" height="'+px+'" alt="'+(alt||'')+'" style="display:inline-block;vertical-align:middle">'; }
+function anhSVG(ten, x, y, s){ return '<image href="hinh/'+ten+'.svg" x="'+x+'" y="'+y+'" width="'+s+'" height="'+s+'"/>'; }
+/* Nhãn số trắng: tròn (tâm cx,cy bán kính r) hoặc viên thuốc (rộng w, cao h) */
+function chuSo(cx, cy, v, co){ var s=String(v); return '<text x="'+cx+'" y="'+(cy+co*0.36).toFixed(1)+'" text-anchor="middle" font-size="'+co+'" '+HFONT+' fill="'+(s==='?'?HM.hoi:HM.chu)+'">'+s+'</text>'; }
+function nhanTron(cx, cy, r, v, co){ return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#fff"/>'+chuSo(cx, cy, v, co||16); }
+function nhanVien(cx, cy, w, h, v, co){ return '<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="'+(h/2)+'" fill="#fff"/>'+chuSo(cx, cy, v, co||18); }
+/* Xếp các hình thành hàng cân đối (6 con -> 3 + 3, không để 5 + 1); toiDa = số hình nhiều nhất một hàng */
+function xepHang(ds, toiDa){
+  var soHang=Math.ceil(ds.length/toiDa), moiHang=Math.ceil(ds.length/soHang), s='<div class="flex flex-col items-center gap-1 mb-2">';
+  for(var i=0;i<ds.length;i+=moiHang) s+='<div class="flex justify-center gap-2">'+ds.slice(i,i+moiHang).join('')+'</div>';
+  return s+'</div>';
 }
-/* ---- Xe tải chở một phép tính (SVG thuần: chữ nằm gọn trong thùng xe, tự co theo khung) ---- */
+
+/* ---- Con bọ rùa: đúng 6 chấm, mỗi cánh 3 chấm tách rời (học sinh đếm được) ---- */
+function ladybug(px){
+  var c=HM.den, s=svgHinh(32,32,px||56), chan='<path d="M9 13 L5 10.5"/><path d="M23 13 L27 10.5"/><path d="M6 19 H2.5"/><path d="M26 19 H29.5"/><path d="M8 25.5 L5 28.5"/><path d="M24 25.5 L27 28.5"/>'
+   +'<path d="M14 5 L12.2 2"/><path d="M18 5 L19.8 2"/>';
+  /* quầng trắng mờ dưới phần màu đen: nền trắng thì không thấy, giao diện Tối thì đầu + chân không bị chìm */
+  s+='<g stroke="#fff" stroke-opacity=".5" stroke-width="3.4" stroke-linecap="round" fill="none">'+chan+'</g><ellipse cx="16" cy="8.4" rx="7" ry="5.4" fill="#fff" fill-opacity=".5"/>'
+   +'<g stroke="'+c+'" stroke-width="1.6" stroke-linecap="round" fill="none">'+chan+'</g>'
+   +'<ellipse cx="16" cy="8.4" rx="6" ry="4.4" fill="'+c+'"/>'
+   +'<circle cx="13.7" cy="6.6" r="1.1" fill="#fff"/><circle cx="18.3" cy="6.6" r="1.1" fill="#fff"/>'
+   +'<circle cx="16" cy="19" r="11" fill="'+HM.do+'"/>'
+   +'<path d="M16 8.5 V30" stroke="'+c+'" stroke-width="1.3"/>';
+  [[11,14.2],[9.6,19.6],[11.6,25],[21,14.2],[22.4,19.6],[20.4,25]].forEach(function(p){ s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.3" fill="'+c+'"/>'; });
+  return s+'</svg>';
+}
+/* ---- Xe tải chở một phép tính: thùng vàng mang nhãn trắng, biểu thức dài thì thùng dài ra (chữ không nhỏ đi) ---- */
 function truck(expr){
-  var dai = String(expr).length>7, T = dai ? 134 : 96, W = T+54;   /* biểu thức dài -> thùng xe dài ra, chữ vẫn to */
-  return '<svg width="'+W+'" height="72" viewBox="0 0 '+W+' 72" style="max-width:100%;height:auto;display:block">'
-   +'<rect x="4" y="12" width="'+T+'" height="40" rx="5" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>'
-   +'<path d="M'+(T+4)+' 22 h26 l16 16 v14 h-42 z" fill="#f87171" stroke="#dc2626" stroke-width="2"/>'
-   +'<rect x="'+(T+10)+'" y="26" width="20" height="14" rx="2" fill="#bae6fd"/>'
-   +'<circle cx="32" cy="58" r="9" fill="#374151"/><circle cx="'+(T+16)+'" cy="58" r="9" fill="#374151"/>'
-   +'<text x="'+(4+T/2)+'" y="39" text-anchor="middle" font-size="'+(dai?18:19)+'" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
-   +'</svg>';
+  var dai=String(expr).length>7, T=dai?132:96, W=T+48, s=svgHinh(W,70);
+  s+='<rect x="2" y="4" width="'+T+'" height="42" rx="7" fill="'+HM.vang+'"/>'
+   +'<rect x="2" y="38" width="'+T+'" height="8" fill="'+HM.vangDam+'"/>'
+   +'<path d="M'+(T+6)+' 16 H'+(T+30)+' Q'+(T+34)+' 16 '+(T+36)+' 20 L'+(T+44)+' 34 V46 H'+(T+6)+' Z" fill="'+HM.xam+'"/>'
+   +'<path d="M'+(T+12)+' 21 H'+(T+29)+' L'+(T+35)+' 32 H'+(T+12)+' Z" fill="'+HM.troi+'"/>'
+   +'<rect x="2" y="44" width="'+(W-4)+'" height="12" rx="5" fill="'+HM.cam+'"/>'
+   +'<rect x="'+(W-7)+'" y="46" width="5" height="5" rx="1.5" fill="'+HM.doDam+'"/>'
+   +'<circle cx="24" cy="58" r="9" fill="'+HM.timDam+'"/><circle cx="24" cy="58" r="3.6" fill="#F4F4F4"/>'
+   +'<circle cx="'+(T+22)+'" cy="58" r="9" fill="'+HM.timDam+'"/><circle cx="'+(T+22)+'" cy="58" r="3.6" fill="#F4F4F4"/>'
+   +nhanVien(2+T/2, 22, T-14, 28, expr, dai?17:19);
+  return s+'</svg>';
 }
 /* ---- Đồng hồ kim ---- */
 function clockSVG(h,m){
@@ -111,14 +142,21 @@ function soChon(v, lv, b, cnt){
 }
 /* Ô "?" trong phép tính */
 function oHoi(){ return '<span class="inline-block px-2 mx-1 border-2 border-amber-500 rounded-lg text-amber-700">?</span>'; }
-/* Hạt số trong dãy: hinh 'tron'|'vuong'|'thoi'; loai 'so'|'hoi'|'an' (… = ô bị che) */
-function hatSo(v, hinh, loai){
-  var cls = loai==='hoi' ? 'bg-white border-2 border-amber-500 text-amber-700 text-xl'
-          : (loai==='an' ? 'bg-slate-100 border border-slate-300 text-slate-500 text-base'
-          : (hinh==='thoi' ? 'bg-sky-300' : 'bg-amber-300')+' text-slate-900 text-base');
-  var txt = loai==='hoi' ? '?' : (loai==='an' ? '&#8230;' : v);
-  if(hinh==='thoi') return '<span style="width:42px;height:42px;transform:rotate(45deg)" class="inline-flex items-center justify-center font-extrabold '+cls+'"><span style="transform:rotate(-45deg)">'+txt+'</span></span>';
-  return '<span style="width:46px;height:46px" class="inline-flex items-center justify-center font-extrabold '+(hinh==='tron'?'rounded-full':'rounded-lg')+' '+cls+'">'+txt+'</span>';
+/* Dãy số = MỘT hình SVG: các hạt cách đều trên một sợi dây, co theo màn hình, không xuống dòng, không đè nhau.
+   hinh 'tron'|'vuong'|'thoi'; hi = vị trí ô "?"; an = vị trí ô bị che (… ), -1 nếu không có */
+function daySo(seq, hi, an, hinh, nen){
+  var P=46, n=seq.length, W=n*P+4, s=svgHinh(W,52);   /* 8 hạt = 372 đơn vị: trên điện thoại chỉ co ~0,9 lần, chữ vẫn to */
+  s+='<line x1="'+(2+P/2)+'" y1="26" x2="'+(W-2-P/2)+'" y2="26" stroke="'+HM.day+'" stroke-width="3" stroke-linecap="round"/>';
+  for(var i=0;i<n;i++){
+    var cx=2+P/2+i*P, loai = i===hi ? 'hoi' : (i===an ? 'an' : 'so');
+    var f = loai==='hoi' ? '#fff' : (loai==='an' ? HM.xam : nen), vien = loai==='hoi' ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '';
+    if(hinh==='tron') s+='<circle cx="'+cx+'" cy="26" r="20" fill="'+f+'"'+vien+'/>';
+    else if(hinh==='thoi') s+='<rect x="'+(cx-15)+'" y="11" width="30" height="30" rx="4" transform="rotate(45 '+cx+' 26)" fill="'+f+'"'+vien+'/>';
+    else s+='<rect x="'+(cx-19)+'" y="7" width="38" height="38" rx="9" fill="'+f+'"'+vien+'/>';
+    if(loai==='an') s+='<text x="'+cx+'" y="31" text-anchor="middle" font-size="18" '+HFONT+' fill="#475569">&#8230;</text>';
+    else s+=chuSo(cx, 26, loai==='hoi' ? '?' : seq[i], loai==='hoi' ? 21 : (String(seq[i]).length>2 ? 15 : 18));
+  }
+  return s+'</svg>';
 }
 /* DÃY SỐ đếm thêm/bớt b. Mức 1: đếm thêm từ b, ô cần tìm ở đầu dãy · Mức 2: thêm hoặc bớt, ô bất kỳ ·
    Mức 3: dãy KHÔNG bắt đầu từ b và ô liền kề cũng bị che -> phải dùng bước đếm b */
@@ -126,8 +164,7 @@ function bnDaySo(b, lv, hinhLen, hinhXuong){
   var up = lv<=1 ? true : Math.random()<0.5, dau = lv>=3 ? rnd(2,4) : 1, dai = lv>=3 ? 7 : 8, seq=[];
   for(var i=0;i<dai;i++) seq.push(b*(dau+i)); if(!up) seq.reverse();
   var hi = lv<=1 ? rnd(1,3) : rnd(1,dai-2), an = lv>=3 ? (hi+1<=dai-2 ? hi+1 : hi-1) : -1, hinh = up ? (hinhLen||'tron') : (hinhXuong||'thoi');
-  var s='<div class="flex flex-wrap justify-center items-center gap-2 mb-3">';
-  for(var j=0;j<dai;j++) s+=hatSo(seq[j], hinh, j===hi ? 'hoi' : (j===an ? 'an' : 'so'));
+  var s='<div class="flex justify-center mb-3">'+daySo(seq, hi, an, hinh, up ? HM.vang : HM.troi);
   return {type:'num', _hi:hi, _seq:seq, _b:b, q:s+'</div><div>Dãy số đếm '+(up?'thêm':'bớt')+' '+b+'. Số ở ô <b class="text-amber-700">?</b> là bao nhiêu?</div>', ans:seq[hi]};
 }
 function bnKiemDay(q){ return q.ans===q._seq[q._hi] && q.ans%q._b===0 && q.ans>0; }
@@ -165,45 +202,41 @@ function bnTinh(b, lv){
 }
 function bnKiemTinh(q){ return q._dang==='tich' ? q.ans===q._b*q._k : q.ans===q._k; }
 
-/* ---- Hộp bút chì màu có n chiếc bút (SGK bài 9 LT4) ---- */
-function hopBut(n){
-  n=n||6; var mau=['#ef4444','#f59e0b','#22c55e','#3b82f6','#a855f7','#ec4899','#14b8a6','#f97316','#84cc16','#6366f1'];
-  var s='<svg width="56" height="72" viewBox="0 0 56 72" style="display:inline-block">', b=40/n;
-  for(var i=0;i<n;i++){ var x=8+i*b+b/2, y=6+(i%2)*5;
-    s+='<rect x="'+(x-2.4).toFixed(1)+'" y="'+y+'" width="4.8" height="34" fill="'+mau[i%mau.length]+'"/>'
-     +'<path d="M'+(x-2.4).toFixed(1)+' '+y+' L'+x.toFixed(1)+' '+(y-6)+' L'+(x+2.4).toFixed(1)+' '+y+' Z" fill="#fde68a"/>'; }
-  return s+'<rect x="4" y="28" width="48" height="41" rx="4" fill="#fdba74" stroke="#c2410c" stroke-width="1.5"/>'
-    +'<rect x="11" y="46" width="34" height="9" rx="2" fill="#fff7ed"/></svg>';
+/* ---- Hộp bút chì màu có n chiếc bút (SGK bài 9 LT4) — bút tách rời, đếm được ---- */
+function hopBut(n, px){
+  n=n||6; var mau=[HM.do,HM.cam,HM.vang,HM.xanhLa,HM.hong,HM.tim,HM.la,HM.doDam,HM.vangDam,HM.camDam];
+  var s=svgHinh(64,80,px||60), p=52/n, w=Math.min(7,p-2);
+  for(var i=0;i<n;i++){ var x=6+i*p+p/2, t=3+(i%2)*6, m=mau[i%mau.length];
+    s+='<path d="M'+(x-w/2).toFixed(1)+' '+(t+9)+' L'+x.toFixed(1)+' '+t+' L'+(x+w/2).toFixed(1)+' '+(t+9)+' Z" fill="'+HM.goNhat+'"/>'
+     +'<path d="M'+(x-1.5).toFixed(1)+' '+(t+3)+' L'+x.toFixed(1)+' '+t+' L'+(x+1.5).toFixed(1)+' '+(t+3)+' Z" fill="'+m+'"/>'
+     +'<rect x="'+(x-w/2).toFixed(1)+'" y="'+(t+9)+'" width="'+w.toFixed(1)+'" height="40" fill="'+m+'"/>'; }
+  return s+'<rect x="2" y="36" width="60" height="42" rx="7" fill="'+HM.troi+'"/><rect x="2" y="36" width="60" height="9" rx="4" fill="'+HM.troiDam+'"/>'
+    +'<rect x="15" y="55" width="34" height="11" rx="5.5" fill="#fff"/></svg>';
 }
-/* ---- Bông hoa nhỏ mang một số (hoặc "?") — chuỗi phép tính bướm → hoa (SGK bài 9 LT2) ---- */
-function hoaNho(v){
-  var s='<svg width="60" height="60" viewBox="0 0 60 60" style="display:inline-block;vertical-align:middle">';
-  for(var i=0;i<6;i++){ var a=i*Math.PI/3; s+='<circle cx="'+(30+15*Math.cos(a)).toFixed(1)+'" cy="'+(30+15*Math.sin(a)).toFixed(1)+'" r="11" fill="#fca5a5" stroke="#dc2626" stroke-width="1.2"/>'; }
-  return s+'<circle cx="30" cy="30" r="14" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>'
-    +'<text x="30" y="36" text-anchor="middle" font-size="'+(String(v).length>2?13:16)+'" font-weight="800" fill="'+(v==='?'?'#b45309':'#7c2d12')+'" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+v+'</text></svg>';
-}
-function buomNho(v){
-  return '<svg width="64" height="56" viewBox="0 0 64 56" style="display:inline-block;vertical-align:middle">'
-   +'<ellipse cx="18" cy="20" rx="15" ry="13" fill="#f9a8d4" stroke="#db2777" stroke-width="1.5"/><ellipse cx="46" cy="20" rx="15" ry="13" fill="#f9a8d4" stroke="#db2777" stroke-width="1.5"/>'
-   +'<ellipse cx="20" cy="40" rx="11" ry="10" fill="#fbcfe8" stroke="#db2777" stroke-width="1.5"/><ellipse cx="44" cy="40" rx="11" ry="10" fill="#fbcfe8" stroke="#db2777" stroke-width="1.5"/>'
-   +'<rect x="29" y="10" width="6" height="38" rx="3" fill="#4b5563"/>'
-   +'<rect x="18" y="19" width="28" height="20" rx="10" fill="#ffffff" stroke="#db2777" stroke-width="1"/>'
-   +'<text x="32" y="34" text-anchor="middle" font-size="15" font-weight="800" fill="#831843" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+v+'</text></svg>';
-}
-/* dau = số ở con bướm; buoc = ['× 4', ': 3', …]; giaTri = số ở từng bông hoa (null -> "?") */
+/* ---- Chuỗi tính liên tiếp: con bướm mang số → (phép tính) → bông hoa → … (SGK bài 9 LT2)
+   MỘT hình SVG: co theo màn hình, không rớt bông hoa xuống dòng. dau = số ở con bướm;
+   buoc = ['× 4', ': 3', …]; giaTri = số ở từng bông hoa (null -> "?"). Phép tính dùng currentColor -> đổi màu theo giao diện. */
 function chuoiBuom(dau, buoc, giaTri){
-  var s='<div class="flex items-center justify-center gap-1 flex-wrap my-2">'+buomNho(dau);
-  for(var i=0;i<buoc.length;i++) s+='<span class="text-slate-600 font-extrabold text-base whitespace-nowrap">'+buoc[i]+' &#8594;</span>'+hoaNho(giaTri[i]===null?'?':giaTri[i]);
-  return s+'</div>';
+  var F=56, A=50, W=F+buoc.length*(A+F)+4, phong = buoc.length<=1 ? 1.4 : (buoc.length===2 ? 1.15 : 1);   /* ít bước thì vẽ to hơn */
+  var s='<svg class="text-slate-700" width="'+Math.round(W*phong)+'" height="'+Math.round(70*phong)+'" viewBox="0 0 '+W+' 70" style="max-width:100%;height:auto;display:inline-block">'
+   +'<g transform="translate(2,5)">'+anhSVG('butterfly',0,0,F)+nhanTron(F/2,F/2+3,13,dau,16)+'</g>', x=2+F;
+  for(var i=0;i<buoc.length;i++){
+    s+='<text x="'+(x+A/2)+'" y="27" text-anchor="middle" font-size="16" '+HFONT+' fill="currentColor">'+buoc[i]+'</text>'
+     +'<path d="M'+(x+6)+' 38 H'+(x+A-8)+' M'+(x+A-14)+' 33 L'+(x+A-7)+' 38 L'+(x+A-14)+' 43" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>';
+    x+=A; var v = giaTri[i]===null ? '?' : giaTri[i];
+    s+='<g transform="translate('+x+',5)">'+anhSVG('cherry_blossom',0,0,F)+nhanTron(F/2,F/2,14,v,String(v).length>2?13:16)+'</g>'; x+=F;
+  }
+  return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 /* ---- Thanh gỗ dài «dai» cm cưa thành n đoạn bằng nhau (SGK bài 9 LT5) ---- */
 function thanhGo(n, dai){
-  var W=260, s='<svg width="'+W+'" height="62" viewBox="0 0 260 62" style="max-width:100%;height:auto;display:inline-block">';
-  s+='<rect x="1" y="1" width="258" height="60" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>';   /* nền sáng riêng: đọc được cả ở giao diện Tối */
-  s+='<text x="130" y="14" text-anchor="middle" font-size="14" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+dai+' cm</text>';
-  s+='<path d="M10 20 L10 16 M10 18 L250 18 M250 16 L250 20" stroke="#92400e" stroke-width="1.5" fill="none"/>';
-  s+='<rect x="10" y="26" width="240" height="22" rx="3" fill="#f59e0b" stroke="#92400e" stroke-width="1.5"/>';
-  for(var i=1;i<n;i++){ var x=(10+i*240/n).toFixed(1); s+='<line x1="'+x+'" y1="24" x2="'+x+'" y2="50" stroke="#7c2d12" stroke-width="2" stroke-dasharray="3 2"/>'; }
+  var s=svgHinh(260,68);
+  s+='<path d="M10 13 V25 M250 13 V25 M10 19 H250" stroke="'+HM.vangDam+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+   +nhanVien(130, 19, 76, 24, dai+' cm', 15)
+   +'<rect x="10" y="32" width="240" height="30" rx="6" fill="'+HM.goNhat+'"/>'
+   +'<rect x="10" y="54" width="240" height="8" rx="3" fill="'+HM.go+'"/>'
+   +'<path d="M26 40 H104 M58 47 H196 M142 39 H232" stroke="'+HM.go+'" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>';
+  for(var i=1;i<n;i++){ var x=(10+i*240/n).toFixed(1); s+='<line x1="'+x+'" y1="29" x2="'+x+'" y2="65" stroke="'+HM.goDam+'" stroke-width="2.2" stroke-dasharray="4 3"/>'; }
   return s+'</svg>';
 }
 /* ---- Bảng nhiều cột kiểu SGK: nhan = 3 nhãn dòng; cot = mảng cột [a,b,c]; o = {c:cột, r:dòng} ô "?" ---- */

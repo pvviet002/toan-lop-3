@@ -41,16 +41,16 @@ var BAI = {
    muc:['Đếm chấm của 2–3 con bằng phép cộng các số 6.', 'Chọn phép nhân đúng cho 4–6 con bọ rùa.', 'Biết tổng số chấm, tìm số con bọ rùa.'],
    make:function(lv){
     if(lv>=3){ var m=rnd(3,9);
-      return {type:'num', _e:m, q:'<div class="flex justify-center mb-2">'+ladybug()+'</div><div>Mỗi con bọ rùa có 6 chấm ở cánh. Đếm được tất cả '+(6*m)+' chấm.</div><div class="mt-1">Hỏi có mấy con bọ rùa?</div>', ans:m, unit:'con',
+      return {type:'num', _e:m, q:'<div class="flex justify-center mb-2">'+ladybug(72)+'</div><div>Mỗi con bọ rùa có 6 chấm ở cánh. Đếm được tất cả '+(6*m)+' chấm.</div><div class="mt-1">Hỏi có mấy con bọ rùa?</div>', ans:m, unit:'con',
         sai:nhanSai([[6*m,'chon-sai-phep'],[m-1,'lech-nhom'],[m+1,'lech-nhom']], m), goiY:{'chon-sai-phep':'Bé tìm xem 6 × mấy = '+(6*m)+'.'}}; }
-    var n = lv<=1 ? rnd(2,3) : rnd(4,6), bugs=''; for(var i=0;i<n;i++) bugs+=ladybug();
+    var n = lv<=1 ? rnd(2,3) : rnd(4,6), bugs=[]; for(var i=0;i<n;i++) bugs.push(ladybug());
     if(lv<=1){ var add=[]; for(var j=0;j<n;j++) add.push('6');
-      return {type:'num', _e:6*n, q:'<div class="flex justify-center gap-1 mb-2 flex-wrap">'+bugs+'</div><div class="text-slate-600 text-base mb-2">Mỗi con bọ rùa có 6 chấm ở cánh. Có '+n+' con bọ rùa.</div>'
+      return {type:'num', _e:6*n, q:xepHang(bugs, 4)+'<div class="text-slate-600 text-base mb-2">Mỗi con bọ rùa có 6 chấm ở cánh. Có '+n+' con bọ rùa.</div>'
         +'<div class="text-xl">'+add.join(' + ')+' = ?</div><div class="text-slate-500 text-base mt-1">(tức là 6 × '+n+')</div>', ans:6*n, unit:'chấm',
         sai:nhanSai([[6+n,'cong-thay-nhan'],[6*(n-1),'lech-nhom'],[6*(n+1),'lech-nhom']], 6*n), goiY:{'cong-thay-nhan':'Có '+n+' con, mỗi con 6 chấm: cộng '+n+' số 6.'}}; }
     var dung='6 × '+n, ch=[dung, '6 + '+n, '6 × '+(n-1), '6 × '+(n+1)]; shuffle(ch);
     var sai={}; ch.forEach(function(c,i){ if(c!==dung) sai[String(i)] = c.indexOf('+')>=0 ? 'cong-thay-nhan' : 'lech-nhom'; });
-    return {type:'mcq', _dung:dung, q:'<div class="flex justify-center gap-1 mb-2 flex-wrap">'+bugs+'</div><div>Phép tính nào cho biết số chấm của '+n+' con bọ rùa?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai};
+    return {type:'mcq', _dung:dung, q:xepHang(bugs, 4)+'<div>Phép tính nào cho biết số chấm của '+n+' con bọ rùa?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai};
   }, check:function(q){ return q.type==='mcq' ? kiemMCQ(q) : q.ans===q._e; }},
 
   /* D2 — Tổng các số 6 → phép nhân (Khám phá a) */
@@ -184,7 +184,7 @@ var BAI = {
       : (chia ? [[k-1,'canh-dong'],[k+1,'canh-dong']] : [[6*(k-1),'canh-dong'],[6*(k+1),'canh-dong'],[7*k,'nham-bang']]);
     var ls=pick(loaiSai.filter(function(p){ return p[0]>0 && p[0]!==dung; }));
     if(lv>=3){ X=ls[0]; tag=ls[1];
-      return {type:'num', mt:(chia?'MT3':'MT2'), _e:dung, q:'<div class="text-5xl mb-1">&#129490;</div><div>Bạn An tính: <b class="text-orange-600">'+bt+' = '+X+'</b>. An tính sai rồi!</div><div class="mt-1">Kết quả đúng là bao nhiêu?</div>',
+      return {type:'num', mt:(chia?'MT3':'MT2'), _e:dung, q:'<div class="flex justify-center mb-1">'+anh('boy', 72, 'Bạn An')+'</div><div>Bạn An tính: <b class="text-orange-600">'+bt+' = '+X+'</b>. An tính sai rồi!</div><div class="mt-1">Kết quả đúng là bao nhiêu?</div>',
         ans:dung, sai:nhanSai([[X, tag]], dung), goiY: chia ? goiYChia6(k) : goiYNhan6(k)}; }
     var laDung=Math.random()<0.5; X = laDung ? dung : ls[0]; tag = laDung ? '' : ls[1];
     var sai = laDung ? {} : {'0': tag};
@@ -221,17 +221,17 @@ var BAI = {
   {name:'Chọn phép tính', sec:'Chọn phép tính — không cần tính ra kết quả', mt:['MT5'], levels:3,
    muc:['Chọn phép nhân cho tình huống gộp nhiều nhóm bằng nhau.', 'Chọn phép chia cho tình huống chia thành các phần bằng nhau.', 'Chọn biểu thức cho bài toán hai bước.'],
    make:function(lv){
-    var ds, q;   /* ds = [[lựa chọn, nhãn lỗi]] — phần tử đầu là đáp án đúng */
-    if(lv<=1){ var n=rnd(2,9), ctx=pick([['Mỗi hộp có 6 cái bánh. Có '+n+' hộp bánh.','số cái bánh'],['Mỗi bó hoa có 6 bông. Có '+n+' bó hoa.','số bông hoa'],['Mỗi con bọ rùa có 6 chấm. Có '+n+' con bọ rùa.','số chấm']]);
-      ds=[['6 × '+n,''], ['6 + '+n,'cong-thay-nhan'], [(6*n)+' : 6','chon-sai-phep']]; q='<div>'+ctx[0]+'</div><div class="mt-1">Phép tính nào tìm được <b>'+ctx[1]+'</b>?</div>'; }
-    else if(lv===2){ var k=rnd(3,10), P=6*k, ct=pick([['Có '+P+' quả cam chia đều vào 6 đĩa.','số cam ở mỗi đĩa'],['Một thanh gỗ dài '+P+' cm cưa thành 6 đoạn bằng nhau.','độ dài mỗi đoạn'],['Có '+P+' học sinh xếp đều thành 6 hàng.','số học sinh mỗi hàng']]);
-      ds=[[P+' : 6',''], [P+' × 6','chon-sai-phep'], [P+' − 6','cong-thay-nhan'], ['6 : '+P,'dao-vai']]; q='<div>'+ct[0]+'</div><div class="mt-1">Phép tính nào tìm được <b>'+ct[1]+'</b>?</div>'; }
+    var ds, q, hinh;   /* ds = [[lựa chọn, nhãn lỗi]] — phần tử đầu là đáp án đúng; hinh = hình gợi tình huống (không có số để đếm) */
+    if(lv<=1){ var n=rnd(2,9), ctx=pick([['Mỗi hộp có 6 chiếc bút chì màu. Có '+n+' hộp bút.','số bút chì màu',hopBut(6,52)],['Mỗi bó hoa có 6 bông. Có '+n+' bó hoa.','số bông hoa',anh('bouquet',56)],['Mỗi con bọ rùa có 6 chấm. Có '+n+' con bọ rùa.','số chấm',ladybug(52)]]);
+      ds=[['6 × '+n,''], ['6 + '+n,'cong-thay-nhan'], [(6*n)+' : 6','chon-sai-phep']]; hinh=ctx[2]; q='<div>'+ctx[0]+'</div><div class="mt-1">Phép tính nào tìm được <b>'+ctx[1]+'</b>?</div>'; }
+    else if(lv===2){ var k=rnd(3,10), P=6*k, ct=pick([['Có '+P+' bông hoa, bó đều thành 6 bó.','số bông hoa mỗi bó',anh('bouquet',56)],['Một thanh gỗ dài '+P+' cm cưa thành 6 đoạn bằng nhau.','độ dài mỗi đoạn',thanhGo(6,P)],['Có '+P+' học sinh xếp đều thành 6 hàng.','số học sinh mỗi hàng',anh('girl',52)+anh('boy',52)]]);
+      ds=[[P+' : 6',''], [P+' × 6','chon-sai-phep'], [P+' − 6','cong-thay-nhan'], ['6 : '+P,'dao-vai']]; hinh=ct[2]; q='<div>'+ct[0]+'</div><div class="mt-1">Phép tính nào tìm được <b>'+ct[1]+'</b>?</div>'; }
     else { var n3=rnd(3,8), m3=rnd(2,9); if(m3===n3) m3=n3+1;
-      ds=[['6 × '+n3+' − '+m3,''], ['6 × '+n3+' + '+m3,'chon-sai-phep'], ['6 + '+n3+' − '+m3,'cong-thay-nhan'], ['6 × '+m3+' − '+n3,'dao-vai']];
+      ds=[['6 × '+n3+' − '+m3,''], ['6 × '+n3+' + '+m3,'chon-sai-phep'], ['6 + '+n3+' − '+m3,'cong-thay-nhan'], ['6 × '+m3+' − '+n3,'dao-vai']]; hinh=hopBut(6,52);
       q='<div>Lớp mua '+n3+' hộp bút chì màu, mỗi hộp 6 chiếc. Các bạn đã dùng '+m3+' chiếc.</div><div class="mt-1">Phép tính nào tìm được <b>số bút còn lại</b>?</div>'; }
     var dung=ds[0][0]; shuffle(ds);
     var ch=ds.map(function(d){ return d[0]; }), sai={}; ds.forEach(function(d,i){ if(d[1]) sai[String(i)]=d[1]; });
-    return {type:'mcq', cot:1, _dung:dung, q:'<div class="text-4xl mb-1">&#129300;</div>'+q, choices:ch, correct:ch.indexOf(dung), sai:sai,
+    return {type:'mcq', cot:1, _dung:dung, q:'<div class="flex justify-center gap-1 mb-2">'+hinh+'</div>'+q, choices:ch, correct:ch.indexOf(dung), sai:sai,
       goiY:{'chon-sai-phep':'Gộp nhiều nhóm bằng nhau: phép nhân. Chia thành phần bằng nhau: phép chia. Bớt đi: phép trừ.', 'cong-thay-nhan':'Có nhiều nhóm bằng nhau thì dùng phép nhân (hoặc chia), không phải cộng, trừ với 6.', 'dao-vai':'Bé xem lại: số nào là số hộp, số nào là số bút mỗi hộp?'}};
   }, check:kiemMCQ}
  ]
