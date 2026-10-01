@@ -205,13 +205,13 @@ function bnKiemTinh(q){ return q._dang==='tich' ? q.ans===q._b*q._k : q.ans===q.
 /* ---- Hộp bút chì màu có n chiếc bút (SGK bài 9 LT4) — bút tách rời, đếm được ---- */
 function hopBut(n, px){
   n=n||6; var mau=[HM.do,HM.cam,HM.vang,HM.xanhLa,HM.hong,HM.tim,HM.la,HM.doDam,HM.vangDam,HM.camDam];
-  var s=svgHinh(64,80,px||60), p=52/n, w=Math.min(7,p-2);
+  var L=Math.max(52, n*8), W=L+12, s=svgHinh(W,80,px||Math.round(60*W/64)), p=L/n, w=Math.min(7,p-2);   /* > 6 bút: hộp rộng ra, bút không mảnh đi */
   for(var i=0;i<n;i++){ var x=6+i*p+p/2, t=3+(i%2)*6, m=mau[i%mau.length];
     s+='<path d="M'+(x-w/2).toFixed(1)+' '+(t+9)+' L'+x.toFixed(1)+' '+t+' L'+(x+w/2).toFixed(1)+' '+(t+9)+' Z" fill="'+HM.goNhat+'"/>'
      +'<path d="M'+(x-1.5).toFixed(1)+' '+(t+3)+' L'+x.toFixed(1)+' '+t+' L'+(x+1.5).toFixed(1)+' '+(t+3)+' Z" fill="'+m+'"/>'
      +'<rect x="'+(x-w/2).toFixed(1)+'" y="'+(t+9)+'" width="'+w.toFixed(1)+'" height="40" fill="'+m+'"/>'; }
-  return s+'<rect x="2" y="36" width="60" height="42" rx="7" fill="'+HM.troi+'"/><rect x="2" y="36" width="60" height="9" rx="4" fill="'+HM.troiDam+'"/>'
-    +'<rect x="15" y="55" width="34" height="11" rx="5.5" fill="#fff"/></svg>';
+  return s+'<rect x="2" y="36" width="'+(W-4)+'" height="42" rx="7" fill="'+HM.troi+'"/><rect x="2" y="36" width="'+(W-4)+'" height="9" rx="4" fill="'+HM.troiDam+'"/>'
+    +'<rect x="'+(W/2-17)+'" y="55" width="34" height="11" rx="5.5" fill="#fff"/></svg>';
 }
 /* ---- Chuỗi tính liên tiếp: con bướm mang số → (phép tính) → bông hoa → … (SGK bài 9 LT2)
    MỘT hình SVG: co theo màn hình, không rớt bông hoa xuống dòng. dau = số ở con bướm;
@@ -258,10 +258,10 @@ function soDo(nut, phep){
   var D=56, A=74, W=nut.length*D+(nut.length-1)*A+8, phong = nut.length<=2 ? 1.25 : 1, x=4;
   var s='<svg class="text-slate-700" width="'+Math.round(W*phong)+'" height="'+Math.round(72*phong)+'" viewBox="0 0 '+W+' 72" style="max-width:100%;height:auto;display:inline-block">';
   for(var i=0;i<nut.length;i++){
-    var o=nut[i], hoi=(o.v===null || o.v===undefined), f=hoi ? '#fff' : HM.vang, vien=hoi ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '';
+    var o=nut[i], hoi=(o.v===null || o.v===undefined), trong=(o.v===''), f=hoi ? '#fff' : (trong ? HM.xam : HM.vang), vien=hoi ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '';
     if(o.h==='tron') s+='<circle cx="'+(x+D/2)+'" cy="44" r="'+(D/2-1.5)+'" fill="'+f+'"'+vien+'/>';
     else s+='<rect x="'+(x+1.5)+'" y="17.5" width="'+(D-3)+'" height="'+(D-3)+'" rx="12" fill="'+f+'"'+vien+'/>';
-    s+=chuSo(x+D/2, 44, hoi ? '?' : o.v, hoi ? 24 : (String(o.v).length>2 ? 18 : 22));
+    if(!trong) s+=chuSo(x+D/2, 44, hoi ? '?' : o.v, hoi ? 24 : (String(o.v).length>2 ? 18 : 22));   /* v:'' = ô trung gian để trống (không hỏi) */
     x+=D;
     if(i<phep.length){
       s+='<text x="'+(x+A/2)+'" y="30" text-anchor="middle" font-size="17" '+HFONT+' fill="currentColor">'+phep[i]+'</text>'
@@ -270,6 +270,32 @@ function soDo(nut, phep){
     }
   }
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
+}
+/* ---- Con bạch tuộc: đúng 8 xúc tu xoè rời nhau, đầu che gốc xúc tu (SGK bài 11) ---- */
+function bachTuoc(px){
+  var s=svgHinh(64,64,px||60), c=HM.tim;
+  for(var i=0;i<8;i++){ var bx=18+i*28/7, ex=4+i*56/7;   /* đầu xúc tu cách nhau 8 đơn vị, KHÔNG móc cong (móc chạm nhau -> khó đếm) */
+    s+='<path d="M'+bx.toFixed(1)+' 32 Q'+((bx+ex)/2).toFixed(1)+' 52 '+ex.toFixed(1)+' 60" stroke="'+c+'" stroke-width="4" fill="none" stroke-linecap="round"/>'; }
+  return s+'<ellipse cx="32" cy="23" rx="18" ry="17" fill="'+c+'"/>'
+    +'<ellipse cx="26" cy="15" rx="5" ry="3.5" fill="#fff" fill-opacity=".35"/>'
+    +'<circle cx="25" cy="25" r="4.6" fill="#fff"/><circle cx="39" cy="25" r="4.6" fill="#fff"/>'
+    +'<circle cx="25.6" cy="25.8" r="2.4" fill="'+HM.den+'"/><circle cx="39.6" cy="25.8" r="2.4" fill="'+HM.den+'"/>'
+    +'<circle cx="21" cy="32" r="2.6" fill="'+HM.hong+'"/><circle cx="43" cy="32" r="2.6" fill="'+HM.hong+'"/></svg>';
+}
+/* ---- Con cua: đúng 8 chân (4 mỗi bên) và 2 càng — đếm được (SGK bài 11) ---- */
+function conCua(px){
+  var s=svgHinh(72,56,px||64), d=HM.doDam, chan='';
+  for(var i=0;i<4;i++){ var y=29+i*4, ey=33+i*6.5;
+    chan+='<path d="M24 '+y+' L13 '+(ey-4)+' L6 '+ey+'"/><path d="M48 '+y+' L59 '+(ey-4)+' L66 '+ey+'"/>'; }
+  s+='<g stroke="'+d+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">'+chan
+   +'<path d="M27 24 L16 15"/><path d="M45 24 L56 15"/><path d="M31 21 V12"/><path d="M41 21 V12"/></g>';
+  /* hai càng: hình tròn có khe kẹp */
+  s+='<path d="M14 15 m-8 0 a8 8 0 1 0 16 0 l-6 -2 l4 -6 a8 8 0 0 0 -14 8 z" fill="'+HM.do+'"/>'
+   +'<path d="M58 15 m8 0 a8 8 0 1 1 -16 0 l6 -2 l-4 -6 a8 8 0 0 1 14 8 z" fill="'+HM.do+'"/>'
+   +'<ellipse cx="36" cy="33" rx="17" ry="12" fill="'+HM.do+'"/><ellipse cx="36" cy="38" rx="14" ry="6" fill="'+d+'" fill-opacity=".35"/>'
+   +'<circle cx="31" cy="11" r="3.4" fill="#fff"/><circle cx="41" cy="11" r="3.4" fill="#fff"/>'
+   +'<circle cx="31" cy="11" r="1.7" fill="'+HM.den+'"/><circle cx="41" cy="11" r="1.7" fill="'+HM.den+'"/>';
+  return s+'</svg>';
 }
 /* ---- Quả bóng mang phép tính: 6 múi màu HM (nhìn từ trên), nhãn trắng ngang giữa ---- */
 function bong(expr){
