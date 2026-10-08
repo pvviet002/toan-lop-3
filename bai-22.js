@@ -33,7 +33,7 @@ function luoiVuong(hs, o){
     for(i=0;i<=n;i++) s+='<line x1="'+(ox+i*c)+'" y1="'+oy+'" x2="'+(ox+i*c)+'" y2="'+(oy+gw)+'" stroke="'+HM.day+'" stroke-width="1.5"/><line x1="'+ox+'" y1="'+(oy+i*c)+'" x2="'+(ox+gw)+'" y2="'+(oy+i*c)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
     s+='<rect data-f="'+idx+'" data-r="'+[h.x,h.y,h.w,h.h].join(',')+'" x="'+X(h.x)+'" y="'+Y(h.y+h.h)+'" width="'+(h.w*c)+'" height="'+(h.h*c)+'" fill="'+HM.troi+'" fill-opacity="0.25" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>';
     if(h.ten){ [['A',h.x,h.y+h.h,-1,-1],['B',h.x+h.w,h.y+h.h,1,-1],['C',h.x+h.w,h.y,1,1],['D',h.x,h.y,-1,1]].forEach(function(v){
-      s+='<text x="'+f1(X(v[1])+v[3]*17)+'" y="'+f1(Y(v[2])+v[4]*(v[4]<0?12:17)+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+v[0]+'</text>'; }); }
+      s+='<circle cx="'+X(v[1])+'" cy="'+Y(v[2])+'" r="4.5" fill="'+HM.cam+'"/><text x="'+f1(X(v[1])+v[3]*13)+'" y="'+f1(Y(v[2])+(v[4]<0 ? -9 : 23))+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+v[0]+'</text>'; }); }
     if(h.pill) s+=pill((X(h.pill[0])+X(h.pill[2]))/2, (Y(h.pill[1])+Y(h.pill[3]))/2, 36, 26, h.pill[4], 16, h.pill[4]);
     h.diem.forEach(function(p){
       s+='<circle data-f="'+idx+'" data-p="'+p[0]+','+p[1]+'" cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="5" fill="'+HM.cam+'"/>';
