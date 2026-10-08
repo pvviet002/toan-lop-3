@@ -28,6 +28,8 @@ Viết cho học sinh lớp 3 và thầy giáo: tiếng Việt có dấu, câu n
    Vẫn **dừng cho thầy duyệt** trước khi viết mã, đúng như skill.
 4. **Chrome cho các cổng soát** (`soat_giao_dien.mjs`, `phong_tranh.mjs`). Công cụ tự tìm Chrome / Chromium, kể cả bản
    Playwright. Không thấy thì cài: `npx -y playwright install --with-deps chromium` (lỗi quyền thì bỏ `--with-deps`).
+   Mạng đám mây chặn CDN (Tailwind, jsDelivr) — công cụ đã tự trả bản lưu sẵn ở `sk-web-toan-tieuhoc/assets/vendor/`
+   (dòng tóm tắt in "CDN: N lượt dùng bản lưu sẵn"), nên **không** cần mạng ngoài. Đừng đặt `CDN_THAT=1` trên đám mây.
    Vẫn không cài được ⇒ chạy các cổng không cần trình duyệt (`kiemtra.js`, `kiem_dem.mjs`) và ghi rõ trong PR:
    **"CHƯA soát giao diện / soát hình — cần chạy trên máy thầy"**. Đừng coi là xong.
 5. **Không đưa thẳng lên web.** Không chạy `dang_web.mjs` không có `--thu`, không push vào `main`, không `--force`.

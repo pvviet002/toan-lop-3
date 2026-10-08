@@ -20,6 +20,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import http from "node:http";
+import { fileURLToPath } from "node:url";
 
 const args = process.argv.slice(2);
 function opt(name, def) { const i = args.indexOf(name); if (i < 0) return def; const v = args[i + 1]; args.splice(i, 2); return v; }
@@ -44,6 +45,19 @@ const CHROME = process.env.CHROME || ["C:/Program Files/Google/Chrome/Applicatio
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable",
   "/usr/bin/chromium", "/usr/bin/chromium-browser", ...pwChrome].find((p) => fs.existsSync(p));
 const LINUX = process.platform === "linux" ? ["--no-sandbox", "--disable-dev-shm-usage"] : [];
+const CHROME_ARGS = (process.env.CHROME_ARGS || "").split(" ").filter(Boolean);   // cờ thêm cho Chrome, vd giả lập mạng chặn CDN
+
+// CDN -> bản lưu sẵn trong assets/vendor (phiên đám mây chặn CDN; trên máy cũng nhanh, ổn định). CDN_THAT=1: tải thật.
+const VENDOR = path.join(path.dirname(fileURLToPath(import.meta.url)), "vendor");
+const CDN_LUU = [[/^https:\/\/cdn\.tailwindcss\.com(\/|$)/, "tailwind.js"],
+  [/canvas-confetti@[\d.]+\/dist\/confetti\.browser\.min\.js/, "confetti.browser.min.js"]];
+let soCdnLuu = 0;
+function phucVuCdn(p) {
+  const hit = CDN_LUU.find(([re]) => re.test(p.request.url)), f = hit && path.join(VENDOR, hit[1]);
+  if (f && fs.existsSync(f)) { soCdnLuu++; cdp("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 200, body: fs.readFileSync(f).toString("base64"),
+    responseHeaders: [{ name: "Content-Type", value: "text/javascript; charset=utf-8" }, { name: "Access-Control-Allow-Origin", value: "*" }] }).catch(() => {}); }
+  else cdp("Fetch.continueRequest", { requestId: p.requestId }).catch(() => {});
+}
 if (!CHROME) { console.error("Không tìm thấy Chrome/Edge — đặt biến CHROME"); process.exit(2); }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // nhật ký mẫu cho M mục tiêu: mức đạt lần lượt 3,2,1,2,0 (lặp) -> ngọn lửa chung = trung vị; engine phải ra đúng và vẽ khớp
@@ -67,7 +81,7 @@ const BASE = "http://127.0.0.1:" + server.address().port;
 // ---- Chrome ngầm + DevTools ----
 const port = 9300 + Math.floor(Math.random() * 600);
 const udd = fs.mkdtempSync(path.join(os.tmpdir(), "sgd-chrome-"));
-const chrome = spawn(CHROME, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--mute-audio", ...LINUX,
+const chrome = spawn(CHROME, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--mute-audio", ...LINUX, ...CHROME_ARGS,
   `--remote-debugging-port=${port}`, `--user-data-dir=${udd}`, "about:blank"], { stdio: "ignore" });
 let ws, seq = 0; const pend = new Map(); const jsLoi = [];
 function cdp(method, params = {}) {
@@ -164,8 +178,10 @@ try {
     const m = JSON.parse(e.data);
     if (m.id && pend.has(m.id)) { const p = pend.get(m.id); pend.delete(m.id); m.error ? p.rej(new Error(m.error.message)) : p.res(m.result); }
     else if (m.method === "Runtime.exceptionThrown") jsLoi.push(m.params.exceptionDetails.exception?.description?.split("\n")[0] || m.params.exceptionDetails.text);
+    else if (m.method === "Fetch.requestPaused") phucVuCdn(m.params);
   });
   await cdp("Page.enable"); await cdp("Runtime.enable"); await cdp("Network.enable");
+  if (!process.env.CDN_THAT) await cdp("Fetch.enable", { patterns: [{ urlPattern: "*cdn.tailwindcss.com*" }, { urlPattern: "*cdn.jsdelivr.net*" }] });
   await cdp("Network.setBlockedURLs", { urls: ["*hits.sh*"] });
 
   for (const bai of BAI) {
@@ -349,6 +365,7 @@ finally {
   try { fs.rmSync(udd, { recursive: true, force: true }); } catch (e) {}
 }
 console.log("\n── TÓM TẮT ──");
+console.log(process.env.CDN_THAT ? "  (CDN tải thật)" : "  (CDN: " + soCdnLuu + " lượt dùng bản lưu sẵn assets/vendor)");
 tomTat.forEach(([b, l, c]) => console.log(`  ${b.padEnd(8)} ${l ? l + " lỗi" : "0 lỗi"} · ${c} cảnh báo`));
 console.log(tongLoi ? `KẾT QUẢ: ${tongLoi} LỖI — CHƯA ĐƯỢC DEPLOY` : `KẾT QUẢ: ĐẠT (không lỗi chặn; ${tongCanh} loại cảnh báo)`);
 process.exit(tongLoi ? 1 : 0);

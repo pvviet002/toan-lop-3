@@ -11,7 +11,7 @@
 //
 // Ảnh ra: <bai>_<giao>_<rộng>_<k>.png. Đọc từng ảnh bằng công cụ xem ảnh, chấm theo references/tieu-chi-soi.md.
 import { spawn, spawnSync } from "node:child_process"; import fs from "node:fs"; import path from "node:path";
-import os from "node:os"; import http from "node:http"; import vm from "node:vm";
+import os from "node:os"; import http from "node:http"; import vm from "node:vm"; import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2), opt = {}, pos = [], CO = new Set(["soat", "khong-chup", "danhmuc"]);
 for (let i = 0; i < argv.length; i++) { if (argv[i].startsWith("--")) { const k = argv[i].slice(2); opt[k] = CO.has(k) ? true : argv[++i]; } else pos.push(argv[i]); }
@@ -179,18 +179,31 @@ const CHROME = process.env.CHROME || ["C:/Program Files/Google/Chrome/Applicatio
   "/usr/bin/chromium", "/usr/bin/chromium-browser", ...pwChrome].find((p) => fs.existsSync(p));
 if (!CHROME) { console.error("Không tìm thấy Chrome/Edge/Chromium — đặt biến CHROME"); process.exit(2); }
 const LINUX = process.platform === "linux" ? ["--no-sandbox", "--disable-dev-shm-usage"] : [];
+const CHROME_ARGS = (process.env.CHROME_ARGS || "").split(" ").filter(Boolean);   // cờ thêm cho Chrome, vd giả lập mạng chặn CDN
+// CDN -> bản lưu sẵn trong sk-web-toan-tieuhoc/assets/vendor (phiên đám mây chặn CDN). CDN_THAT=1: tải thật.
+const VENDOR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "sk-web-toan-tieuhoc", "assets", "vendor");
+const CDN_LUU = [[/^https:\/\/cdn\.tailwindcss\.com(\/|$)/, "tailwind.js"],
+  [/canvas-confetti@[\d.]+\/dist\/confetti\.browser\.min\.js/, "confetti.browser.min.js"]];
+function phucVuCdn(p) {
+  const hit = CDN_LUU.find(([re]) => re.test(p.request.url)), f = hit && path.join(VENDOR, hit[1]);
+  if (f && fs.existsSync(f)) cdp("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: 200, body: fs.readFileSync(f).toString("base64"),
+    responseHeaders: [{ name: "Content-Type", value: "text/javascript; charset=utf-8" }, { name: "Access-Control-Allow-Origin", value: "*" }] });
+  else cdp("Fetch.continueRequest", { requestId: p.requestId });
+}
 const port = 9300 + Math.floor(Math.random() * 600);
 const udd = fs.mkdtempSync(path.join(os.tmpdir(), "sgd-chrome-"));
-const chrome = spawn(CHROME, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--mute-audio", ...LINUX,
+const chrome = spawn(CHROME, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--mute-audio", ...LINUX, ...CHROME_ARGS,
   `--remote-debugging-port=${port}`, `--user-data-dir=${udd}`, "about:blank"], { stdio: "ignore" });
 let list; for (let i = 0; i < 60 && !list; i++) { await sleep(200); try { list = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); } catch {} }
 const ws = new WebSocket(list.find((t) => t.type === "page").webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener("open", r));
 let seq = 0; const pend = new Map();
-ws.addEventListener("message", (m) => { const d = JSON.parse(m.data); if (d.id && pend.has(d.id)) { pend.get(d.id)(d.result || {}); pend.delete(d.id); } });
+ws.addEventListener("message", (m) => { const d = JSON.parse(m.data); if (d.id && pend.has(d.id)) { pend.get(d.id)(d.result || {}); pend.delete(d.id); }
+  else if (d.method === "Fetch.requestPaused") phucVuCdn(d.params); });
 const cdp = (method, params = {}) => new Promise((res) => { const id = ++seq; pend.set(id, res); ws.send(JSON.stringify({ id, method, params })); });
 const ev = async (e) => (await cdp("Runtime.evaluate", { expression: e, returnByValue: true, awaitPromise: true })).result?.value;
 await cdp("Page.enable"); await cdp("Runtime.enable");
+if (!process.env.CDN_THAT) await cdp("Fetch.enable", { patterns: [{ urlPattern: "*cdn.tailwindcss.com*" }, { urlPattern: "*cdn.jsdelivr.net*" }] });
 
 const BANG = bangMau(); let tongLoi = 0, tongCanh = 0;
 for (const [ten, url, rong] of viec) {

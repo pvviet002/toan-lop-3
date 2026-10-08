@@ -230,6 +230,11 @@ Script Python in tiếng Việt ra console bị lỗi mã hoá cp1252 — ghi fi
   thay thế khi không có máy thầy: không SGK, mở PR thay vì push `main`). **Sửa skill này hoặc `sk-ve-hinh-tieuhoc` xong ⇒
   `node .claude/dong-bo-skill.mjs --len-repo`** rồi commit `.claude/skills` cùng lần đưa lên tới; gộp PR đám mây có sửa
   skill ⇒ `git pull` rồi `--ve-may`. Công cụ soát tìm được cả Chrome Linux / Playwright (`--no-sandbox` trên Linux).
+- **CDN lưu sẵn (08/10/2026):** đám mây chặn CDN nên trang không dựng ⇒ soát hỏng toàn bộ. `soat_giao_dien` + `phong_tranh`
+  chặn yêu cầu tới `cdn.tailwindcss.com` / `cdn.jsdelivr.net` (CDP `Fetch`) và trả bản trong `assets/vendor/`
+  (Tailwind 3.4.17, canvas-confetti 1.6.0). `CDN_THAT=1` = tải thật; `CHROME_ARGS="--proxy-server=http://127.0.0.1:9"`
+  giả lập mạng chặn (đối chứng: CDN thật ⇒ "trang không dựng được"). Trang bài thêm thư viện CDN mới ⇒ tải vào `vendor/`
+  + thêm một dòng `CDN_LUU` ở CẢ hai công cụ, không thì đám mây lại hỏng.
 - **Mặc định: git** qua `assets/dang_web.mjs` (xem Quy trình bước 6). Chi tiết, cách
   dựng lại bản sao git, và đường **dự phòng qua trình duyệt** (khi máy mất git/mạng)
   → `references/quy-trinh-commit.md`.
