@@ -48,6 +48,16 @@ function btBang25(v){
 }
 function kiemCung(q){ var n=q.choices.filter(function(c){ return tinhBT(c)===q._v; }).length; return n===1 && tinhBT(q.choices[q.correct])===q._v && tinhBT(q._target)===q._v && new Set(q.choices).size===q.choices.length; }
 
+/* Tính nhẩm hỗn hợp (bảng 4–8, Luyện tập tiết 2): nhãn lỗi cho a × b và (a × b) : a */
+function saiNhanA(a,b){ return nhanSai([[a*(b-1),'canh-dong'],[a*(b+1),'canh-dong'],[a+b,'cong-thay-nhan'],[(a-1)*b,'nham-bang'],[(a+1)*b,'nham-bang']], a*b); }
+function saiChiaA(a,b){ return nhanSai([[b-1,'canh-dong'],[b+1,'canh-dong'],[a*b-a,'cong-thay-nhan'],[a,'dao-vai']], b); }
+/* Bộ ba phép tính cho dạng "So với 10": loại phép tính theo ngưỡng 10 */
+function bonPhep(pool, soLon, soBe){   /* chọn 3 phép tính khác nhau: soLon phép > 10, soBe phép < 10, còn lại tuỳ ý */
+  for(var t=0;t<500;t++){ var c=shuffle(pool.slice()).slice(0,3), L=c.filter(function(e){ return tinhBT(e)>10; }).length, B=c.filter(function(e){ return tinhBT(e)<10; }).length;
+    if(L===soLon && (soBe<0 || B===soBe)) return c; }
+  return null;
+}
+
 var BAI = {
  n: 12,
  title: 'Bảng Nhân 9, Bảng Chia 9',
@@ -62,7 +72,7 @@ var BAI = {
  ],
  topics: [
   /* D1 — Múa rồng (Khám phá) */
-  {name:'Múa rồng', sec:'Khám phá — Phép nhân 9 từ phép cộng', mt:['MT1'], levels:3,
+  {name:'Múa rồng', sec:'Khám phá a — Múa rồng: phép nhân 9 từ phép cộng', mt:['MT1'], levels:3,
    muc:['Đếm số người của 2–3 đội múa rồng bằng phép cộng các số 9.', 'Cộng nhiều số 9 (4 đội) mà không cần gợi ý phép nhân.', 'Làm ngược lại: biết tổng số người, tìm số đội múa rồng.'],
    make:function(lv){
     if(lv>=3){ var m=rnd(3,9);
@@ -90,19 +100,46 @@ var BAI = {
   }, check:function(q){ return q.type==='mcq' ? (kiemMCQ(q) && (q._dung==='Đ')===(q._m===q._k)) : q.ans===q._e; }},
 
   /* D3 — Lập bảng nhân 9 / bảng chia 9 (Khám phá). Dùng chung MT2 và MT3 */
-  {name:'Lập bảng', sec:'Khám phá — Hoàn thành bảng nhân 9, bảng chia 9', mt:['MT2','MT3'], levels:3,
+  {name:'Lập bảng', sec:'Khám phá b — Bảng nhân 9, bảng chia 9', mt:['MT2','MT3'], levels:3,
    muc:['Điền các dòng đầu của bảng nhân 9 hoặc bảng chia 9.', 'Điền các dòng cuối của bảng nhân 9 hoặc bảng chia 9.', 'Điền khi các dòng bên cạnh cũng bị che — phải nhớ, không đếm thêm.'],
    make:function(lv, mt){ return bang9(lv, mt==='MT3' ? true : (mt==='MT2' ? false : Math.random()<0.5)); },
    check:function(q){ return bnKiemBang(q) && q.ans>0; }},
 
+  /* D14 — Bảng số (Luyện tập tiết 2, LT2): Thừa số · Thừa số · Tích  và  Số bị chia · Số chia · Thương. Một ô "?" */
+  {name:'Bảng số', sec:'Luyện tập, tiết 2 — Số? (bảng Thừa số – Tích, Số bị chia – Thương)', mt:['MT2','MT3'], levels:3,
+   muc:['Tìm tích hoặc thương trong bảng, số nhỏ.', 'Tìm thừa số hoặc số chia trong bảng.', 'Bảng nhiều cột, ô ? ở thừa số hoặc số bị chia.'],
+   make:function(lv, mt){
+    var chia = (mt==='MT3' ? true : (mt==='MT2' ? false : Math.random()<0.5)), n = lv>=3 ? 6 : 5, ks=[], x, cot, c, r, k, ans, sai, gy;
+    while(ks.length<n){ x = lv<=1 ? pick([1,2,3,4,5,6,7]) : rnd(2,10); if(ks.indexOf(x)<0) ks.push(x); }
+    c=rnd(0,n-1); k = lv<=1 ? rnd(2,5) : (lv===2 ? rnd(3,10) : rnd(3,10)); if(ks.indexOf(k)>=0 && ks.indexOf(k)!==c) ks[ks.indexOf(k)]=ks[c]; ks[c]=k;
+    var chieu = ks.map(function(){ return Math.random()<0.5; });   /* true: số 9 đứng cột trái */
+    if(lv<=1) chieu[c]=true;   /* mức 1 (bảng chia): cột có ô ? là Số bị chia · 9 · Thương */
+    if(!chia){
+      cot=ks.map(function(v,i){ return chieu[i] ? [9, v, 9*v] : [v, 9, 9*v]; });
+      if(lv<=1){ r=2; ans=9*k; sai=saiNhan9(k); gy=goiYNhan9(k); }
+      else { r = chieu[c] ? 1 : 0; ans=k; sai=nhanSai([[k-1,'canh-dong'],[k+1,'canh-dong'],[9*k,'dao-vai'],[9,'dao-vai']], k); gy={'canh-dong':'Bé nhẩm: 9 × mấy = '+(9*k)+'? Dựa vào cột có tích '+(9*k)+'.', 'dao-vai':'Ô ? là thừa số còn thiếu, không phải tích.'}; }
+      return {type:'num', mt:'MT2', _e:ans, _bang:'nhan', _cot:cot, _c:c, _r:r, q:bangCot(['Thừa số','Thừa số','Tích'], cot, {c:c, r:r})+'<div class="mt-1">Số ở ô <b class="text-amber-700">?</b> là bao nhiêu?</div>', ans:ans, sai:sai, goiY:gy};
+    }
+    cot=ks.map(function(v,i){ return chieu[i] ? [9*v, 9, v] : [9*v, v, 9]; });
+    if(lv<=1){ r=2; ans=k; sai=saiChia9(k); gy=goiYChia9(k); }
+    else if(lv===2){ r = chieu[c] ? 2 : 1; ans = chieu[c] ? k : k; sai=nhanSai([[9,'dao-vai'],[9*k,'dao-vai'],[k-1,'canh-dong'],[k+1,'canh-dong']], k); gy={'dao-vai':'Ô ? là số chia hoặc thương, không phải số bị chia '+(9*k)+'.', 'canh-dong':'Bé nhẩm: '+(9*k)+' : mấy = 9? hoặc 9 × mấy = '+(9*k)+'?'}; }
+    else { r=0; ans=9*k; sai=nhanSai([[k,'dao-vai'],[9*(k-1),'canh-dong'],[9*(k+1),'canh-dong'],[9+k,'cong-thay-nhan']], 9*k); gy={'dao-vai':'Ô ? là số bị chia: lấy số chia nhân với thương.', 'canh-dong':'Số bị chia = số chia × thương. Bé nhân lại nhé!', 'cong-thay-nhan':'Số bị chia = thương × số chia, không phải cộng.'}; }
+    return {type:'num', mt:'MT3', _e:ans, _bang:'chia', _cot:cot, _c:c, _r:r, q:bangCot(['Số bị chia','Số chia','Thương'], cot, {c:c, r:r})+'<div class="mt-1">Số ở ô <b class="text-amber-700">?</b> là bao nhiêu?</div>', ans:ans, sai:sai, goiY:gy};
+  }, check:function(q){ var col=q._cot[q._c], r=q._r, tr = q._bang==='nhan' ? col[0]*col[1]===col[2] : (col[1]*col[2]===col[0]);
+    return tr && q.ans===col[r] && q.ans===q._e && q.ans>=0 && q._cot.length>=5 && new Set(q._cot.map(function(x){ return x.join(','); })).size===q._cot.length; }},
+
   /* D4 — Nhân nhẩm bảng 9 (Hoạt động 1) */
-  {name:'Nhân nhẩm', sec:'Hoạt động 1 — Tính nhẩm bảng nhân 9', mt:['MT2'], levels:3,
+  {name:'Nhân nhẩm', sec:'Hoạt động 1 — Tính nhẩm (nhân)', mt:['MT2'], levels:3,
    muc:['Nhớ 9 × 1 đến 9 × 5.', 'Nhớ 9 × 6 đến 9 × 10, cả khi đổi chỗ thừa số.', 'Dùng kết quả đã biết để tính nhanh kết quả bên cạnh, hoặc tìm thừa số chưa biết.'],
    make:function(lv){
     var k;
     if(lv<=1){ k=rnd(1,5); return {type:'num', _e:9*k, q:kyHieu('Tính nhẩm', '9 × '+k+' ='+oHoi()), ans:9*k, sai:saiNhan9(k), goiY:goiYNhan9(k)}; }
-    if(lv===2){ k=pick([6,7,8,9,10,rnd(2,10)]); var bt = Math.random()<0.6 ? '9 × '+k : k+' × 9';
+    if(lv===2){ k=pick([6,7,8,9,10,rnd(2,10),0]);
+      if(k===0){ var b0 = Math.random()<0.5 ? '9 × 0' : '0 × 9'; return {type:'num', _e:0, q:kyHieu('Tính nhẩm', b0+' ='+oHoi()), ans:0, sai:nhanSai([[9,'cong-thay-nhan'],[1,'sai-buoc']], 0), goiY:{'cong-thay-nhan':'Nhân với 0 thì kết quả bằng 0, không phải 9.', 'sai-buoc':'Số nào nhân với 0 cũng bằng 0.'}}; }
+      var bt = Math.random()<0.6 ? '9 × '+k : k+' × 9';
       return {type:'num', _e:9*k, q:kyHieu('Tính nhẩm', bt+' ='+oHoi()), ans:9*k, sai:saiNhan9(k), goiY:goiYNhan9(k)}; }
+    if(Math.random()<0.25){ var a=rnd(4,8), b=rnd(3,9); return {type:'num', _e:a*b, q:kyHieu('Tính nhẩm (các bảng khác)', a+' × '+b+' ='+oHoi()), ans:a*b, sai:saiNhanA(a,b),
+      goiY:{'canh-dong':'Bé đếm lại theo bảng nhân '+a+'.', 'cong-thay-nhan':a+' × '+b+' là '+b+' lần số '+a+', không phải '+a+' + '+b+'.', 'nham-bang':'Bé nhớ đúng bảng nhân '+a+' nhé!'}}; }
     k=rnd(3,9);
     if(Math.random()<0.4){ k=rnd(3,10);
       return {type:'num', _e:k, q:kyHieu('Tìm số thích hợp', '9 ×'+oHoi()+'= '+(9*k)), ans:k, sai:nhanSai([[k-1,'canh-dong'],[k+1,'canh-dong'],[9*k,'dao-vai']], k),
@@ -113,10 +150,12 @@ var BAI = {
   }, check:function(q){ return q.ans===q._e; }},
 
   /* D5 — Chia nhẩm bảng 9 (Hoạt động 1) */
-  {name:'Chia nhẩm', sec:'Hoạt động 1 — Tính nhẩm bảng chia 9', mt:['MT3'], levels:3,
+  {name:'Chia nhẩm', sec:'Hoạt động 1 — Tính nhẩm (chia)', mt:['MT3'], levels:3,
    muc:['Chia nhẩm 18 : 9 đến 45 : 9.', 'Chia nhẩm 54 : 9 đến 90 : 9.', 'Từ một phép nhân suy ra phép chia cho thừa số kia; tìm số bị chia.'],
    make:function(lv){
     if(lv>=3){ var k=pick([2,3,4,5,6,7,8,10]);
+      if(Math.random()<0.25){ var a=rnd(3,8), b=rnd(2,9); return {type:'num', _e:b, q:kyHieu('Tính nhẩm (các bảng khác)', (a*b)+' : '+a+' ='+oHoi()), ans:b, sai:saiChiaA(a,b),
+        goiY:{'canh-dong':'Bé nhẩm: '+a+' × mấy = '+(a*b)+'?', 'cong-thay-nhan':'Đây là phép chia, không phải phép trừ.', 'dao-vai':'Tìm số mà '+a+' × số đó = '+(a*b)+'.'}}; }
       if(Math.random()<0.4) return {type:'num', _e:9*k, q:kyHieu('Tìm số thích hợp', oHoi()+': 9 = '+k), ans:9*k,
         sai:nhanSai([[k,'dao-vai'],[9+k,'cong-thay-nhan'],[9*(k-1),'canh-dong'],[9*(k+1),'canh-dong']], 9*k), goiY:{'dao-vai':'Ô trống là số bị chia: lấy thương '+k+' nhân với số chia 9.', 'cong-thay-nhan':'Số bị chia = thương × số chia, không phải cộng.', 'canh-dong':'Bé nhẩm: mấy chia 9 được '+k+'? Lấy '+k+' × 9.'}};
       return {type:'num', _e:9, q:'<div class="text-slate-600 mb-1">Biết <b>9 × '+k+' = '+(9*k)+'</b>.</div>'+kyHieu('Vậy', (9*k)+' : '+k+' ='+oHoi()), ans:9,
@@ -161,7 +200,7 @@ var BAI = {
   }, check:kiemCung},
 
   /* D8 — Số còn thiếu trong dãy đếm thêm/bớt 9 (Luyện tập) */
-  {name:'Số còn thiếu', sec:'Luyện tập — Nêu các số còn thiếu', mt:['MT4'], levels:3,
+  {name:'Số còn thiếu', sec:'Luyện tập, tiết 1 — Nêu các số còn thiếu', mt:['MT4'], levels:3,
    muc:['Đếm thêm 9 từ 9, tìm số ở đầu dãy.', 'Đếm thêm hoặc bớt 9, tìm số ở giữa dãy.', 'Dãy không bắt đầu từ 9 và ô bên cạnh bị che — dùng bước đếm 9.'],
    make:function(lv){
     var q=bnDaySo(9, lv, 'vuong', 'tron'), a=q.ans;
@@ -171,7 +210,7 @@ var BAI = {
   }, check:bnKiemDay},
 
   /* D9 — Sơ đồ nhân rồi chia (Luyện tập — Số?) */
-  {name:'Sơ đồ', sec:'Luyện tập — Số?', mt:['MT4'], levels:3,
+  {name:'Sơ đồ', sec:'Luyện tập, tiết 1 — Số? (sơ đồ)', mt:['MT4'], levels:3,
    muc:['Nhân 9 với 2 hoặc 3 rồi chia cho 3 hoặc 9.', 'Nhân 9 rồi chia cho một số trong bảng chia đã học.', 'Số lớn hơn: nhân 9 với số tới 10 rồi chia cho 4, 5, 6, 8.'],
    make:function(lv){
     var p = lv<=1 ? rnd(2,3) : (lv===2 ? rnd(2,6) : rnd(4,10)), mid=9*p, divs=[];
@@ -183,19 +222,51 @@ var BAI = {
       goiY:{'thieu-buoc':'Bé mới làm xong mũi tên thứ nhất. Còn mũi tên : '+qd+' nữa!', 'cong-thay-nhan':'Mũi tên : '+qd+' là phép chia cho '+qd+', không phải phép trừ.', 'chon-sai-phep':'Mũi tên thứ hai là chia: lấy số ở ô giữa chia cho '+qd+'.'}};
   }, check:function(q){ return q._mid%q._qd===0 && q.ans===q._mid/q._qd; }},
 
-  /* D10 — So kết quả với 10 (Luyện tập; hình bông hoa chở phép tính). Phép tính ngắn: <= 9 ký tự */
-  {name:'So với 10', sec:'Luyện tập — Kết quả lớn hơn hay bé hơn 10?', mt:['MT4'], levels:3,
-   muc:['So kết quả với 10 khi kết quả khác xa 10.', 'So kết quả với 10 khi kết quả rất gần 10 (9, 10, 11…).', 'So kết quả phép tính hai bước với 10.'],
+  /* D10 — So kết quả với 10 (Luyện tập tiết 1, LT3; hình bông hoa chở phép tính). Sách cho chọn NHIỀU bông hoa; engine chấm một đáp án nên
+     đổi thành câu ĐẾM ("có bao nhiêu phép tính ... 10") và câu CHỌN MỘT. Phép tính ngắn: <= 9 ký tự */
+  {name:'So với 10', sec:'Luyện tập, tiết 1 — Kết quả lớn hơn hay bé hơn 10?', mt:['MT4'], levels:3,
+   muc:['So kết quả với 10 khi kết quả khác xa 10 (một bông hoa; đếm hoặc chọn một).', 'So kết quả với 10 khi kết quả rất gần 10 (9, 10, 11…).', 'So kết quả phép tính hai bước với 10.'],
    make:function(lv){
-    var e;
-    if(lv<=1) e=pick(['9 × 3','9 × 4','9 × 5','9 × 6','9 × 8','9 × 9','18 : 9','27 : 9','36 : 9','45 : 9']);
-    else if(lv===2) e=pick(['9 × 1','9 × 2','90 : 9','90 : 9','81 : 9','63 : 9','72 : 9','54 : 9']);
-    else e=pick(['9 × 2 − 9','9 × 2 − 7','9 × 2 − 8','9 × 3 − 9','9 × 1 + 1','9 × 1 + 2','9 × 2 + 1','9 × 3 − 8']);
-    var v=tinhBT(e), correct = v>10 ? 0 : (v<10 ? 1 : 2);
-    return {type:'mcq', _e:e,
-      q:'<div class="mb-1">Kết quả của phép tính trên bông hoa so với <b>10</b> thế nào?</div><div class="flex justify-center my-2">'+flower(e)+'</div>',
-      choices:['Lớn hơn 10','Bé hơn 10','Bằng 10'], correct:correct, goiY:{'chung':'Bé tính kết quả của phép tính trên bông hoa, rồi so sánh với 10.'}};
-  }, check:function(q){ var v=tinhBT(q._e); return q.correct===(v>10?0:(v<10?1:2)) && Number.isInteger(v) && q._e.length<=9; }},
+    var far=['9 × 3','9 × 4','9 × 5','9 × 6','9 × 8','9 × 9','18 : 9','27 : 9','36 : 9','45 : 9'], near=['9 × 1','9 × 2','90 : 9','81 : 9','63 : 9','72 : 9','54 : 9'],
+        hai=['9 × 2 − 9','9 × 2 − 7','9 × 2 − 8','9 × 3 − 9','9 × 1 + 1','9 × 1 + 2','9 × 2 + 1','9 × 3 − 8'], pool = lv<=1 ? far : (lv===2 ? near : hai), kieu = lv===1 ? pick(['mot','dem']) : (lv===2 ? pick(['mot','chon']) : pick(['dem','chon']));
+    if(kieu==='mot'){ var e=pick(pool), v=tinhBT(e), correct = v>10 ? 0 : (v<10 ? 1 : 2);
+      return {type:'mcq', _kieu:'mot', _e:e, q:'<div class="mb-1">Kết quả của phép tính trên bông hoa so với <b>10</b> thế nào?</div><div class="flex justify-center my-2">'+flower(e)+'</div>',
+        choices:['Lớn hơn 10','Bé hơn 10','Bằng 10'], correct:correct, goiY:{'chung':'Bé tính kết quả của phép tính trên bông hoa, rồi so sánh với 10.'}}; }
+    var lon = Math.random()<0.5, cands;
+    if(kieu==='dem'){ cands=null; for(var g=0;g<60 && !cands;g++) cands=bonPhep(pool, lon ? rnd(1,2) : 0, -1); if(cands && !lon){ cands=null; for(var g2=0;g2<60 && !cands;g2++) cands=bonPhep(pool, rnd(1,2), -1); lon=true; }
+      if(!cands) cands=bonPhep(far, 1, -1);
+      var dem=cands.filter(function(x){ return tinhBT(x)>10; }).length;
+      return {type:'num', _kieu:'dem', _es:cands, _e:dem, q:'<div class="mb-1">Có bao nhiêu bông hoa ghi phép tính có kết quả <b>lớn hơn 10</b>?</div>'+xepHang(cands.map(function(x){ return flower(x); }), 3), ans:dem, unit:'bông hoa',
+        sai:nhanSai([[dem-1,'lech-nhom'],[dem+1,'lech-nhom'],[3-dem,'chon-sai-phep']], dem), goiY:{'lech-nhom':'Bé tính kết quả từng bông hoa rồi đếm lại nhé!', 'chon-sai-phep':'Bé đếm các bông hoa lớn hơn 10, không đếm các bông bé hơn 10.', 'chung':'Bé tính từng phép tính, so với 10 rồi đếm.'}}; }
+    /* chọn một: đúng một phép tính thoả điều kiện */
+    var dk = lon ? 'lớn hơn 10' : 'bé hơn 10', ok=function(x){ return lon ? tinhBT(x)>10 : tinhBT(x)<10; }, dung=null, sai3=[], i, mix=shuffle(pool.slice());
+    for(i=0;i<mix.length;i++){ if(ok(mix[i])){ if(!dung) dung=mix[i]; } else if(sai3.length<2) sai3.push(mix[i]); }
+    if(!dung || sai3.length<2){ dk='lớn hơn 10'; ok=function(x){ return tinhBT(x)>10; }; dung=null; sai3=[]; mix=shuffle(far.slice()); for(i=0;i<mix.length;i++){ if(ok(mix[i])){ if(!dung) dung=mix[i]; } else if(sai3.length<2) sai3.push(mix[i]); } lon=true; }
+    var ch=shuffle([dung].concat(sai3));
+    return {type:'mcq', cot:1, _kieu:'chon', _lon:lon, _dung:dung, q:'<div>Phép tính nào có kết quả <b>'+dk+'</b>?</div>', choices:ch, correct:ch.indexOf(dung),
+      goiY:{'chung':'Bé tính kết quả từng phép tính, rồi so với 10.'}};
+  }, check:function(q){
+    if(q._kieu==='mot'){ var v=tinhBT(q._e); return q.correct===(v>10?0:(v<10?1:2)) && Number.isInteger(v) && q._e.length<=9; }
+    if(q._kieu==='dem') return q._es.length===3 && q._es.every(function(x){ return x.length<=9 && Number.isInteger(tinhBT(x)); }) && q.ans===q._es.filter(function(x){ return tinhBT(x)>10; }).length && q.ans>=1 && q.ans<=2;
+    var dd=q.choices.filter(function(x){ return q._lon ? tinhBT(x)>10 : tinhBT(x)<10; }); return dd.length===1 && dd[0]===q._dung && kiemMCQ(q) && q.choices.every(function(x){ return x.length<=9; }); }},
+
+  /* D15 — Tìm hai số lớn hơn 1 có tích cho trước (Luyện tập tiết 2, LT4) */
+  {name:'Tìm hai số có tích', sec:'Luyện tập, tiết 2 — Tìm hai số lớn hơn 1 có tích là một số cho trước', mt:['MT4'], levels:3,
+   muc:['Tích nhỏ, hai số lớn hơn 1 (ví dụ 14 = 2 × 7).', 'Tích có hai cặp số lớn hơn 1 (ví dụ 18 = 2 × 9 = 3 × 6): chọn một cặp.', 'Tích lớn hơn, nhiều cặp; đáp án nhiễu rất giống đáp án đúng.'],
+   make:function(lv){
+    var Ps = lv<=1 ? [12,14,15,16] : (lv===2 ? [18,20,24] : [30,36,40,42,48]), P=pick(Ps), pairs=[], a, b, dung, ds=[], them;
+    for(a=2;a*a<=P;a++) if(P%a===0 && P/a>1) pairs.push([a,P/a]);
+    var cap=pick(pairs); dung=cap[0]+' và '+cap[1];
+    var ok=function(u,v){ return u>1 && v>1 && u*v===P; };
+    them=function(u,v,nhan){ var t=u+' và '+v; if(u>=1 && v>=1 && !ok(u,v) && !ds.some(function(d){ return d[0]===t; }) && t!==dung) ds.push([t,nhan]); };
+    them(1, P, 'thieu-buoc'); if(lv>=2) them(P, 1, 'thieu-buoc');
+    them(cap[0], cap[1]+1, 'canh-dong'); them(cap[0]+1, cap[1], 'canh-dong'); them(cap[0]-1<1?cap[0]+2:cap[0]-1, cap[1], 'canh-dong'); them(cap[0], cap[1]-1, 'canh-dong');
+    var first = ds.filter(function(d){ return d[1]==='thieu-buoc'; }).slice(0,1), rest=shuffle(ds.filter(function(d){ return d[1]!=='thieu-buoc'; })).slice(0,2);
+    var sel=shuffle([[dung,'']].concat(first, rest)), ch=sel.map(function(d){ return d[0]; }), sai={}; sel.forEach(function(d,i){ if(d[1]) sai[String(i)]=d[1]; });
+    return {type:'mcq', cot:1, _P:P, _dung:dung, q:'<div>Cặp số nào <b>đều lớn hơn 1</b> và có <b>tích là '+P+'</b>?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
+      goiY:{'thieu-buoc':'Cặp có số 1 chưa đủ: đề bài cần hai số đều lớn hơn 1.', 'canh-dong':'Bé nhân hai số của cặp đó: tích có bằng '+P+' không?'}};
+  }, check:function(q){ var P=q._P, t=q.choices.filter(function(c){ var p=c.split(' và ').map(Number); return p[0]>1 && p[1]>1 && p[0]*p[1]===P; });
+    return t.length===1 && t[0]===q._dung && kiemMCQ(q) && q.choices.length>=3; }},
 
   /* D11 — Đúng hay sai? Tìm lỗi (không có trong SGK) */
   {name:'Đúng / Sai', sec:'Tìm lỗi — Bạn tính đúng hay sai?', mt:['MT2','MT3'], levels:3,
@@ -218,7 +289,7 @@ var BAI = {
   }, check:function(q){ if(q.type==='num') return q.ans===q._e; var d = q._chia ? q._k : 9*q._k; return q.choices.join()==='Đ,S' && q.correct===(q._X===d?0:1) && (q._dung==='Đ') === (q._X===d); }},
 
   /* D12 — Giải toán (Luyện tập): thuyền, túi cam, can nước mắm */
-  {name:'Giải toán', sec:'Luyện tập — Giải toán', mt:['MT5'], levels:3,
+  {name:'Giải toán', sec:'Luyện tập, tiết 1 và 2 — Giải toán', mt:['MT5'], levels:3,
    muc:['Bài toán một phép nhân với số nhỏ, có hình các chiếc thuyền.', 'Bài toán một phép nhân hoặc phép chia với 9.', 'Bài toán hai bước (nhân rồi trừ, chia rồi nhân).'],
    make:function(lv){
     var r=Math.random(), n = lv<=1 ? rnd(2,5) : rnd(2,9);
