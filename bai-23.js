@@ -295,7 +295,7 @@ var BAI = {
       return {type:'mcq', cot:1, _lv:1, _p:p, _dungAn:dungAn, _pt:{a:p.a,b:p.b,n:ve.nho,kq:ve.kq}, _dsn:dsn, _dung:dsn[idx][0],
         q:nguoiNoi('boy','<div class="text-center">Bạn An đặt tính và nói: «Mình tính đúng rồi.»</div>')+fig+'<div>Em thấy thế nào?</div>', choices:ch, correct:idx, sai:sai, goiY:gy}; }
     if(lv===2){
-      var tx=[['quen-nho',TEN_LOI_AN['quen-nho']],['viet-ca-hai-chu-so',TEN_LOI_AN['viet-ca-hai-chu-so']],['nho-nham',TEN_LOI_AN['nho-nham']],['',  'An không sai ở bước nào cả.']];
+      var tx=[['quen-nho',TEN_LOI_AN['quen-nho']],['viet-ca-hai-chu-so',TEN_LOI_AN['viet-ca-hai-chu-so']],['nho-nham',TEN_LOI_AN['nho-nham']],['', 'An nhân sai chữ số ở hàng đơn vị.']];
       shuffle(tx); var ch2=tx.map(function(d){ return d[1]; }), sai2={}; tx.forEach(function(d,i){ if(d[0] && d[0]!==kind) sai2[String(i)]=d[0]; });
       var di = tx.findIndex(function(d){ return d[0]===kind; });
       return {type:'mcq', cot:1, _lv:2, _p:p, _kind:kind, _pt:{a:p.a,b:p.b,n:e.nho,kq:e.kq}, _dung:ch2[di],
