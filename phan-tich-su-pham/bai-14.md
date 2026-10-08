@@ -1,7 +1,7 @@
-# Phân tích sư phạm — Bài 14: Một phần mấy (BẢN NHÁP CHỜ DUYỆT)
+# Phân tích sư phạm — Bài 14: Một phần mấy (ĐÃ DUYỆT 08/10/2026, kèm chỉnh sửa của thầy)
 
 Mẫu: `bai-9.js`, `bai-10.js`, `bai-11.js` (đã có Luyện thông minh) + khối "LUYỆN THÔNG MINH" ở đầu `engine.js`.
-Phạm vi sửa: chỉ `bai-14.js` (và file phân tích này). Không đụng `engine.js`, `figures.js`, `lua.js`, `bai-14.html`. Chưa viết dòng mã nào.
+Phạm vi sửa: chỉ `bai-14.js` (và file phân tích này). Không đụng `engine.js`, `figures.js`, `lua.js`, `bai-14.html`. Đã viết mã và kiểm (xem mục 6).
 
 Bài 14 là **bài khái niệm** (một phần hai, một phần tư … một phần chín), **không phải bảng nhân**. Mục tiêu và nhãn lỗi hoàn toàn khác bài 9–13:
 bé phải hiểu "các phần **bằng nhau**" và gắn đúng "một phần mấy" với số phần, không với số phần chưa tô hay số vật được khoanh.
@@ -82,20 +82,18 @@ Các nhãn chuẩn dùng thêm: `lech-nhom` (đếm thiếu/thừa một phần)
 - **Emoji ở "Chia đều" mức 3** (🧒, 🥚, 📚): đề xuất **bỏ hình, chỉ để lời văn** (bài toán vẫn rõ); không vẽ hình mới, không sửa `figures.js`.
 - Không có hình mới nào cần vẽ cho các dạng thêm (D4, D10, D11 dùng chữ, `vat`, `anh`).
 
-## 6. Việc sẽ làm sau khi thầy duyệt
+## 6. Kiểm (phiên đám mây 08/10/2026)
 
-1. Viết lại `bai-14.js` theo bảng trên (nối chuỗi, **không** backtick hay template literal).
-2. Chạy RIÊNG từng cổng (đặt `CHROME` nếu cần):
-   - `node .claude/skills/sk-web-toan-tieuhoc/assets/kiemtra.js . bai-14.js 400000`
-   - `node .claude/skills/sk-ve-hinh-tieuhoc/assets/phong_tranh.mjs . <thư mục tạm> bai-14 --soat --khong-chup --rong 375,1200 --giao light,dark --lan 3`
-   - `node .claude/skills/sk-web-toan-tieuhoc/assets/soat_giao_dien.mjs . bai-14 --cau 2`
-3. Push, ghi kết quả từng cổng trong mô tả PR, đổi tiêu đề thành "[XONG] Bài 14: Luyện thông minh", gỡ trạng thái nháp. Không tự gộp.
+- `kiemtra.js . bai-14.js 400000` → ✅ OK (11 dạng; MT1:2 MT2:2 MT3:2 MT4:2 MT5:3).
+- `phong_tranh.mjs . bai-14 --soat --khong-chup --rong 375,1200 --giao light,dark --lan 3` → **SOÁT HÌNH: ĐẠT**, **0 lỗi** (hết lỗi emoji); 4 cảnh báo là màu ngoài bảng HM của các hình riêng (bài 14 có trong `chua_chuan.txt`).
+- `soat_giao_dien.mjs . bai-14 --cau 2` → **ĐẠT**, 0 lỗi, 0 cảnh báo; tự chơi Luyện thông minh 18 câu, 3 câu sai có gợi ý riêng.
+- `kiem_dem.mjs`: SAI vì lý do đã biết (`data-dem` chưa lên `main`). Không sửa.
 
-## 7. Cần thầy quyết (kèm phương án đề xuất)
+## 7. Quyết định của thầy (08/10/2026) và cách đã làm
 
-1. **Mục SGK ở mục 0** có đúng không? Đề xuất: đúng như bảng (ghi chú đầu `bai-14.js` đã liệt kê đủ Khám phá, HĐ1–3, LT1–4).
-2. **Bốn nhãn lỗi riêng** (`dem-phan-chua-to`, `dem-vat-khoanh`, `phan-khong-bang`, `doc-nham`): giữ (**đề xuất**, vì lỗi hiểu khái niệm không khớp nhãn chuẩn) hay gom về `lech-nhom`?
-3. **Chia đều mức 3**: bỏ emoji, chỉ lời văn (**đề xuất**) hay chờ vẽ hình?
-4. **Năm mục tiêu** như bảng (nhận ra · đọc viết · các phần bằng nhau · nhóm vật · tìm một phần mấy của số) có hợp ý thầy không? Đề xuất: giữ như bảng.
-5. **Thứ tự dạng**: xếp lại theo sư phạm như bài 9–11 (**đề xuất**).
-6. Xác nhận 11 dạng và 3 dạng "không có trong SGK".
+1. **Mục SGK đúng** như bảng.
+2. **Hoạt động 2** (chọn cách đọc) sách có cả một phần năm: Mức 1 của D3 gồm 1/2, 1/3, 1/4, 1/5.
+3. **Luyện tập 1** sách có hình tròn chia phần không bằng nhau, và hình chia 9 phần mà ghi 1/8: D6 Mức 2–3 giữ cả hai bẫy.
+4. **Luyện tập 2** (tô 1/8 hình nào): có hình vuông chia 8 tam giác bằng nhau (`kim:8`); `check()` bảo đảm **chỉ một** hình đúng.
+5. **Luyện tập 4 (D9)** bám mẫu sách: chia 6 táo thành 2 phần, chia 12 cam thành 3 phần (nằm trong dải Mức 2).
+6. Giữ **bốn nhãn riêng** (`dem-phan-chua-to`, `dem-vat-khoanh`, `phan-khong-bang`, `doc-nham`). Bỏ emoji ở Chia đều Mức 3. Năm mục tiêu giữ; xếp lại theo sư phạm; 11 dạng, 3 dạng ngoài SGK.
