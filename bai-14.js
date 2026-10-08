@@ -1,9 +1,10 @@
-/* bai-14.js — NỘI DUNG Bài 14 (Một phần mấy). Engine v2, THÍCH ỨNG 3 mức (levels:3, make(lv)).
-   Bám SGK trang in 42-45: Khám phá (1/2, 1/4) · HĐ1 Đ,S hình chữ nhật · HĐ2 Chọn cách đọc ·
-   HĐ3 Khoanh 1/4 số hạt dẻ · LT1 Đ,S hình tròn · LT2 Tô màu 1/8 hình nào · LT3 Khoanh rau · LT4 Số?
+/* bai-14.js — Bài 14: Một phần mấy. Engine v2 — LUYỆN THÔNG MINH.
+   Theo bảng phân tích sư phạm đã duyệt (phan-tich-su-pham/bai-14.md):
+   5 MỤC TIÊU (muctieu) × 11 DẠNG (topics), mỗi dạng 3 mức (Thông tư 27: Nhận biết · Hiểu · Vận dụng).
    Mức 1 = số nhỏ như sách, lựa chọn khác hẳn nhau · Mức 2 = số lớn hơn, bẫy quen thuộc (đếm phần chưa tô)
    · Mức 3 = tình huống mới: các phần KHÔNG bằng nhau, hai hình cùng số vật xếp khác, bài toán có lời.
-   Hình riêng: phân số dọc, hình tròn/chữ nhật chia phần, bánh, hình tô màu, hạt dẻ/rau/quả xếp hàng.
+   Mỗi câu gắn nhãn lỗi cho đáp án nhiễu (q.sai) + gợi ý (q.goiY). Bốn nhãn riêng của bài khai báo ở BAI.loi.
+   Hình riêng: phân số dọc, hình tròn/chữ nhật chia phần, bánh, hình tô màu, hạt dẻ/rau/quả xếp hàng. Không dùng emoji.
    QUY TẮC: nối chuỗi, KHÔNG backtick và KHÔNG template literal. */
 
 var DOC = ['', 'một', 'hai', 'ba', 'tư', 'năm', 'sáu', 'bảy', 'tám', 'chín', 'mười'];
@@ -118,6 +119,8 @@ function vat(loai, x, y){
 }
 /* Hình khoanh (HĐ3, LT3): mã 'CHỮ:r:c:h|c:chỉ số:vật' — lưới r hàng × c cột, khoanh 1 hàng (1/r) hoặc 1 cột (1/c) */
 function khoanhPS(ch){ var p=ch.split(':'); return p[3]==='h' ? +p[1] : +p[2]; }
+/* Số vật nằm trong vòng khoanh: khoanh 1 hàng thì có c vật, khoanh 1 cột thì có r vật */
+function soVatKhoanh(ch){ var p=ch.split(':'); return p[3]==='h' ? +p[2] : +p[1]; }
 function khoanh(ch){
   var p=ch.split(':'), L=p[0], r=+p[1], c=+p[2], md=p[3], k=+p[4], lo=p[5], o=30, pd=9, W=c*o+pd*2, H=r*o+pd*2, h=svgMo(W,H);
   h+='<rect x="1" y="1" width="'+(W-2)+'" height="'+(H-2)+'" rx="10" fill="#fef9ec" stroke="#a8a29e" stroke-width="1.5"/>';
@@ -126,6 +129,21 @@ function khoanh(ch){
   else h+='<rect x="'+(pd+k*o+1)+'" y="'+(pd+1)+'" width="'+(o-2)+'" height="'+(r*o-2)+'" rx="'+((o-2)/2)+'" fill="none" stroke="#dc2626" stroke-width="2.5"/>';
   return '<div class="flex flex-col items-center gap-1">'+h+'</svg><div class="text-lg font-extrabold text-slate-700">'+L+'</div></div>';
 }
+
+/* ---- Tiện ích riêng bài 14 (nhãn lỗi, kiểm) ---- */
+/* Bảng nhãn lỗi cho đáp số: ds = [[giá trị, nhãn], …]; bỏ giá trị <= 0 hoặc trùng đáp án đúng */
+function nhanSai(ds, dung){ var o={}; ds.forEach(function(p){ var v=p[0]; if(v>0 && v!==dung && !(String(v) in o)) o[String(v)]=p[1]; }); return o; }
+function kiemMCQ(q){ return q.choices[q.correct]===q._dung && new Set(q.choices).size===q.choices.length; }
+/* Nhãn lỗi cho các lựa chọn "1/v": v = n−1 là đếm phần chưa tô; còn lại là đếm lệch số phần */
+function saiPS(ns, n){ var o={}; ns.forEach(function(v,i){ if(v!==n) o[String(i)] = (v===n-1 ? 'dem-phan-chua-to' : 'lech-nhom'); }); return o; }
+var GOIY_PS = {
+  'dem-phan-chua-to':'Bé đếm TẤT CẢ các phần bằng nhau của hình, cả phần đã tô màu.',
+  'lech-nhom':'Bé đếm lại số phần bằng nhau của hình nhé!',
+  'phan-khong-bang':'Muốn nói một phần mấy, các phần phải BẰNG NHAU. Bé nhìn xem các phần có bằng nhau không.',
+  'dem-vat-khoanh':'Bé đếm xem hình chia được mấy PHẦN bằng nhau, không đếm số vật được khoanh.',
+  'doc-nham':'Bé nhớ: 1/2 một phần hai, 1/3 một phần ba, 1/4 một phần tư, 1/5 một phần năm.'
+};
+
 /* Mức 1: lưới nhỏ · Mức 2: lưới lớn — cùng lưới, một hình khoanh hàng, một hình khoanh cột.
    Mức 3: HAI lưới cùng số vật nhưng xếp khác (r×c và c×r), cùng khoanh một hàng -> phải đếm số phần, không đếm số vật khoanh. */
 function cauKhoanh(lo, ten, lv){
@@ -141,7 +159,9 @@ function cauKhoanh(lo, ten, lv){
     for(var j=0;j<2;j++) ch.push(['A','B'][j]+':'+r+':'+c+':'+ds[j].md+':'+ds[j].k+':'+lo);
     hoi=pick([r,c]);
   }
-  return {type:'mcq', figFn:khoanh, _k:hoi, q:'<div>Đã khoanh vào '+fr(hoi)+' số '+ten+' của hình nào?</div>', choices:ch, correct:(khoanhPS(ch[0])===hoi?0:1)};
+  var dung=(khoanhPS(ch[0])===hoi?0:1), sai={}, sg=1-dung;   /* lựa chọn sai: nếu số vật khoanh đúng bằng số hỏi thì là lỗi đếm vật */
+  sai[String(sg)] = soVatKhoanh(ch[sg])===hoi ? 'dem-vat-khoanh' : 'lech-nhom';
+  return {type:'mcq', figFn:khoanh, _k:hoi, q:'<div>Đã khoanh vào '+fr(hoi)+' số '+ten+' của hình nào?</div>', choices:ch, correct:dung, sai:sai, goiY:GOIY_PS};
 }
 function kiemKhoanh(q){ var t=q.choices.filter(function(c){ return khoanhPS(c)===q._k; }).length; return t===1 && khoanhPS(q.choices[q.correct])===q._k; }
 /* Đ, S: n phần; câu nói "1/k". Mức 1: k=n hoặc lệch xa · Mức 2: bẫy đếm phần CHƯA tô (n-1) hoặc n+1 · Mức 3: thêm hình có các phần KHÔNG bằng nhau */
@@ -151,21 +171,30 @@ function cauDS(n, lv, veBang, veLech, ten){
   else if(Math.random()<0.5) k=n;
   else if(lv<=1) k=n+pick([2,3]);
   else k=(n>2 && Math.random()<0.6) ? n-1 : n+1;
-  var hinh = bang ? veBang(n) : veLech(n);
-  return {type:'mcq', figFn:dsBtn, _n:n, _k:k, _bang:bang, q:'<div class="flex justify-center mb-2">'+hinh+'</div><div>Đã tô màu '+fr(k)+' '+ten+'.</div><div class="text-base text-slate-500 mt-1">Đúng (Đ) hay sai (S)?</div>', choices:['Đ','S'], correct:((bang && k===n)?0:1)};
+  var hinh = bang ? veBang(n) : veLech(n), dung=((bang && k===n)?0:1), sai={};
+  if(dung===1) sai['0'] = !bang ? 'phan-khong-bang' : (k===n-1 ? 'dem-phan-chua-to' : 'lech-nhom');   /* chọn Đ nhầm */
+  return {type:'mcq', figFn:dsBtn, _n:n, _k:k, _bang:bang, q:'<div class="flex justify-center mb-2">'+hinh+'</div><div>Đã tô màu '+fr(k)+' '+ten+'.</div><div class="text-base text-slate-500 mt-1">Đúng (Đ) hay sai (S)?</div>', choices:['Đ','S'], correct:dung, sai:sai, goiY:GOIY_PS};
 }
 function kiemDS(q){ return q.choices.join()==='Đ,S' && q.correct===((q._bang && q._k===q._n)?0:1) && q._k>=2; }
 
 var BAI = {
  n: 14,
  title: 'Một Phần Mấy',
- sub: 'Bé chọn một hoạt động rồi luyện tập nhé!',
- goal: 10,
+ sub: 'Luyện thông minh: câu hỏi tự đổi theo bé — làm hết lượt để xem ngọn lửa!',
+ goal: 10, soCau: 18, soCauToiDa: 24,
+ loi: {'dem-phan-chua-to':'Đếm số phần chưa tô thay vì tổng số phần', 'dem-vat-khoanh':'Đếm số vật được khoanh thay vì số phần bằng nhau',
+       'phan-khong-bang':'Quên kiểm tra các phần có bằng nhau không', 'doc-nham':'Nhầm cách đọc'},
+ muctieu: [
+  {id:'MT1', ten:'Nhận ra một phần mấy trên hình', muc:['Nhận ra một phần hai, một phần ba, một phần tư trên hình tròn hoặc hình khác hẳn nhau.', 'Đếm số phần bằng nhau khi hình chia 3–9 phần, các lựa chọn gần giống nhau.', 'Chọn hình đúng khi có hình đủ số phần nhưng các phần KHÔNG bằng nhau.']},
+  {id:'MT2', ten:'Đọc, viết một phần mấy', muc:['Đọc đúng một phần hai, một phần ba, một phần tư, một phần năm.', 'Đọc và viết tới một phần sáu (nhớ: một phần TƯ).', 'Chuyển qua lại cách đọc – cách viết tới một phần chín, các lựa chọn rất gần nhau.']},
+  {id:'MT3', ten:'Các phần phải bằng nhau', muc:['Đếm số phần bằng nhau (2–5 phần) để biết câu nói đúng hay sai.', 'Không nhầm với số phần CHƯA tô màu; hình chia tới 9 phần (9 phần mà ghi 1/8).', 'Nhận ra các phần KHÔNG bằng nhau thì không gọi là một phần mấy.']},
+  {id:'MT4', ten:'Một phần mấy của nhóm vật', muc:['Hình ít vật: biết khoanh một hàng hay một cột là một phần mấy.', 'Hình nhiều vật (10–15), đếm số hàng, số cột cẩn thận.', 'Hai hình cùng số vật xếp khác nhau: đếm số PHẦN bằng nhau, không đếm số vật khoanh.']},
+  {id:'MT5', ten:'Tìm một phần mấy của một số', muc:['Tìm một phần mấy khi quả đã được chia sẵn thành các nhóm bằng nhau; một nửa của số nhỏ.', 'Tự chia đều số quả (có hình) để tìm một phần mấy; chọn phép chia.', 'Bài toán có lời: tìm một phần mấy, hoặc tìm phần CÒN LẠI (hai bước).']}
+ ],
  topics: [
-  {name:'Khám phá', sec:'Khám phá — Một phần hai, một phần tư', levels:3,
-   muc:['Nhận ra một phần hai, một phần tư trên hình tròn.',
-        'Nhận ra một phần mấy khi hình tròn chia 3–6 phần, các lựa chọn gần giống nhau.',
-        'Đếm đúng khi hình tròn chia nhiều phần nhỏ (6–9 phần).'],
+  /* D1 — Hình tròn chia phần (Khám phá — Một phần hai, một phần tư) */
+  {name:'Hình tròn', sec:'Khám phá — Một phần hai, một phần tư', mt:['MT1'], levels:3,
+   muc:['Nhận ra một phần hai, một phần tư trên hình tròn.', 'Nhận ra một phần mấy khi hình tròn chia 3–6 phần, các lựa chọn gần giống nhau.', 'Đếm đúng khi hình tròn chia nhiều phần nhỏ (6–9 phần).'],
    make:function(lv){
     var n, ns;
     if(lv<=1){ n=pick([2,4]); ns=xa(n,2,9,3); }
@@ -173,49 +202,11 @@ var BAI = {
     else { n=rnd(6,9); ns=gan(n,2,10,4); }
     return {type:'mcq', figFn:frBig, _n:n, q:'<div class="flex justify-center mb-2">'+tronPS(n, rnd(0,n-1))+'</div>'
       +'<div class="text-base text-slate-600 mb-1">Hình tròn được chia thành các phần bằng nhau, tô màu 1 phần.</div>'
-      +'<div>Đã tô màu <b>một phần mấy</b> hình tròn?</div>', choices:ns.map(function(v){ return '1/'+v; }), correct:ns.indexOf(n)};
+      +'<div>Đã tô màu <b>một phần mấy</b> hình tròn?</div>', choices:ns.map(function(v){ return '1/'+v; }), correct:ns.indexOf(n), sai:saiPS(ns, n), goiY:GOIY_PS};
   }, check:function(q){ return q.choices[q.correct]==='1/'+q._n && new Set(q.choices).size===q.choices.length; }},
 
-  {name:'Đ/S chữ nhật', sec:'Hoạt động 1 — Đ, S? (hình chữ nhật)', levels:3,
-   muc:['Đếm số phần bằng nhau (2–4 phần) để biết câu nói đúng hay sai.',
-        'Không nhầm với số phần CHƯA tô màu, hình chia tới 6 phần.',
-        'Nhận ra các phần KHÔNG bằng nhau thì không gọi là một phần mấy.'],
-   make:function(lv){
-    var n = lv<=1 ? rnd(2,4) : (lv===2 ? rnd(3,6) : rnd(4,7)), s=rnd(0,n-1);
-    return cauDS(n, lv, function(m){ return hcnPS(m, s); }, function(m){ return hcnPS(m, s, phanLech(m)); }, 'hình chữ nhật');
-  }, check:kiemDS},
-
-  {name:'Cách đọc', sec:'Hoạt động 2 — Chọn cách đọc phù hợp với cách viết', levels:3,
-   muc:['Đọc đúng một phần hai, một phần ba, một phần tư.',
-        'Đọc và viết được một phần mấy tới một phần sáu (nhớ: một phần TƯ).',
-        'Chuyển qua lại cách đọc – cách viết tới một phần chín, các lựa chọn rất gần nhau.'],
-   make:function(lv){
-    var xuoi = lv<=1 ? true : Math.random()<0.5, n, ns;
-    if(lv<=1){ n=rnd(2,4); ns=xa(n,2,9,3); }
-    else if(lv===2){ n=rnd(2,6); ns=gan(n,2,9,4); }
-    else { n=rnd(5,9); ns=gan(n,2,10,4); }
-    if(xuoi) return {type:'mcq', _n:n, _doc:true, q:'<div class="flex justify-center mb-2">'+banh(n,true)+'</div><div>Miếng bánh tô màu là '+fr(n)+' chiếc bánh. Đọc là gì?</div>',
-        choices:ns.map(docPS), correct:ns.indexOf(n)};
-    return {type:'mcq', figFn:frBig, _n:n, _doc:false, q:'<div class="text-2xl font-extrabold text-orange-700 my-2">« '+docPS(n)+' »</div><div>Chọn cách viết phù hợp:</div>',
-      choices:ns.map(function(v){ return '1/'+v; }), correct:ns.indexOf(n)};
-  }, check:function(q){ var ok = q._doc ? q.choices[q.correct]===docPS(q._n) : q.choices[q.correct]==='1/'+q._n; return ok && new Set(q.choices).size===q.choices.length; }},
-
-  {name:'Hạt dẻ', sec:'Hoạt động 3 — Đã khoanh vào một phần mấy số hạt dẻ?', levels:3,
-   muc:['Hình ít hạt: biết khoanh một hàng hay một cột là một phần mấy.',
-        'Hình nhiều hạt hơn (10–15 hạt), đếm số hàng, số cột cẩn thận.',
-        'Hai hình cùng số hạt nhưng xếp khác nhau — đếm số PHẦN bằng nhau, không đếm số hạt được khoanh.'],
-   make:function(lv){ return cauKhoanh('hatde', 'hạt dẻ', lv); }, check:kiemKhoanh},
-
-  {name:'Đ/S hình tròn', sec:'Luyện tập 1 — Đ, S? (hình tròn)', levels:3,
-   muc:['Đếm số phần bằng nhau của hình tròn (3–5 phần).',
-        'Hình tròn chia nhiều phần (5–9), không nhầm với số phần chưa tô.',
-        'Nhận ra hình tròn chia thành các phần KHÔNG bằng nhau.'],
-   make:function(lv){
-    var n = lv<=1 ? rnd(3,5) : (lv===2 ? rnd(5,9) : rnd(5,9)), s=rnd(0,n-1);
-    return cauDS(n, lv, function(m){ return tronPS(m, s); }, function(m){ return tronPS(m, s, null, 150, phanLech(m)); }, 'hình tròn');
-  }, check:kiemDS},
-
-  {name:'Tô màu hình nào', sec:'Luyện tập 2 — Đã tô màu một phần mấy của hình nào?', levels:3,
+  /* D2 — Đã tô màu một phần mấy của hình nào? (Luyện tập 2) */
+  {name:'Tô màu hình nào', sec:'Luyện tập 2 — Đã tô màu một phần mấy của hình nào?', mt:['MT1'], levels:3,
    muc:['Chọn hình tô một phần hai, một phần ba, một phần tư — các hình khác hẳn nhau.',
         'Đếm số phần bằng nhau trên nhiều kiểu hình (lưới ô, tam giác, dải, hình tròn).',
         'Loại hình có đủ số phần nhưng các phần KHÔNG bằng nhau.'],
@@ -227,16 +218,76 @@ var BAI = {
       k=pick([4,5,6,8]); var g=gan(k,2,9,3); ch=g.map(taoHinh).concat([hinhLech(k)]); shuffle(ch);
       ms=ch.map(soPhanHinh);
     }
-    return {type:'mcq', figFn:hinhTo, _k:k, q:'<div>Đã tô màu '+fr(k)+' hình nào?</div>', choices:ch, correct:ms.indexOf(k)};
+    var sai={}; ch.forEach(function(c,i){ var m=soPhanHinh(c); if(m!==k) sai[String(i)] = m===0 ? 'phan-khong-bang' : 'lech-nhom'; });
+    return {type:'mcq', figFn:hinhTo, _k:k, q:'<div>Đã tô màu '+fr(k)+' hình nào?</div>', choices:ch, correct:ms.indexOf(k), sai:sai, goiY:GOIY_PS};
   }, check:function(q){ var t=q.choices.filter(function(c){ return soPhanHinh(c)===q._k; }).length; return t===1 && soPhanHinh(q.choices[q.correct])===q._k && new Set(q.choices).size===q.choices.length; }},
 
-  {name:'Khoanh rau', sec:'Luyện tập 3 — Đã khoanh vào một phần mấy số cây?', levels:3,
+  /* D3 — Chọn cách đọc phù hợp với cách viết (Hoạt động 2) */
+  {name:'Cách đọc', sec:'Hoạt động 2 — Chọn cách đọc phù hợp với cách viết', mt:['MT2'], levels:3,
+   muc:['Đọc đúng một phần hai, một phần ba, một phần tư, một phần năm.',
+        'Đọc và viết được một phần mấy tới một phần sáu (nhớ: một phần TƯ).',
+        'Chuyển qua lại cách đọc – cách viết tới một phần chín, các lựa chọn rất gần nhau.'],
+   make:function(lv){
+    var xuoi = lv<=1 ? true : Math.random()<0.5, n, ns;
+    if(lv<=1){ n=rnd(2,5); ns=xa(n,2,9,3); }
+    else if(lv===2){ n=rnd(2,6); ns=gan(n,2,9,4); }
+    else { n=rnd(5,9); ns=gan(n,2,10,4); }
+    var sai={}; ns.forEach(function(v,i){ if(v!==n) sai[String(i)]='doc-nham'; });
+    if(xuoi) return {type:'mcq', _n:n, _doc:true, q:'<div class="flex justify-center mb-2">'+banh(n,true)+'</div><div>Miếng bánh tô màu là '+fr(n)+' chiếc bánh. Đọc là gì?</div>',
+        choices:ns.map(docPS), correct:ns.indexOf(n), sai:sai, goiY:GOIY_PS};
+    return {type:'mcq', figFn:frBig, _n:n, _doc:false, q:'<div class="text-2xl font-extrabold text-orange-700 my-2">« '+docPS(n)+' »</div><div>Chọn cách viết phù hợp:</div>',
+      choices:ns.map(function(v){ return '1/'+v; }), correct:ns.indexOf(n), sai:sai, goiY:GOIY_PS};
+  }, check:function(q){ var ok = q._doc ? q.choices[q.correct]===docPS(q._n) : q.choices[q.correct]==='1/'+q._n; return ok && new Set(q.choices).size===q.choices.length; }},
+
+  /* D4 — Đọc đúng hay sai? (không có trong SGK) */
+  {name:'Đọc đúng hay sai', sec:'Đọc đúng hay sai — Bạn đọc, viết có đúng không?', mt:['MT2'], levels:3,
+   muc:['Biết cách đọc đúng một phần hai … một phần năm.', 'Đúng hay sai tới một phần sáu.', 'Đúng hay sai tới một phần chín, các cách đọc gần nhau.'],
+   make:function(lv){
+    var n = lv<=1 ? rnd(2,5) : (lv===2 ? rnd(2,6) : rnd(3,9)), laDung=Math.random()<0.5, m=n;
+    if(!laDung){ m = lv<=1 ? pick([2,3,4,5].filter(function(v){ return Math.abs(v-n)>=2; })) : n+pick([-1,1]); if(!(m>=2 && m<=(lv<=1?5:(lv===2?6:9)))) m=n+(n>2?-1:1); }
+    var viet = lv>=3 && Math.random()<0.5, cau;
+    if(viet) cau='<div class="text-2xl font-extrabold text-orange-700 my-2">« '+docPS(m)+' » viết là '+fr(n)+'</div>';
+    else cau='<div class="text-2xl font-extrabold text-orange-700 my-2">'+fr(n)+' đọc là « '+docPS(m)+' »</div>';
+    var dung=(m===n?'Đ':'S');
+    return {type:'mcq', figFn:dsBtn, _n:n, _m:m, _dung:dung, q:cau+'<div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>', choices:['Đ','S'], correct:(m===n?0:1), sai:(m===n?{}:{'0':'doc-nham'}), goiY:GOIY_PS};
+  }, check:function(q){ return q.choices.join()==='Đ,S' && q.correct===(q._m===q._n?0:1) && q._n>=2 && q._m>=2 && kiemMCQ(q); }},
+
+  /* D5 — Đ, S? hình chữ nhật (Hoạt động 1) */
+  {name:'Đ/S chữ nhật', sec:'Hoạt động 1 — Đ, S? (hình chữ nhật)', mt:['MT3'], levels:3,
+   muc:['Đếm số phần bằng nhau (2–4 phần) để biết câu nói đúng hay sai.',
+        'Không nhầm với số phần CHƯA tô màu, hình chia tới 6 phần.',
+        'Nhận ra các phần KHÔNG bằng nhau thì không gọi là một phần mấy.'],
+   make:function(lv){
+    var n = lv<=1 ? rnd(2,4) : (lv===2 ? rnd(3,6) : rnd(4,7)), s=rnd(0,n-1);
+    return cauDS(n, lv, function(m){ return hcnPS(m, s); }, function(m){ return hcnPS(m, s, phanLech(m)); }, 'hình chữ nhật');
+  }, check:kiemDS},
+
+  /* D6 — Đ, S? hình tròn (Luyện tập 1): có cả hình chia phần không bằng nhau, và hình chia 9 phần mà ghi 1/8 */
+  {name:'Đ/S hình tròn', sec:'Luyện tập 1 — Đ, S? (hình tròn)', mt:['MT3'], levels:3,
+   muc:['Đếm số phần bằng nhau của hình tròn (3–5 phần).',
+        'Hình tròn chia nhiều phần (5–9), không nhầm với số phần chưa tô.',
+        'Nhận ra hình tròn chia thành các phần KHÔNG bằng nhau.'],
+   make:function(lv){
+    var n = lv<=1 ? rnd(3,5) : rnd(5,9), s=rnd(0,n-1);
+    return cauDS(n, lv, function(m){ return tronPS(m, s); }, function(m){ return tronPS(m, s, null, 150, phanLech(m)); }, 'hình tròn');
+  }, check:kiemDS},
+
+  /* D7 — Khoanh hạt dẻ (Hoạt động 3) */
+  {name:'Hạt dẻ', sec:'Hoạt động 3 — Đã khoanh vào một phần mấy số hạt dẻ?', mt:['MT4'], levels:3,
+   muc:['Hình ít hạt: biết khoanh một hàng hay một cột là một phần mấy.',
+        'Hình nhiều hạt hơn (10–15 hạt), đếm số hàng, số cột cẩn thận.',
+        'Hai hình cùng số hạt nhưng xếp khác nhau — đếm số PHẦN bằng nhau, không đếm số hạt được khoanh.'],
+   make:function(lv){ return cauKhoanh('hatde', 'hạt dẻ', lv); }, check:kiemKhoanh},
+
+  /* D8 — Khoanh rau (Luyện tập 3) */
+  {name:'Khoanh rau', sec:'Luyện tập 3 — Đã khoanh vào một phần mấy số cây?', mt:['MT4'], levels:3,
    muc:['Luống ít cây: biết khoanh một hàng hay một cột là một phần mấy.',
         'Luống nhiều cây (10–15 cây), đếm số hàng, số cột cẩn thận.',
         'Hai luống cùng số cây nhưng xếp khác nhau — đếm số PHẦN bằng nhau, không đếm số cây được khoanh.'],
    make:function(lv){ return Math.random()<0.5 ? cauKhoanh('caibap', 'cây cải bắp', lv) : cauKhoanh('xalach', 'cây xà lách', lv); }, check:kiemKhoanh},
 
-  {name:'Chia đều', sec:'Luyện tập 4 — Số?', levels:3,
+  /* D9 — Chia đều: tìm một phần mấy số quả (Luyện tập 4) */
+  {name:'Chia đều', sec:'Luyện tập 4 — Số?', mt:['MT5'], levels:3,
    muc:['Tìm một phần mấy khi quả đã được chia sẵn thành các nhóm bằng nhau.',
         'Tự chia đều số quả (có hình) để tìm một phần mấy.',
         'Giải bài toán có lời văn: tìm một phần mấy, hoặc tìm phần CÒN LẠI (hai bước).'],
@@ -244,12 +295,15 @@ var BAI = {
     var k, m, N, lo=pick(['tao','cam']), ten=(lo==='tao'?'táo':'cam'), hinh='';
     if(lv>=3){
       k=rnd(2,5); m=rnd(3,9); N=k*m;
-      var tt=pick([['Lớp 3A có '+N+' bạn.', 'số bạn là tổ Một', 'Tổ Một có mấy bạn?', 'bạn', 'bạn còn lại không ở tổ Một', '&#129490;'],
-                   ['Mẹ có '+N+' quả trứng.', 'số trứng mẹ đã dùng làm bánh', 'Mẹ đã dùng mấy quả trứng?', 'quả', 'quả trứng mẹ còn lại', '&#129370;'],
-                   ['Thư viện có '+N+' quyển truyện.', 'số truyện đã cho các bạn mượn', 'Đã cho mượn mấy quyển?', 'quyển', 'quyển truyện còn lại trong thư viện', '&#128218;']]);
+      var tt=pick([['Lớp 3A có '+N+' bạn.', 'số bạn là tổ Một', 'Tổ Một có mấy bạn?', 'bạn', 'bạn còn lại không ở tổ Một'],
+                   ['Mẹ có '+N+' quả trứng.', 'số trứng mẹ đã dùng làm bánh', 'Mẹ đã dùng mấy quả trứng?', 'quả', 'quả trứng mẹ còn lại'],
+                   ['Thư viện có '+N+' quyển truyện.', 'số truyện đã cho các bạn mượn', 'Đã cho mượn mấy quyển?', 'quyển', 'quyển truyện còn lại trong thư viện']]);
       var con = Math.random()<0.5;
-      return {type:'num', _k:k, _N:N, _con:con, q:'<div class="text-5xl mb-2">'+tt[5]+'</div><div>'+tt[0]+' '+fr(k)+' '+tt[1]+'.</div>'
-        +'<div class="mt-1">'+(con ? ('Hỏi có bao nhiêu '+tt[4]+'?') : tt[2])+'</div>', ans:(con? N-m : m), unit:tt[3]};
+      return {type:'num', _k:k, _N:N, _con:con, q:'<div>'+tt[0]+' '+fr(k)+' '+tt[1]+'.</div>'
+        +'<div class="mt-1">'+(con ? ('Hỏi có bao nhiêu '+tt[4]+'?') : tt[2])+'</div>', ans:(con? N-m : m), unit:tt[3],
+        sai: con ? nhanSai([[m,'thieu-buoc'],[N,'dao-vai'],[k,'dao-vai']], N-m) : nhanSai([[N,'dao-vai'],[k,'dao-vai'],[N-m,'chon-sai-phep'],[N*k,'chon-sai-phep']], m),
+        goiY: con ? {'thieu-buoc':'Bé đã tìm được '+fr(k)+' số đó là '+m+'. Còn bước lấy '+N+' trừ đi '+m+'!', 'dao-vai':'Bé tìm phần CÒN LẠI: lấy tổng trừ đi phần đã dùng.'}
+                  : {'dao-vai':'Bé chia '+N+' thành '+k+' phần bằng nhau. Một phần có mấy?', 'chon-sai-phep':'Tìm một phần mấy thì dùng phép chia: '+N+' : '+k+'.'}};
     }
     k = lv<=1 ? rnd(2,3) : rnd(2,5); m = lv<=1 ? rnd(2,4) : rnd(2,6); N=k*m;
     if(lv<=1){   /* như Mẫu: đã chia sẵn thành k nhóm */
@@ -264,7 +318,41 @@ var BAI = {
       hinh='<div class="flex justify-center mb-2">'+s2+'</svg></div>';
     }
     return {type:'num', _k:k, _N:N, _con:false, q:hinh+'<div class="text-base text-slate-600">Chia '+N+' quả '+ten+' thành '+k+' phần bằng nhau.</div>'
-      +'<div>'+fr(k)+' số quả '+ten+' là <b class="text-amber-700">?</b> quả '+ten+'.</div>', ans:m, unit:'quả'};
-  }, check:function(q){ return q._N%q._k===0 && (q._con ? q.ans===q._N-q._N/q._k : q.ans*q._k===q._N) && q.ans>=1; }}
+      +'<div>'+fr(k)+' số quả '+ten+' là <b class="text-amber-700">?</b> quả '+ten+'.</div>', ans:m, unit:'quả',
+      sai:nhanSai([[N,'dao-vai'],[k,'dao-vai'],[m-1,'lech-nhom'],[m+1,'lech-nhom']], m),
+      goiY:{'dao-vai':'Bé chia '+N+' quả thành '+k+' phần bằng nhau. Một phần có mấy quả?', 'lech-nhom':'Bé chia đều lại: mỗi phần có mấy quả '+ten+'?'}};
+  }, check:function(q){ return q._N%q._k===0 && (q._con ? q.ans===q._N-q._N/q._k : q.ans*q._k===q._N) && q.ans>=1; }},
+
+  /* D10 — Một phần mấy của một số (không có trong SGK) */
+  {name:'Một phần mấy của số', sec:'Một phần mấy của một số — không có hình', mt:['MT5'], levels:3,
+   muc:['Tìm một nửa, một phần ba của số nhỏ.', 'Tìm một phần mấy (tới một phần năm) của một số.', 'Tìm một phần mấy rồi tìm phần CÒN LẠI.'],
+   make:function(lv){
+    var n = lv<=1 ? pick([2,3]) : rnd(2,5), m = lv<=1 ? rnd(2,5) : rnd(2,9), N=n*m, v=pick(['quả cam','cái kẹo','quyển truyện','bông hoa']);
+    if(lv>=3){
+      return {type:'num', _n:n, _N:N, _con:true, q:'<div>Có '+N+' '+v+'. Đã lấy '+fr(n)+' số '+v+'.</div><div class="mt-1">Hỏi còn lại bao nhiêu '+v+'?</div>', ans:N-m, unit:'',
+        sai:nhanSai([[m,'thieu-buoc'],[N,'dao-vai'],[N-n,'chon-sai-phep']], N-m), goiY:{'thieu-buoc':'Bé đã tìm được số '+v+' đã lấy: '+m+'. Còn bước lấy '+N+' trừ đi '+m+'!', 'dao-vai':'Bài hỏi số còn lại, không phải tổng.', 'chon-sai-phep':'Tìm '+fr(n)+' của '+N+' thì dùng phép chia '+N+' : '+n+'.'}}; }
+    return {type:'num', _n:n, _N:N, _con:false, q:'<div>Có '+N+' '+v+'.</div><div class="mt-1">'+fr(n)+' số '+v+' là bao nhiêu '+v+'?</div>', ans:m, unit:'',
+      sai:nhanSai([[N,'dao-vai'],[n,'dao-vai'],[N-n,'chon-sai-phep'],[N*n,'chon-sai-phep'],[m-1,'lech-nhom'],[m+1,'lech-nhom']], m),
+      goiY:{'dao-vai':'Bé chia '+N+' thành '+n+' phần bằng nhau. Một phần là bao nhiêu?', 'chon-sai-phep':'Tìm '+fr(n)+' của '+N+' thì dùng phép chia: '+N+' : '+n+'.', 'lech-nhom':'Bé nhẩm: '+n+' × mấy = '+N+'?'}};
+  }, check:function(q){ return q._N%q._n===0 && q.ans===(q._con ? q._N-q._N/q._n : q._N/q._n) && q.ans>=1; }},
+
+  /* D11 — Chọn phép tính (không có trong SGK) */
+  {name:'Chọn phép tính', sec:'Chọn phép tính — không cần tính ra kết quả', mt:['MT5'], levels:3,
+   muc:['Chọn phép chia để tìm một nửa số vật.', 'Chọn phép chia để tìm một phần mấy số vật.', 'Chọn biểu thức hai bước (tìm một phần mấy rồi tìm phần còn lại).'],
+   make:function(lv){
+    var n = lv<=1 ? 2 : rnd(3,5), m=rnd(2,9), N=n*m, v=pick(['quả cam','cái kẹo','quyển truyện','bông hoa']), ds, q;
+    if(lv<=2){
+      ds=[[N+' : '+n,''], [N+' × '+n,'chon-sai-phep'], [N+' − '+n,'chon-sai-phep'], [n+' : '+N,'dao-vai']];
+      q='<div>Có '+N+' '+v+'.</div><div class="mt-1">Phép tính nào tìm được '+fr(n)+' số '+v+'?</div>';
+    } else {
+      n=rnd(2,5); m=rnd(2,9); N=n*m;
+      ds=[[N+' − '+N+' : '+n,''], [N+' : '+n,'thieu-buoc'], [N+' + '+N+' : '+n,'chon-sai-phep'], [N+' : '+n+' − '+n,'dao-vai']];
+      q='<div>Có '+N+' '+v+'. Đã lấy '+fr(n)+' số '+v+'.</div><div class="mt-1">Phép tính nào tìm được <b>số '+v+' còn lại</b>?</div>';
+    }
+    var dung=ds[0][0]; shuffle(ds);
+    var ch=ds.map(function(d){ return d[0]; }), sai={}; ds.forEach(function(d,i){ if(d[1]) sai[String(i)]=d[1]; });
+    return {type:'mcq', cot:1, _dung:dung, q:q, choices:ch, correct:ch.indexOf(dung), sai:sai,
+      goiY:{'chon-sai-phep':'Tìm một phần mấy của một số thì chia số đó cho số phần bằng nhau. Còn lại: bớt đi phần đã lấy.', 'dao-vai':'Bé xem lại: số nào là tổng, số nào là số phần bằng nhau?', 'thieu-buoc':'Bé mới tìm được số đã lấy. Còn bước lấy tổng trừ đi số đã lấy!'}};
+  }, check:kiemMCQ}
  ]
 };

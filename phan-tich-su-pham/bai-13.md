@@ -1,7 +1,7 @@
-# Phân tích sư phạm — Bài 13: Tìm thành phần trong phép nhân, phép chia (BẢN NHÁP CHỜ DUYỆT)
+# Phân tích sư phạm — Bài 13: Tìm thành phần trong phép nhân, phép chia (ĐÃ DUYỆT 08/10/2026, kèm chỉnh sửa của thầy)
 
 Mẫu: `bai-9.js`, `bai-10.js`, `bai-11.js` (đã có Luyện thông minh) + khối "LUYỆN THÔNG MINH" ở đầu `engine.js`.
-Phạm vi sửa: chỉ `bai-13.js` (và file phân tích này). Không đụng `engine.js`, `figures.js`, `lua.js`, `bai-13.html`. Chưa viết dòng mã nào.
+Phạm vi sửa: chỉ `bai-13.js` (và file phân tích này). Không đụng `engine.js`, `figures.js`, `lua.js`, `bai-13.html`. Đã viết mã và kiểm (xem mục 6).
 
 Bài 13 **không phải bài bảng nhân 7, 8, 9** nên mục tiêu và nhãn lỗi khác: bé học **tìm thành phần chưa biết** (thừa số, số bị chia, số chia), không học thêm một bảng mới.
 
@@ -78,19 +78,19 @@ Phân bố: MT1 bốn dạng (D1, D2, D8, D9) · MT2 ba dạng (D3, D8, D9) · M
   Muốn có hình thì giao riêng cho skill `sk-ve-hinh-tieuhoc`, làm sau ở bản trên máy thầy.
 - **Hình `jug`** (ca nước, hình riêng trong `bai-13.js`) dùng màu ngoài bảng HM: chỉ cảnh báo (bài 13 có trong `chua_chuan.txt`). Đề xuất **giữ nguyên**; chuẩn hoá màu là việc của skill vẽ hình.
 
-## 6. Việc sẽ làm sau khi thầy duyệt
+## 6. Kiểm (phiên đám mây 08/10/2026)
 
-1. Viết lại `bai-13.js` theo bảng trên (nối chuỗi, **không** backtick hay template literal).
-2. Chạy RIÊNG từng cổng (đặt `CHROME` nếu cần):
-   - `node .claude/skills/sk-web-toan-tieuhoc/assets/kiemtra.js . bai-13.js 400000`
-   - `node .claude/skills/sk-ve-hinh-tieuhoc/assets/phong_tranh.mjs . <thư mục tạm> bai-13 --soat --khong-chup --rong 375,1200 --giao light,dark --lan 3`
-   - `node .claude/skills/sk-web-toan-tieuhoc/assets/soat_giao_dien.mjs . bai-13 --cau 2`
-3. Push, ghi kết quả từng cổng trong mô tả PR, đổi tiêu đề thành "[XONG] Bài 13: Luyện thông minh", gỡ trạng thái nháp. Không tự gộp.
+- `kiemtra.js . bai-13.js 400000` → ✅ OK (11 dạng; MT1:4 MT2:3 MT3:3 MT4:3 MT5:2).
+- `phong_tranh.mjs . bai-13 --soat --khong-chup --rong 375,1200 --giao light,dark --lan 3` → **SOÁT HÌNH: ĐẠT**, **0 lỗi** (hết lỗi emoji); 4 cảnh báo là màu ngoài bảng HM của hình `jug` (bài 13 có trong `chua_chuan.txt`).
+- `soat_giao_dien.mjs . bai-13 --cau 2` → **ĐẠT**, 0 lỗi, 0 cảnh báo; tự chơi Luyện thông minh 18 câu, 4 câu sai có gợi ý riêng.
+- `kiem_dem.mjs`: SAI vì lý do đã biết (`data-dem` chưa lên `main`). Không sửa.
 
-## 7. Cần thầy quyết (kèm phương án đề xuất)
+## 7. Quyết định của thầy (08/10/2026) và cách đã làm
 
-1. **Mục SGK ở mục 0** có đúng không, và cách đánh số các ý a, b, c của Khám phá và Hoạt động 1, 2? Đề xuất: đúng như bảng; thầy cho số mục để ghi `sec` chuẩn.
-2. **Giải toán**: bỏ emoji, chỉ lời văn (**đề xuất**) hay chờ vẽ hình?
-3. **Năm mục tiêu** như bảng (thừa số · số bị chia · số chia · bảng và sơ đồ · giải toán) có hợp ý thầy không? Đề xuất: giữ như bảng.
-4. **Thứ tự dạng**: xếp lại theo sư phạm như bài 9–11 (**đề xuất**).
-5. Xác nhận 11 dạng và 3 dạng "không có trong SGK".
+1. **Mục SGK** có hai phần, `sec` ghi đúng sách: Khám phá (tìm thừa số trong một tích — ca nước) · Hoạt động 1 (tìm thừa số theo mẫu) · Hoạt động 2 (Số? bảng Thừa số · Thừa số · Tích) · Hoạt động 3 (giải toán ca-bin, chia đều) ·
+   Khám phá a (tìm số bị chia — lọ hoa, nhân), b (tìm số chia — lọ hoa, chia theo nhóm) · Hoạt động 1 a, b · Hoạt động 2 (Số? bảng Số bị chia · Số chia · Thương) · Luyện tập 1 (Số? mũi tên tìm ô đầu) · Luyện tập 2 (giải toán đĩa cam).
+2. **D2 Tìm thừa số:** Mức 1 chỉ có ô trống ở thừa số thứ nhất; từ Mức 2 có cả ô trống ở thừa số thứ hai (6 × ? = 24).
+3. **D8 Sơ đồ:** Luyện tập 1 là một bước tìm ô đầu, cả × lẫn :. Mức 1–2 bám dạng này, cả hai chiều; Mức 3 hai bước.
+4. **D10 Giải toán:** Mức 1 tìm tổng số hoa (lọ hoa, nhân). Mức 2 phân biệt rõ **chia đều** (tìm mỗi ca-bin) với **chia theo nhóm** (tìm số đĩa cam), thêm bài nhân. Mức 3 hai bước.
+5. **Hình:** bỏ emoji. Bài lọ hoa dùng `anh('bouquet')`; bài khác chỉ lời văn. Giữ `jug`.
+6. Năm mục tiêu giữ; xếp lại thứ tự theo sư phạm; 11 dạng, 3 dạng ngoài SGK. **Bài 12 hoãn** (thầy đang vẽ lại hình bài 12 trên máy).
