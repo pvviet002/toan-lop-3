@@ -113,6 +113,8 @@ var BAI = { n:<N>, title:'Tên bài', sub:'...', goal:10, topics:[
 - **Lời câu hỏi (08/10/2026, bài 16):** nút Đúng/Sai chỉ đi với **mệnh đề** ("M là trung điểm của đoạn thẳng AB.");
   câu hỏi "… có … không?" thì nút là **Có / Không**. Đáp án nhiễu không được chứa chính đối tượng đang hỏi
   ("Điểm K ở giữa hai điểm nào?" mà có lựa chọn "C và K").
+- **Dạng "Bạn An nói … vì sao?" (09/10/2026, bài 20):** đừng báo trước "Bạn An nói sai" rồi cho đáp án "Đúng, vì…" — tự
+  mâu thuẫn. Hỏi "Em thấy thế nào?" với các lựa chọn bắt đầu "Đồng ý, vì…" / "Không đồng ý, vì…".
 - **Quy tắc code:** nối chuỗi `'...'+x+'...'`, KHÔNG backtick và KHÔNG `${` (kể cả trong
   comment). Deploy chính giờ là git nên luật này chỉ còn để giữ được đường dự phòng
   qua trình duyệt — `kiemtra.js` vẫn soát, cứ giữ. Dùng `×` cho nhân, `:` cho chia.
