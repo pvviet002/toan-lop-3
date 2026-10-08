@@ -29,9 +29,15 @@ function hinhTron(sp, px){
   var C=130, R=84, s=svgX(260, 260, px||240), i;
   s+='<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="'+HM.troi+'" fill-opacity="0.22" stroke="currentColor" stroke-width="3"/>';
   sp.seg.forEach(function(g){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); s+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'; });
-  sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); var dx=b[0]-a[0], dy=b[1]-a[1], ln=Math.hypot(dx,dy)||1, nx=-dy/ln, ny=dx/ln; if(ny>0 || (ny===0 && nx>0)){ nx=-nx; ny=-ny; }
-      s+=nhanVien(Math.round((a[0]+b[0])/2+nx*28), Math.round((a[1]+b[1])/2+ny*28), 58, 24, g[2], 16); } });
-  s+='<circle cx="'+C+'" cy="'+C+'" r="5.5" fill="'+HM.cam+'"/><text x="'+(C+10)+'" y="'+(C+24)+'" font-size="20" '+HFONT+' fill="currentColor">O</text>';
+  var hop=[];
+  sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); var dx=b[0]-a[0], dy=b[1]-a[1], ln=Math.hypot(dx,dy)||1, nx=-dy/ln, ny=dx/ln; if(nx>0.05 || (Math.abs(nx)<=0.05 && ny>0)){ nx=-nx; ny=-ny; }   /* nhãn dời sang bên trái / phía trên */
+      var px0=Math.round((a[0]+b[0])/2+nx*34), py0=Math.round((a[1]+b[1])/2+ny*34); hop.push([px0-29, py0-12, px0+29, py0+12]);
+      s+=nhanVien(px0, py0, 58, 24, g[2], 16); } });
+  /* chữ O: thử bốn góc quanh tâm, chọn góc không đụng nhãn cm */
+  var ox=C+10, oy=C+24, tot=-1;
+  [[10,24],[-26,24],[10,-10],[-26,-10]].forEach(function(c){ var bx=[C+c[0]-2, C+c[1]-20, C+c[0]+22, C+c[1]+4], d=0; hop.forEach(function(h){ if(bx[0]<h[2]+4 && bx[2]>h[0]-4 && bx[1]<h[3]+4 && bx[3]>h[1]-4) d++; });
+    if(tot<0 && d===0){ tot=1; ox=C+c[0]; oy=C+c[1]; } });
+  s+='<circle cx="'+C+'" cy="'+C+'" r="5.5" fill="'+HM.cam+'"/><text x="'+ox+'" y="'+oy+'" font-size="20" '+HFONT+' fill="currentColor">O</text>';
   sp.pts.forEach(function(p){ var a=p.ang*Math.PI/180, k=p.k||1, x=C+R*k*Math.cos(a), y=C-R*k*Math.sin(a), lx=C+(R*k+18)*Math.cos(a), ly=C-(R*k+18)*Math.sin(a)+7;
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5.5" fill="'+HM.cam+'"/><text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="20" '+HFONT+' fill="currentColor">'+p.t+'</text>'; });
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
