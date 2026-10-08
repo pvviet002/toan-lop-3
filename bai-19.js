@@ -177,10 +177,10 @@ function hcnNhan(nhan){
 /* ---- Hình mới 8 (D11): đường thẳng A–C–D–B, đoạn CD hỏng; đi vòng theo hình chữ nhật CMND (C, D trên đường; M, N phía dưới). Nhãn đặt giữa CM và MN ---- */
 function duongVong(cm, mn){
   var W=300, H=190, s=svgX(W,H), yL=50, xC=80, xD=220, yM=140;
-  s+='<path d="M20 '+yL+' L'+xC+' '+yL+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M'+xC+' '+yL+' L'+xD+' '+yL+'" stroke="'+HM.do+'" stroke-width="3" stroke-dasharray="3 6" stroke-linecap="round" fill="none"/><path d="M'+xD+' '+yL+' L280 '+yL+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>';
+  s+='<path d="M34 '+yL+' L'+xC+' '+yL+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M'+xC+' '+yL+' L'+xD+' '+yL+'" stroke="'+HM.do+'" stroke-width="3" stroke-dasharray="3 6" stroke-linecap="round" fill="none"/><path d="M'+xD+' '+yL+' L266 '+yL+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>';
   s+='<path d="M'+xC+' '+yL+' L'+xC+' '+yM+' L'+xD+' '+yM+' L'+xD+' '+yL+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
   s+=nhanVien(xC, Math.round((yL+yM)/2), 66, 26, cm+' km', 16)+nhanVien(Math.round((xC+xD)/2), yM, 66, 26, mn+' km', 16);
-  [['A',20,yL,-1,-1],['C',xC,yL,0,-1],['D',xD,yL,0,-1],['B',280,yL,1,-1],['M',xC,yM,-1,1],['N',xD,yM,1,1]].forEach(function(p){ s+='<circle cx="'+p[1]+'" cy="'+p[2]+'" r="5" fill="'+HM.cam+'"/><text x="'+(p[1]+p[3]*16)+'" y="'+(p[2]+p[4]*(p[4]<0?14:17)+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+p[0]+'</text>'; });
+  [['A',34,yL,-1,-1],['C',xC,yL,0,-1],['D',xD,yL,0,-1],['B',266,yL,1,-1],['M',xC,yM,-1,1],['N',xD,yM,1,1]].forEach(function(p){ s+='<circle cx="'+p[1]+'" cy="'+p[2]+'" r="5" fill="'+HM.cam+'"/><text x="'+(p[1]+p[3]*16)+'" y="'+(p[2]+p[4]*(p[4]<0?14:17)+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+p[0]+'</text>'; });
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 
