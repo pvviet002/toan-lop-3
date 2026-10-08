@@ -236,7 +236,7 @@ var BAI = {
     if(kieu==='dem'){ cands=null; for(var g=0;g<60 && !cands;g++) cands=bonPhep(pool, lon ? rnd(1,2) : 0, -1); if(cands && !lon){ cands=null; for(var g2=0;g2<60 && !cands;g2++) cands=bonPhep(pool, rnd(1,2), -1); lon=true; }
       if(!cands) cands=bonPhep(far, 1, -1);
       var dem=cands.filter(function(x){ return tinhBT(x)>10; }).length;
-      return {type:'num', _kieu:'dem', _es:cands, _e:dem, q:'<div class="mb-1">Có bao nhiêu bông hoa ghi phép tính có kết quả <b>lớn hơn 10</b>?</div>'+xepHang(cands.map(function(x){ return flower(x); }), 3), ans:dem, unit:'bông hoa',
+      return {type:'num', _kieu:'dem', _es:cands, _e:dem, q:'<div class="mb-1">Có bao nhiêu bông hoa ghi phép tính có kết quả <b>lớn hơn 10</b>?</div>'+xepHang(cands.map(function(x){ return flower(x); }), 2), ans:dem, unit:'bông hoa',
         sai:nhanSai([[dem-1,'lech-nhom'],[dem+1,'lech-nhom'],[3-dem,'chon-sai-phep']], dem), goiY:{'lech-nhom':'Bé tính kết quả từng bông hoa rồi đếm lại nhé!', 'chon-sai-phep':'Bé đếm các bông hoa lớn hơn 10, không đếm các bông bé hơn 10.', 'chung':'Bé tính từng phép tính, so với 10 rồi đếm.'}}; }
     /* chọn một: đúng một phép tính thoả điều kiện */
     var dk = lon ? 'lớn hơn 10' : 'bé hơn 10', ok=function(x){ return lon ? tinhBT(x)>10 : tinhBT(x)<10; }, dung=null, sai3=[], i, mix=shuffle(pool.slice());
