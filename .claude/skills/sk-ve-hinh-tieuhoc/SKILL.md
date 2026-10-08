@@ -133,3 +133,13 @@ Trạng thái: bài 9–12 đã chuẩn hoá. Bài 13, 14 chưa vẽ lại, có 
   → Bộ soát cuộn từng thẻ vào giữa màn hình trước khi kiểm. Khi sửa bộ soát, **thử cài lỗi cố ý** để chắc nó còn bắt được.
 - **Chèn mã JS bằng heredoc + Python** làm `\n` thành xuống dòng thật, `\\S` mất một dấu `\`.
   → Sửa file `.mjs`/`.js` bằng Edit, không bằng heredoc.
+- **Hình học — điểm nhiễu đặt ngay trên điểm khác** (bài 16, 08/10/2026: K ngoài đường thẳng nằm trên M / che hẳn nhãn E).
+  → Điểm ngoài đường cách mọi điểm trên đường ≥ 1,5 cm theo chiều ngang; hai điểm liền kề cách ≥ 2 cm (hoặc đủ để nhãn
+  chữ không chạm); bộ sinh loại bộ số vi phạm. **Đám mây (font Linux hẹp hơn Segoe UI) bỏ sót lỗi chữ đè chữ mà Windows
+  bắt được** — đừng thiết kế sát biên; hình học phải soát lại trên máy thầy.
+- **Nhãn độ dài đặt lệch đoạn nó đo** (bài 17: "14 cm" của đường kính nằm trên nửa AO, nhìn như bán kính 14 cm — dạy sai).
+  → Nhãn nằm giữa ĐÚNG đoạn được đo (đường kính: giữa cả đoạn, hoặc ngoặc dưới cả đoạn). Nhãn bán kính phải có ĐOẠN
+  bán kính được vẽ (tâm → điểm trên đường tròn); không để nhãn cm lơ lửng, không lặp nhãn cho cùng một đoạn.
+- **Con vật vẽ ra không đúng loài** (bài 16: "cào cào" vẽ thân tròn mắt to thành con ếch).
+  → Giữ nét nhận diện của loài (cào cào: thân dài thon, chân sau dài gập chữ V ngược, râu); không nhận ra được thì dùng
+  chấm tròn có chữ thay vì hình sai.

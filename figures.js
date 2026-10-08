@@ -12,7 +12,8 @@ function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random
    mảng màu đặc, KHÔNG viền đen, bo tròn, mỗi vật thêm tối đa một sắc đậm hơn để tạo khối.
    Số trên hình: nhãn TRẮNG, chữ #212121 đậm; ô "?" chữ #B45309.
    Nhân vật / đồ vật trang trí: ảnh có sẵn trong hinh/ (Fluent Emoji, giấy phép MIT — xem hinh/LICENSE-fluentui-emoji.txt).
-   Vật mà học sinh phải ĐẾM (chấm bọ rùa, số bút…): TỰ VẼ ở đây để đếm được đúng.
+   Vật mà học sinh phải ĐẾM (chấm bọ rùa, số bút…): TỰ VẼ ở đây để đếm được đúng, và gắn data-dem="<loại>"
+   lên TỪNG chi tiết để đếm — kiem_dem.mjs (skill sk-ve-hinh-tieuhoc) đếm lại tự động.
    ===================================================================================== */
 var HM = {do:'#F8312F', doDam:'#CA0B4A', cam:'#FF822D', camDam:'#FF6723', vang:'#FCD53F', vangDam:'#FFB02E',
   la:'#86D72F', xanhLa:'#00D26A', troi:'#26C9FC', troiDam:'#00A6ED', hong:'#FF6DC6', tim:'#8D65C5', timDam:'#321B41',
@@ -45,7 +46,7 @@ function ladybug(px){
    +'<circle cx="13.7" cy="6.6" r="1.1" fill="#fff"/><circle cx="18.3" cy="6.6" r="1.1" fill="#fff"/>'
    +'<circle cx="16" cy="19" r="11" fill="'+HM.do+'"/>'
    +'<path d="M16 8.5 V30" stroke="'+c+'" stroke-width="1.3"/>';
-  [[11,14.2],[9.6,19.6],[11.6,25],[21,14.2],[22.4,19.6],[20.4,25]].forEach(function(p){ s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.3" fill="'+c+'"/>'; });
+  [[11,14.2],[9.6,19.6],[11.6,25],[21,14.2],[22.4,19.6],[20.4,25]].forEach(function(p){ s+='<circle data-dem="cham" cx="'+p[0]+'" cy="'+p[1]+'" r="2.3" fill="'+c+'"/>'; });
   return s+'</svg>';
 }
 /* ---- Xe tải chở một phép tính: thùng vàng mang nhãn trắng, biểu thức dài thì thùng dài ra (chữ không nhỏ đi) ---- */
@@ -70,54 +71,6 @@ function clockSVG(h,m){
   var ha=(((h%12)+m/60)/12)*2*Math.PI-Math.PI/2; s+='<line x1="70" y1="70" x2="'+(70+30*Math.cos(ha)).toFixed(1)+'" y2="'+(70+30*Math.sin(ha)).toFixed(1)+'" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>';
   var ma=(m/60)*2*Math.PI-Math.PI/2; s+='<line x1="70" y1="70" x2="'+(70+45*Math.cos(ma)).toFixed(1)+'" y2="'+(70+45*Math.sin(ma)).toFixed(1)+'" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>';
   s+='<circle cx="70" cy="70" r="4" fill="#ef4444"/></svg>'; return s;
-}
-/* ---- Con rồng múa (generic) ---- */
-function dragon(){
-  return '<svg width="122" height="66" viewBox="0 0 160 84" style="display:inline-block">'
-   +'<ellipse cx="86" cy="78" rx="60" ry="4" fill="rgba(0,0,0,.1)"/>'
-   +'<path d="M46 46 Q66 20 88 42 Q110 64 132 42" stroke="#16a34a" stroke-width="15" fill="none" stroke-linecap="round"/>'
-   +'<path d="M46 46 Q66 20 88 42 Q110 64 132 42" stroke="#f59e0b" stroke-width="15" fill="none" stroke-linecap="round" stroke-dasharray="3 16"/>'
-   +'<path d="M132 42 l14 -7 l-2 9 l10 3 l-13 6 z" fill="#22c55e"/>'
-   +'<circle cx="34" cy="42" r="19" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>'
-   +'<circle cx="27" cy="37" r="4" fill="#fff"/><circle cx="27" cy="37" r="1.8" fill="#1f2937"/>'
-   +'<path d="M18 47 q-9 3 -14 -2" stroke="#f59e0b" stroke-width="3" fill="none" stroke-linecap="round"/>'
-   +'<path d="M34 23 l4 -12 l5 12 z" fill="#f59e0b"/>'
-   +'<path d="M24 24 l1 -9 l5 8 z" fill="#f59e0b"/>'
-   +'</svg>';
-}
-/* ---- Quả dưa hấu chở một phép tính (nhãn trắng — chữ không đè lên sọc) ---- */
-function melon(expr){
-  return '<svg width="132" height="70" viewBox="0 0 132 70" style="max-width:100%;height:auto;display:block">'
-   +'<ellipse cx="64" cy="38" rx="58" ry="27" fill="#4ade80" stroke="#16a34a" stroke-width="3"/>'
-   +'<path d="M30 15 Q40 38 30 61" stroke="#15803d" stroke-width="2.5" fill="none"/>'
-   +'<path d="M64 12 Q74 38 64 64" stroke="#15803d" stroke-width="2.5" fill="none"/>'
-   +'<path d="M98 15 Q88 38 98 61" stroke="#15803d" stroke-width="2.5" fill="none"/>'
-   +'<path d="M120 24 q9 -3 12 -10" stroke="#15803d" stroke-width="3" fill="none" stroke-linecap="round"/>'
-   +'<rect x="21" y="24" width="86" height="28" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>'
-   +'<text x="64" y="44" text-anchor="middle" font-size="'+coChu(expr,18)+'" font-weight="800" fill="#14532d" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
-   +'</svg>';
-}
-/* ---- Bông hoa hướng dương chở một phép tính (nhãn trắng giữa nhuỵ) ---- */
-function flower(expr){
-  var s='<svg width="118" height="118" viewBox="0 0 120 120" style="max-width:100%;height:auto;display:block">'
-   +'<g fill="#facc15" stroke="#eab308" stroke-width="1.5">';
-  for(var i=0;i<12;i++){ var a=i*30; var r=a*Math.PI/180; var x=60+34*Math.cos(r), y=60+34*Math.sin(r);
-    s+='<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="9" ry="17" transform="rotate('+a+' '+x.toFixed(1)+' '+y.toFixed(1)+')"/>'; }
-  s+='</g><circle cx="60" cy="60" r="26" fill="#b45309"/>'
-   +'<rect x="20" y="46" width="80" height="28" rx="14" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>'
-   +'<text x="60" y="66" text-anchor="middle" font-size="'+coChu(expr,18)+'" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+expr+'</text>'
-   +'</svg>';
-  return s;
-}
-/* ---- Sơ đồ hai bước: [a] op1-> (?) op2-> [?] ---- */
-function arrow2(a, op1, op2){
-  return '<div class="flex items-center justify-center gap-1 md:gap-2 my-3 flex-wrap">'
-   +'<span style="width:52px;height:52px" class="inline-flex items-center justify-center rounded-lg bg-emerald-400 text-white font-extrabold text-xl">'+a+'</span>'
-   +'<span class="text-slate-500 font-bold text-sm">'+op1+' &#8594;</span>'
-   +'<span style="width:52px;height:52px" class="inline-flex items-center justify-center rounded-full bg-slate-100 border border-slate-300 text-slate-400 font-extrabold text-lg">?</span>'
-   +'<span class="text-slate-500 font-bold text-sm">'+op2+' &#8594;</span>'
-   +'<span style="width:52px;height:52px" class="inline-flex items-center justify-center rounded-xl bg-white border-2 border-amber-400 text-amber-600 font-extrabold text-xl">?</span>'
-   +'</div>';
 }
 
 /* =====================================================================================
@@ -150,9 +103,9 @@ function daySo(seq, hi, an, hinh, nen){
   for(var i=0;i<n;i++){
     var cx=2+P/2+i*P, loai = i===hi ? 'hoi' : (i===an ? 'an' : 'so');
     var f = loai==='hoi' ? '#fff' : (loai==='an' ? HM.xam : nen), vien = loai==='hoi' ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '';
-    if(hinh==='tron') s+='<circle cx="'+cx+'" cy="26" r="20" fill="'+f+'"'+vien+'/>';
-    else if(hinh==='thoi') s+='<rect x="'+(cx-15)+'" y="11" width="30" height="30" rx="4" transform="rotate(45 '+cx+' 26)" fill="'+f+'"'+vien+'/>';
-    else s+='<rect x="'+(cx-19)+'" y="7" width="38" height="38" rx="9" fill="'+f+'"'+vien+'/>';
+    if(hinh==='tron') s+='<circle data-tach="1" cx="'+cx+'" cy="26" r="20" fill="'+f+'"'+vien+'/>';
+    else if(hinh==='thoi') s+='<rect data-tach="1" x="'+(cx-15)+'" y="11" width="30" height="30" rx="4" transform="rotate(45 '+cx+' 26)" fill="'+f+'"'+vien+'/>';
+    else s+='<rect data-tach="1" x="'+(cx-19)+'" y="7" width="38" height="38" rx="9" fill="'+f+'"'+vien+'/>';
     if(loai==='an') s+='<text x="'+cx+'" y="31" text-anchor="middle" font-size="18" '+HFONT+' fill="#475569">&#8230;</text>';
     else s+=chuSo(cx, 26, loai==='hoi' ? '?' : seq[i], loai==='hoi' ? 21 : (String(seq[i]).length>2 ? 15 : 18));
   }
@@ -209,7 +162,7 @@ function hopBut(n, px){
   for(var i=0;i<n;i++){ var x=6+i*p+p/2, t=3+(i%2)*6, m=mau[i%mau.length];
     s+='<path d="M'+(x-w/2).toFixed(1)+' '+(t+9)+' L'+x.toFixed(1)+' '+t+' L'+(x+w/2).toFixed(1)+' '+(t+9)+' Z" fill="'+HM.goNhat+'"/>'
      +'<path d="M'+(x-1.5).toFixed(1)+' '+(t+3)+' L'+x.toFixed(1)+' '+t+' L'+(x+1.5).toFixed(1)+' '+(t+3)+' Z" fill="'+m+'"/>'
-     +'<rect x="'+(x-w/2).toFixed(1)+'" y="'+(t+9)+'" width="'+w.toFixed(1)+'" height="40" fill="'+m+'"/>'; }
+     +'<rect data-dem="but" x="'+(x-w/2).toFixed(1)+'" y="'+(t+9)+'" width="'+w.toFixed(1)+'" height="40" fill="'+m+'"/>'; }
   return s+'<rect x="2" y="36" width="'+(W-4)+'" height="42" rx="7" fill="'+HM.troi+'"/><rect x="2" y="36" width="'+(W-4)+'" height="9" rx="4" fill="'+HM.troiDam+'"/>'
     +'<rect x="'+(W/2-17)+'" y="55" width="34" height="11" rx="5.5" fill="#fff"/></svg>';
 }
@@ -217,14 +170,14 @@ function hopBut(n, px){
    MỘT hình SVG: co theo màn hình, không rớt bông hoa xuống dòng. dau = số ở con bướm;
    buoc = ['× 4', ': 3', …]; giaTri = số ở từng bông hoa (null -> "?"). Phép tính dùng currentColor -> đổi màu theo giao diện. */
 function chuoiBuom(dau, buoc, giaTri){
-  var F=56, A=50, W=F+buoc.length*(A+F)+4, phong = buoc.length<=1 ? 1.4 : (buoc.length===2 ? 1.15 : 1);   /* ít bước thì vẽ to hơn */
+  var F=56, A=(buoc.length>=3 ? 44 : 50), W=F+buoc.length*(A+F)+4, phong = buoc.length<=1 ? 1.4 : (buoc.length===2 ? 1.15 : 1);   /* ít bước thì vẽ to hơn */
   var s='<svg class="text-slate-700" width="'+Math.round(W*phong)+'" height="'+Math.round(70*phong)+'" viewBox="0 0 '+W+' 70" style="max-width:100%;height:auto;display:inline-block">'
-   +'<g transform="translate(2,5)">'+anhSVG('butterfly',0,0,F)+nhanTron(F/2,F/2+3,13,dau,16)+'</g>', x=2+F;
+   +'<g transform="translate(2,5)">'+anhSVG('butterfly',0,0,F)+nhanTron(F/2,F/2+3,13.5,dau,17)+'</g>', x=2+F;
   for(var i=0;i<buoc.length;i++){
-    s+='<text x="'+(x+A/2)+'" y="27" text-anchor="middle" font-size="16" '+HFONT+' fill="currentColor">'+buoc[i]+'</text>'
+    s+='<text x="'+(x+A/2)+'" y="27" text-anchor="middle" font-size="17" '+HFONT+' fill="currentColor">'+buoc[i]+'</text>'
      +'<path d="M'+(x+6)+' 38 H'+(x+A-8)+' M'+(x+A-14)+' 33 L'+(x+A-7)+' 38 L'+(x+A-14)+' 43" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>';
     x+=A; var v = giaTri[i]===null ? '?' : giaTri[i];
-    s+='<g transform="translate('+x+',5)">'+anhSVG('cherry_blossom',0,0,F)+nhanTron(F/2,F/2,14,v,String(v).length>2?13:16)+'</g>'; x+=F;
+    s+='<g transform="translate('+x+',5)">'+anhSVG('cherry_blossom',0,0,F)+nhanTron(F/2,F/2,14.5,v,String(v).length>2?14:17)+'</g>'; x+=F;
   }
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
@@ -235,8 +188,8 @@ function thanhGo(n, dai){
    +nhanVien(130, 19, 76, 24, dai+' cm', 15)
    +'<rect x="10" y="32" width="240" height="30" rx="6" fill="'+HM.goNhat+'"/>'
    +'<rect x="10" y="54" width="240" height="8" rx="3" fill="'+HM.go+'"/>'
-   +'<path d="M26 40 H104 M58 47 H196 M142 39 H232" stroke="'+HM.go+'" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>';
-  for(var i=1;i<n;i++){ var x=(10+i*240/n).toFixed(1); s+='<line x1="'+x+'" y1="29" x2="'+x+'" y2="65" stroke="'+HM.goDam+'" stroke-width="2.2" stroke-dasharray="4 3"/>'; }
+   +'<path d="M26 40 H104 M58 47 H196 M142 39 H232" stroke="'+HM.go+'" stroke-width="1.5" stroke-linecap="round" opacity=".55" fill="none"/>';
+  for(var i=1;i<n;i++){ var x=(10+i*240/n).toFixed(1); s+='<line data-dem="vach" x1="'+x+'" y1="29" x2="'+x+'" y2="65" stroke="'+HM.goDam+'" stroke-width="2.2" stroke-dasharray="4 3"/>'; }
   return s+'</svg>';
 }
 /* ---- Đội kéo co: mỗi đội một hàng 7 bạn (trai/gái xen kẽ) nắm sợi dây — đếm được 7 bạn mỗi đội (SGK bài 10) ---- */
@@ -246,7 +199,7 @@ function doiKeoCo(soDoi, moiDoi){
     var s=svgHinh(W,58)+'<path d="M4 45 H'+(W-4)+'" stroke="'+HM.go+'" stroke-width="5" stroke-linecap="round"/>'
       +'<path d="M4 45 H'+(W-4)+'" stroke="'+HM.goNhat+'" stroke-width="2" stroke-dasharray="5 5"/>';
     for(var i=0;i<moiDoi;i++){ var cx=28+i*42;   /* mặt bạn nhỏ + hai bàn tay nắm dây */
-      s+=anhSVG((i+d)%2 ? 'girl' : 'boy', cx-20, 4, 40)
+      s+=anhSVG((i+d)%2 ? 'girl' : 'boy', cx-20, 4, 40).replace('<image', '<image data-dem="ban"')
         +'<circle cx="'+(cx-9)+'" cy="45" r="4.5" fill="#FFC83D"/><circle cx="'+(cx+9)+'" cy="45" r="4.5" fill="#FFC83D"/>'; }
     out+=s+'</svg>';
   }
@@ -275,7 +228,7 @@ function soDo(nut, phep){
 function bachTuoc(px){
   var s=svgHinh(64,64,px||60), c=HM.tim;
   for(var i=0;i<8;i++){ var bx=18+i*28/7, ex=4+i*56/7;   /* đầu xúc tu cách nhau 8 đơn vị, KHÔNG móc cong (móc chạm nhau -> khó đếm) */
-    s+='<path d="M'+bx.toFixed(1)+' 32 Q'+((bx+ex)/2).toFixed(1)+' 52 '+ex.toFixed(1)+' 60" stroke="'+c+'" stroke-width="4" fill="none" stroke-linecap="round"/>'; }
+    s+='<path data-dem="xuctu" d="M'+bx.toFixed(1)+' 32 Q'+((bx+ex)/2).toFixed(1)+' 52 '+ex.toFixed(1)+' 60" stroke="'+c+'" stroke-width="4" fill="none" stroke-linecap="round"/>'; }
   return s+'<ellipse cx="32" cy="23" rx="18" ry="17" fill="'+c+'"/>'
     +'<ellipse cx="26" cy="15" rx="5" ry="3.5" fill="#fff" fill-opacity=".35"/>'
     +'<circle cx="25" cy="25" r="4.6" fill="#fff"/><circle cx="39" cy="25" r="4.6" fill="#fff"/>'
@@ -286,12 +239,12 @@ function bachTuoc(px){
 function conCua(px){
   var s=svgHinh(72,56,px||64), d=HM.doDam, chan='';
   for(var i=0;i<4;i++){ var y=29+i*4, ey=33+i*6.5;
-    chan+='<path d="M24 '+y+' L13 '+(ey-4)+' L6 '+ey+'"/><path d="M48 '+y+' L59 '+(ey-4)+' L66 '+ey+'"/>'; }
+    chan+='<path data-dem="chan" d="M24 '+y+' L13 '+(ey-4)+' L6 '+ey+'"/><path data-dem="chan" d="M48 '+y+' L59 '+(ey-4)+' L66 '+ey+'"/>'; }
   s+='<g stroke="'+d+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">'+chan
    +'<path d="M27 24 L16 15"/><path d="M45 24 L56 15"/><path d="M31 21 V12"/><path d="M41 21 V12"/></g>';
   /* hai càng: hình tròn có khe kẹp */
-  s+='<path d="M14 15 m-8 0 a8 8 0 1 0 16 0 l-6 -2 l4 -6 a8 8 0 0 0 -14 8 z" fill="'+HM.do+'"/>'
-   +'<path d="M58 15 m8 0 a8 8 0 1 1 -16 0 l6 -2 l-4 -6 a8 8 0 0 1 14 8 z" fill="'+HM.do+'"/>'
+  s+='<path data-dem="cang" d="M14 15 m-8 0 a8 8 0 1 0 16 0 l-6 -2 l4 -6 a8 8 0 0 0 -14 8 z" fill="'+HM.do+'"/>'
+   +'<path data-dem="cang" d="M58 15 m8 0 a8 8 0 1 1 -16 0 l6 -2 l-4 -6 a8 8 0 0 1 14 8 z" fill="'+HM.do+'"/>'
    +'<ellipse cx="36" cy="33" rx="17" ry="12" fill="'+HM.do+'"/><ellipse cx="36" cy="38" rx="14" ry="6" fill="'+d+'" fill-opacity=".35"/>'
    +'<circle cx="31" cy="11" r="3.4" fill="#fff"/><circle cx="41" cy="11" r="3.4" fill="#fff"/>'
    +'<circle cx="31" cy="11" r="1.7" fill="'+HM.den+'"/><circle cx="41" cy="11" r="1.7" fill="'+HM.den+'"/>';
@@ -310,7 +263,7 @@ var THU=['T2','T3','T4','T5','T6','T7','CN'];
 function tuanLe(soTuan){
   var out='<div class="flex flex-col items-center gap-1 mb-2">';
   for(var t=0;t<soTuan;t++){ var s=svgHinh(296,40);
-    for(var i=0;i<7;i++) s+='<rect x="'+(2+i*42)+'" y="2" width="38" height="36" rx="8" fill="'+(i===6 ? HM.cam : HM.troi)+'"/>'+chuSo(21+i*42, 20, THU[i], 14);
+    for(var i=0;i<7;i++) s+='<rect data-dem="ngay" x="'+(2+i*42)+'" y="2" width="38" height="36" rx="8" fill="'+(i===6 ? HM.cam : HM.troi)+'"/>'+chuSo(21+i*42, 20, THU[i], 14);
     out+=s+'</svg>'; }
   return out+'</div>';
 }
@@ -318,7 +271,7 @@ function tuanLe(soTuan){
 function hopCoc(soHop){
   var s=svgHinh(soHop*44+4, 48);
   for(var i=0;i<soHop;i++){ var x=2+i*44;
-    s+='<rect x="'+(x+2)+'" y="12" width="36" height="34" rx="4" fill="'+HM.goNhat+'"/>'
+    s+='<rect data-dem="hop" x="'+(x+2)+'" y="12" width="36" height="34" rx="4" fill="'+HM.goNhat+'"/>'
      +'<rect x="'+x+'" y="6" width="40" height="10" rx="3" fill="'+HM.go+'"/>'   /* nắp phẳng (không vát — vát trông như mái nhà) */
      +'<path d="M'+(x+13)+' 22 H'+(x+27)+' L'+(x+25)+' 38 H'+(x+15)+' Z" fill="#fff" fill-opacity=".9"/>'; }
   return s+'</svg>';
@@ -333,4 +286,72 @@ function bangCot(nhan, cot, o){
     s+='</tr>';
   }
   return s+'</table>';
+}
+/* ---- Đội múa rồng: con rồng dài, 9 bạn nhỏ cầm gậy đỡ thân rồng — đếm được 9 người mỗi đội (SGK bài 12) ---- */
+function doiMuaRong(soDoi, moiDoi){
+  moiDoi=moiDoi||9; var P=38, x0=66, W=x0+moiDoi*P+14, out='<div class="flex flex-col items-center gap-1 mb-2">';
+  for(var d=0;d<soDoi;d++){
+    var s=svgHinh(W,92), than='M40 26';
+    for(var i=0;i<=moiDoi;i++){ var x=x0-6+i*P; than+=' Q'+(x-P/2)+' '+(i%2 ? 8 : 40)+' '+x+' 24'; }
+    for(var k=0;k<moiDoi;k++){ var cx=x0+12+k*P;   /* gậy từ thân rồng xuống tay bạn nhỏ */
+      s+='<line x1="'+cx+'" y1="26" x2="'+cx+'" y2="62" stroke="'+HM.goDam+'" stroke-width="2.5" stroke-linecap="round"/>'; }
+    s+='<path d="'+than+'" stroke="'+HM.xanhLa+'" stroke-width="15" fill="none" stroke-linecap="round"/>'
+     +'<path d="'+than+'" stroke="'+HM.vang+'" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="1 10"/>'
+     +'<path d="M'+(W-14)+' 24 l10 -9 l-1 9 l7 5 l-11 3 z" fill="'+HM.vangDam+'"/>';                 /* đuôi */
+    s+='<path d="M22 12 l3 -10 l5 9 z M34 11 l5 -9 l3 10 z" fill="'+HM.vangDam+'"/>'                  /* sừng */
+     +'<circle cx="32" cy="26" r="19" fill="'+HM.do+'"/>'
+     +'<path d="M14 34 q-8 4 -12 0 M16 38 q-6 7 -12 6" stroke="'+HM.vangDam+'" stroke-width="3" fill="none" stroke-linecap="round"/>'   /* râu */
+     +'<circle cx="25" cy="21" r="5" fill="#fff"/><circle cx="24" cy="21" r="2.4" fill="'+HM.den+'"/>'
+     +'<path d="M17 31 q8 6 16 1" stroke="'+HM.doDam+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+    for(var j=0;j<moiDoi;j++){ var cx2=x0+12+j*P;
+      s+=anhSVG((j+d)%2 ? 'girl' : 'boy', cx2-17, 56, 34).replace('<image', '<image data-dem="ban"')+'<circle cx="'+(cx2+1)+'" cy="62" r="4" fill="#FFC83D"/>'; }
+    out+=s+'</svg>';
+  }
+  return out+'</div>';
+}
+/* ---- Quả dưa hấu chở một phép tính: vỏ xanh sọc đậm, nhãn trắng ---- */
+function melon(expr){
+  var dai=String(expr).length>7, W=dai?168:132, c=W/2, s=svgHinh(W,72);   /* biểu thức dài -> quả dài ra, chữ giữ cỡ */
+  s+='<ellipse cx="'+c+'" cy="38" rx="'+(c-4)+'" ry="32" fill="'+HM.xanhLa+'"/>';
+  [[-0.66,0.55],[-0.33,0.85],[0,1],[0.33,0.85],[0.66,0.55]].forEach(function(p){ var h=32*p[1], x=c+p[0]*(c-4);
+    s+='<path d="M'+x.toFixed(1)+' '+(38-h+2).toFixed(1)+' q'+(p[0]<0?-7:(p[0]>0?7:0))+' '+h.toFixed(1)+' 0 '+(2*h-4).toFixed(1)+'" stroke="#00A35F" stroke-width="6" fill="none" stroke-linecap="round"/>'; });
+  return s+'<path d="M'+(W-16)+' 16 q8 -6 12 -14" stroke="'+HM.goDam+'" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    +nhanVien(c, 38, dai?128:92, 30, expr, 18)+'</svg>';
+}
+/* ---- Bông hoa hướng dương chở một phép tính: hai lớp cánh vàng, nhuỵ nâu, nhãn trắng ---- */
+function flower(expr){
+  var s=svgHinh(120,120);
+  for(var i=0;i<12;i++){ var a=i*30+15, r=a*Math.PI/180, x=60+36*Math.cos(r), y=60+36*Math.sin(r);
+    s+='<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="9" ry="18" transform="rotate('+(a+90)+' '+x.toFixed(1)+' '+y.toFixed(1)+')" fill="'+HM.vangDam+'"/>'; }
+  for(var j=0;j<12;j++){ var b=j*30, q=b*Math.PI/180, u=60+34*Math.cos(q), v=60+34*Math.sin(q);
+    s+='<ellipse cx="'+u.toFixed(1)+'" cy="'+v.toFixed(1)+'" rx="9" ry="17" transform="rotate('+(b+90)+' '+u.toFixed(1)+' '+v.toFixed(1)+')" fill="'+HM.vang+'"/>'; }
+  var dai=String(expr).length>7;   /* biểu thức dài: nhãn rộng ra phủ lên cánh, chữ không nhỏ đi */
+  return s+'<circle cx="60" cy="60" r="27" fill="'+HM.goDam+'"/>'+nhanVien(60, 60, dai?112:84, 30, expr, dai?16:18)+'</svg>';
+}
+/* ---- Con thuyền buồm (hình gợi tình huống) ---- */
+function thuyen(px){
+  return svgHinh(64,64,px||60)
+   +'<path d="M31 6 V44" stroke="'+HM.goDam+'" stroke-width="2.5"/>'
+   +'<path d="M33 9 L54 40 H33 Z" fill="'+HM.vang+'"/><path d="M29 14 L12 40 H29 Z" fill="'+HM.cam+'"/>'
+   +'<path d="M6 44 H58 L50 56 H14 Z" fill="'+HM.do+'"/><path d="M10 50 H54 L50 56 H14 Z" fill="'+HM.doDam+'"/>'
+   +'<path d="M2 60 q6 -4 12 0 t12 0 t12 0 t12 0 t12 0" stroke="'+HM.troi+'" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
+}
+/* ---- Túi lưới đựng 9 quả cam (3 × 3) — đếm được ---- */
+function tuiCam(px, soQua){
+  soQua=soQua||9; var s=svgHinh(64,72,px||60);
+  s+='<path d="M14 14 Q32 4 50 14" stroke="'+HM.xanhLa+'" stroke-width="3" fill="none" stroke-linecap="round"/>'
+   +'<path d="M8 18 H56 L52 66 Q32 72 12 66 Z" fill="'+HM.la+'" fill-opacity=".25"/>';
+  for(var i=0;i<soQua;i++){ var cx=18+(i%3)*14, cy=29+Math.floor(i/3)*14;
+    s+='<circle data-dem="qua" cx="'+cx+'" cy="'+cy+'" r="6.6" fill="'+HM.cam+'"/><circle cx="'+(cx-2)+'" cy="'+(cy-2)+'" r="1.6" fill="#fff" fill-opacity=".5"/>'; }
+  return s+'<path d="M8 18 H56 L52 66 Q32 72 12 66 Z" stroke="'+HM.xanhLa+'" stroke-width="2" fill="none" stroke-dasharray="3 3"/></svg>';
+}
+/* ---- Một hàng can nhựa (đếm được số can) ---- */
+function hangCan(soCan){
+  var s=svgHinh(soCan*34+4, 46);
+  for(var i=0;i<soCan;i++){ var x=2+i*34;
+    s+='<rect data-dem="can" x="'+(x+2)+'" y="10" width="28" height="34" rx="5" fill="'+HM.vangDam+'"/>'
+     +'<rect x="'+(x+19)+'" y="3" width="8" height="9" rx="2" fill="'+HM.doDam+'"/>'
+     +'<path d="M'+(x+6)+' 14 h9 v-6 h-9 z" fill="none" stroke="'+HM.cam+'" stroke-width="2.5"/>'
+     +'<rect x="'+(x+7)+'" y="22" width="18" height="14" rx="3" fill="#fff" fill-opacity=".85"/>'; }
+  return s+'</svg>';
 }
