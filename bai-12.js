@@ -107,9 +107,9 @@ var BAI = {
 
   /* D14 — Bảng số (Luyện tập tiết 2, LT2): Thừa số · Thừa số · Tích  và  Số bị chia · Số chia · Thương. Một ô "?" */
   {name:'Bảng số', sec:'Luyện tập, tiết 2 — Số? (bảng Thừa số – Tích, Số bị chia – Thương)', mt:['MT2','MT3'], levels:3,
-   muc:['Tìm tích hoặc thương trong bảng, số nhỏ.', 'Tìm thừa số hoặc số chia trong bảng.', 'Bảng nhiều cột, ô ? ở thừa số hoặc số bị chia.'],
+   muc:['Tìm tích hoặc thương trong bảng, số nhỏ.', 'Tìm thừa số hoặc số chia trong bảng.', 'Ô ? ở thừa số hoặc số bị chia (khó nhất trong bảng).'],
    make:function(lv, mt){
-    var chia = (mt==='MT3' ? true : (mt==='MT2' ? false : Math.random()<0.5)), n = lv>=3 ? 6 : 5, ks=[], x, cot, c, r, k, ans, sai, gy;
+    var chia = (mt==='MT3' ? true : (mt==='MT2' ? false : Math.random()<0.5)), n = 5, ks=[], x, cot, c, r, k, ans, sai, gy;
     while(ks.length<n){ x = lv<=1 ? pick([1,2,3,4,5,6,7]) : rnd(2,10); if(ks.indexOf(x)<0) ks.push(x); }
     c=rnd(0,n-1); k = lv<=1 ? rnd(2,5) : (lv===2 ? rnd(3,10) : rnd(3,10)); if(ks.indexOf(k)>=0 && ks.indexOf(k)!==c) ks[ks.indexOf(k)]=ks[c]; ks[c]=k;
     var chieu = ks.map(function(){ return Math.random()<0.5; });   /* true: số 9 đứng cột trái */
