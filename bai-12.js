@@ -20,10 +20,10 @@ var BAI = {
    muc:['Đếm số người của 2–3 đội múa rồng bằng phép cộng các số 9.', 'Cộng nhiều số 9 (4 đội) mà không cần gợi ý phép nhân.', 'Làm ngược lại: biết tổng số người, tìm số đội múa rồng.'],
    make:function(lv){
     if(lv>=3){ var m=rnd(3,9);
-      return {type:'num', _n:m, _nguoc:true, q:'<div class="flex justify-center mb-2">'+dragon()+'</div><div>Mỗi đội múa rồng có 9 người. Có tất cả '+(9*m)+' người múa rồng.</div><div class="mt-1">Hỏi có mấy đội múa rồng?</div>', ans:m, unit:'đội'}; }
-    var n = lv<=1 ? rnd(2,3) : 4, dr='', add=[];
-    for(var i=0;i<n;i++){ dr+=dragon(); add.push('9'); }
-    return {type:'num', _n:n, _nguoc:false, q:'<div class="flex justify-center gap-1 mb-2 flex-wrap">'+dr+'</div>'
+      return {type:'num', _n:m, _nguoc:true, q:doiMuaRong(1)+'<div>Mỗi đội múa rồng có 9 người. Có tất cả '+(9*m)+' người múa rồng.</div><div class="mt-1">Hỏi có mấy đội múa rồng?</div>', ans:m, unit:'đội'}; }
+    var n = lv<=1 ? rnd(2,3) : 4, add=[];
+    for(var i=0;i<n;i++) add.push('9');
+    return {type:'num', _n:n, _nguoc:false, q:doiMuaRong(n)
       +'<div class="text-slate-600 text-base mb-2">Mỗi đội múa rồng có 9 người. Có '+n+' đội múa rồng như thế.</div>'
       +'<div class="text-xl">'+add.join(' + ')+' = ?</div>'
       +(lv<=1 ? '<div class="text-slate-500 text-base mt-1">(tức là 9 × '+n+')</div>' : ''), ans:9*n, unit:'người'};
@@ -63,7 +63,7 @@ var BAI = {
     for(var q2=2;q2<=9;q2++){ if(mid%q2!==0 || mid/q2>10 && lv<3) continue; if(lv<=1 && [3,9].indexOf(q2)<0) continue; if(lv>=3 && (q2===9 || q2<4)) continue; divs.push(q2); }
     if(!divs.length) divs=[9];
     var qd=pick(divs);
-    return {type:'num', _mid:mid, _qd:qd, q: arrow2(9, '× '+p, ': '+qd)+'<div>Số ở ô cuối cùng là bao nhiêu?</div>', ans: mid/qd};
+    return {type:'num', _mid:mid, _qd:qd, q: soDo([{v:9, h:'vuong'}, {v:'', h:'tron'}, {v:null, h:'vuong'}], ['× '+p, ': '+qd])+'<div>Số ở ô cuối cùng là bao nhiêu?</div>', ans: mid/qd};
   }, check:function(q){ return q._mid%q._qd===0 && q.ans===q._mid/q._qd; }},
 
   {name:'So với 10', sec:'Luyện tập — Kết quả lớn hơn hay bé hơn 10?', levels:3,
@@ -83,16 +83,16 @@ var BAI = {
    muc:['Bài toán một phép nhân với số nhỏ.', 'Bài toán một phép nhân hoặc phép chia với 9.', 'Bài toán hai bước (nhân rồi trừ, chia rồi nhân).'],
    make:function(lv){
     var r=Math.random(), n = lv<=1 ? rnd(2,5) : rnd(2,9);
-    if(lv<=1) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
+    if(lv<=1) return {type:'num', _e:9*n, q:xepHang(Array(n+1).join('x').split('').map(function(){ return thuyen(); }), 5)+'Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
     if(lv===2){
-      if(r<0.34) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
-      if(r<0.68) return {type:'num', _e:9*n, q:'<div class="text-5xl mb-2">&#127818;</div>Mỗi túi có 9 quả cam. Hỏi '+n+' túi như thế có bao nhiêu quả cam?', ans:9*n, unit:'quả'};
-      return {type:'num', _e:n, q:'<div class="text-5xl mb-2">&#129371;</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi mỗi can có bao nhiêu lít nước mắm?', ans:n, unit:'lít'};
+      if(r<0.34) return {type:'num', _e:9*n, q:'<div class="flex justify-center mb-2">'+thuyen(64)+'</div>Trên mỗi thuyền có 9 người. Hỏi '+n+' thuyền như thế có bao nhiêu người?', ans:9*n, unit:'người'};
+      if(r<0.68) return {type:'num', _e:9*n, q:'<div class="flex justify-center mb-2">'+tuiCam(64)+'</div>Mỗi túi có 9 quả cam. Hỏi '+n+' túi như thế có bao nhiêu quả cam?', ans:9*n, unit:'quả'};
+      return {type:'num', _e:n, q:'<div class="flex justify-center mb-2">'+hangCan(9)+'</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi mỗi can có bao nhiêu lít nước mắm?', ans:n, unit:'lít'};
     }
     if(r<0.5){ var m=rnd(2,9*n-2);
-      return {type:'num', _e:9*n-m, q:'<div class="text-5xl mb-2">&#9973;</div>Trên mỗi thuyền có 9 người. Có '+n+' thuyền cập bến, đã có '+m+' người lên bờ. Hỏi còn bao nhiêu người trên thuyền?', ans:9*n-m, unit:'người'}; }
+      return {type:'num', _e:9*n-m, q:'<div class="flex justify-center mb-2">'+thuyen(64)+'</div>Trên mỗi thuyền có 9 người. Có '+n+' thuyền cập bến, đã có '+m+' người lên bờ. Hỏi còn bao nhiêu người trên thuyền?', ans:9*n-m, unit:'người'}; }
     var h=rnd(2,5);
-    return {type:'num', _e:n*h, q:'<div class="text-5xl mb-2">&#129371;</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi '+h+' can như thế có bao nhiêu lít nước mắm?', ans:n*h, unit:'lít'};
+    return {type:'num', _e:n*h, q:'<div class="flex justify-center mb-2">'+hangCan(9)+'</div>Chia đều '+(9*n)+' l nước mắm vào 9 cái can. Hỏi '+h+' can như thế có bao nhiêu lít nước mắm?', ans:n*h, unit:'lít'};
   }, check:function(q){ return q.ans===q._e && q.ans>0; }}
  ]
 };
