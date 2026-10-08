@@ -88,10 +88,10 @@ function figGoc(code){ return svgX(200,190,200)+veGoc(gocTuMa(code))+'</svg>'; }
 /* ---- Hình mới 2 (D2, D13): đường tròn có chấm I theo mã "kiểu:xoay"; kiểu = tam, l35, l55, tren, ngoai (khoảng cách chấm I tới tâm / bán kính) ---- */
 var TY_LE={tam:0, l35:0.35, l55:0.55, tren:1, ngoai:1.45};
 function figTron(code){
-  var p=code.split(':'), r=TY_LE[p[0]], rot=+p[1], C=[100,100], R=52, I=diemTu(C, rot, R*r), s=svgX(200,200,190), d = r===0 ? [0.7,-0.7] : donVi([I[0]-C[0], I[1]-C[1]]);
-  s+='<circle cx="100" cy="100" r="52" fill="'+HM.xanhLa+'" fill-opacity="0.25" stroke="currentColor" stroke-width="3"/>'
+  var p=code.split(':'), r=TY_LE[p[0]], rot=+p[1], C=[100,100], R=48, I=diemTu(C, rot, R*r), s=svgX(200,200,190), d = r===0 ? [0.7,-0.7] : donVi([I[0]-C[0], I[1]-C[1]]);
+  s+='<circle cx="100" cy="100" r="48" fill="'+HM.xanhLa+'" fill-opacity="0.25" stroke="currentColor" stroke-width="3"/>'
     +'<circle cx="'+f1(I[0])+'" cy="'+f1(I[1])+'" r="5.5" fill="'+HM.cam+'"/>'
-    +'<text x="'+f1(I[0]+d[0]*17)+'" y="'+f1(I[1]+d[1]*17+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">I</text>';
+    +'<text x="'+f1(I[0]+d[0]*17)+'" y="'+f1(I[1]+d[1]*17+7)+'" text-anchor="middle" font-size="21" font-family="Georgia,Times New Roman,serif" font-weight="800" fill="currentColor">I</text>';
   return s+'</svg>';
 }
 function khoangTam(code){ return TY_LE[code.split(':')[0]]; }
@@ -131,7 +131,7 @@ function datHcn(w, h, nx, ny){ return {x:rnd(0,nx-w), y:rnd(0,ny-h), w:w, h:h}; 
    khối vuông (w = h) mang data-dem="hv", khối chữ nhật (w khác h) mang data-dem="hcn". Khối đặt sát nhau, vẽ thu vào 1,5 đơn vị để có khe, không chồng nhau. ---- */
 function khoiGhep(ten, n, chan){
   var bl, hu, wu, extra='', u;
-  if(ten==='tau'){ bl=[{x:0,y:0,w:4,h:2},{x:0,y:2,w:1,h:1},{x:4,y:0,w:2,h:2}]; for(var i=0;i<n;i++) bl.push({x:6+4*i,y:0,w:4,h:2}); hu=3; wu=6+4*n; u = n>=3 ? 15 : 19; }
+  if(ten==='tau'){ bl=[{x:0,y:0,w:4,h:2},{x:0,y:2,w:1,h:1},{x:4,y:0,w:2,h:2}]; for(var i=0;i<n;i++) bl.push({x:6+4*i,y:0,w:4,h:2}); hu=4; wu=6+4*n; u = n>=3 ? 15 : 19; }
   else if(ten==='robot'){ bl=[{x:2,y:6,w:2,h:2},{x:1,y:3,w:4,h:3},{x:0,y:3,w:1,h:3},{x:5,y:3,w:1,h:3},{x:1,y:0,w:1,h:3},{x:4,y:0,w:1,h:3}]; if(chan){ bl.push({x:0,y:0,w:1,h:1},{x:5,y:0,w:1,h:1}); } hu=8; wu=6; u=22; }
   else { bl=[{x:0,y:0,w:3,h:2},{x:0,y:2,w:3,h:3},{x:3,y:0,w:2,h:5},{x:5,y:0,w:3,h:2},{x:5,y:2,w:3,h:3},{x:6,y:6,w:1,h:2}]; hu=8; wu=8; u=24; }
   return {bl:bl, hu:hu, wu:wu, u:u, ten:ten};
@@ -142,8 +142,8 @@ function veKhoi(g){
   if(ten==='nha') s+='<polygon points="'+X(-0.4)+','+Y(5)+' '+X(8.4)+','+Y(5)+' '+X(4)+','+Y(8)+'" fill="'+HM.do+'" fill-opacity="0.85"/>';
   g.bl.forEach(function(b){ var kind = b.w===b.h ? 'hv' : 'hcn';
     s+='<rect data-dem="'+kind+'" x="'+f1(X(b.x)+1.5)+'" y="'+f1(Y(b.y+b.h)+1.5)+'" width="'+f1(b.w*u-3)+'" height="'+f1(b.h*u-3)+'" rx="3" fill="'+(kind==='hv' ? HM.cam : HM.troi)+'"/>'; });
-  if(ten==='tau'){ g.bl.forEach(function(b){ if(b.y===0 && b.w>=2){ var yy=Y(0)+2; s+='<circle cx="'+f1(X(b.x)+0.9*u)+'" cy="'+f1(yy+3)+'" r="'+f1(0.42*u)+'" fill="currentColor"/><circle cx="'+f1(X(b.x+b.w)-0.9*u)+'" cy="'+f1(yy+3)+'" r="'+f1(0.42*u)+'" fill="currentColor"/>'; } });
-    s+='<circle cx="'+f1(X(0.5))+'" cy="'+f1(Y(3.6))+'" r="'+f1(0.38*u)+'" fill="'+HM.xam+'" fill-opacity="0.8"/>'; }
+  if(ten==='tau'){ g.bl.forEach(function(b){ if(b.y===0 && b.w>=2){ var yy=Y(0)+2; s+='<circle cx="'+f1(X(b.x)+0.9*u)+'" cy="'+f1(yy+3)+'" r="'+f1(0.42*u)+'" fill="'+HM.goDam+'"/><circle cx="'+f1(X(b.x+b.w)-0.9*u)+'" cy="'+f1(yy+3)+'" r="'+f1(0.42*u)+'" fill="'+HM.goDam+'"/>'; } });
+    s+='<circle cx="'+f1(X(0.9))+'" cy="'+f1(Y(3.7))+'" r="'+f1(0.4*u)+'" fill="'+HM.xam+'"/><circle cx="'+f1(X(1.6))+'" cy="'+f1(Y(4.2))+'" r="'+f1(0.3*u)+'" fill="'+HM.xam+'"/>'; }
   if(ten==='robot'){ s+='<circle cx="'+f1(X(2.6))+'" cy="'+f1(Y(7))+'" r="3" fill="#fff"/><circle cx="'+f1(X(3.4))+'" cy="'+f1(Y(7))+'" r="3" fill="#fff"/>'
     +'<path d="M'+f1(X(2.5))+' '+f1(Y(6.4))+' L'+f1(X(3.5))+' '+f1(Y(6.4))+'" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>'
     +'<path d="M'+f1(X(3))+' '+f1(Y(8)+1)+' L'+f1(X(3))+' '+f1(Y(8)-9)+'" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="'+f1(X(3))+'" cy="'+f1(Y(8)-11)+'" r="3.5" fill="'+HM.do+'"/>'; }
@@ -319,13 +319,15 @@ var BAI = {
   {name:'Tâm đường tròn thứ hai', sec:'Tiết 2, HĐ2 bước 2 — Chọn tâm đường tròn thứ hai', mt:['MT5'], levels:3,
    muc:['Ba điểm: một điểm nằm ngay trên nét tròn.', 'Điểm gần đúng là bẫy.', 'Bốn điểm, có cả điểm trùng tâm đường tròn thứ nhất.'],
    make:function(lv){
-    var nm=chuMoi(), tam=nm[0], ts=[nm[1],nm[2],nm[3],nm[4]], R=52, n = lv<=2 ? 3 : 4, ty, angs=shuffle([30,100,170,240,310]).slice(0,n);
+    var nm=chuMoi(), tam=nm[0], ts=[nm[1],nm[2],nm[3],nm[4]], R=52, n = lv<=2 ? 3 : 4, ty, a0, a0=rnd(0,89), angs=shuffle(n===3 ? [a0,a0+120,a0+240] : [a0,a0+90,a0+180,a0+270]);
     ty = lv<=1 ? [1,0,1.6] : (lv===2 ? [1,0.65,1.35] : [1,0,0.65,1.35]);
     var pts=[], i, C=[130,130], s=svgX(260,260,260);
     s+='<circle cx="130" cy="130" r="'+(R*1.0)+'" fill="'+HM.xanhLa+'" fill-opacity="0.25" stroke="currentColor" stroke-width="3"/>';
     ty.forEach(function(t, k){ pts.push(t===0 ? [C[0],C[1]] : diemTu(C, angs[k], R*t)); });
     var order=shuffle(ty.map(function(_, k){ return k; })), P=order.map(function(k){ return pts[k]; }), T=order.map(function(k){ return ty[k]; });
-    s+='<circle cx="130" cy="130" r="5.5" fill="'+HM.cam+'"/><text x="'+(130+16)+'" y="'+(130+30)+'" text-anchor="start" font-size="19" '+HFONT+' fill="currentColor">'+tam+'</text>';
+    var off=[[16,30],[-16,30],[16,-14],[-16,-14]], best=off[0], bd=-1;
+    off.forEach(function(o){ var m=1e9; pts.forEach(function(p, k){ if(ty[k]!==0){ m=Math.min(m, Math.hypot(p[0]-(130+o[0]), p[1]-(130+o[1]))); } }); if(m>bd){ bd=m; best=o; } });
+    s+='<circle cx="130" cy="130" r="5.5" fill="'+HM.cam+'"/><text x="'+(130+best[0])+'" y="'+(130+best[1])+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+tam+'</text>';
     P.forEach(function(p, k){ if(T[k]===0) return; var d=donVi([p[0]-C[0], p[1]-C[1]]); s+='<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="5" fill="'+HM.cam+'"/><text x="'+f1(p[0]+d[0]*17)+'" y="'+f1(p[1]+d[1]*17+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+ts[k]+'</text>'; });
     var cand=[], dungT=ts[T.indexOf(1)], sai={}; for(i=0;i<P.length;i++) if(T[i]!==0) cand.push(i);
     var ch=cand.map(function(k){ return ts[k]; }); if(T.indexOf(0)>=0){ ch.push(tam); }
