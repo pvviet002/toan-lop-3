@@ -157,9 +157,9 @@ var BAI = {
     if(m==='MT1'){ sp=[{ang:pick([50,60,110,130]), rot:5*rnd(0,71), ten:[X,Y,Z]}]; hinh=hinhGoc(sp,{cols:1, cw:230, ch:200, len:80});
       if(lv<=1){ var dungMD=Math.random()<0.5, dd = dungMD ? X : pick([Y,Z]); cau=dd+' là đỉnh của góc.'; dung=dungMD?'Đ':'S'; var meta1=dd; if(!dungMD) sai['0']='nham-dinh-canh'; }
       else if(lv===2){ var d2=Math.random()<0.5, ca = d2 ? X+Y+' và '+X+Z : X+Y+' và '+Y+Z; cau=ca+' là hai cạnh của góc đỉnh '+X+'.'; dung=d2?'Đ':'S'; var meta2=ca; if(!d2) sai['0']='nham-dinh-canh'; }
-      else { var cau3=Y+Z+' là một cạnh của góc đỉnh '+X+'.'; ch=shuffle(['Sai, vì '+Y+Z+' không đi ra từ đỉnh '+X+'.', 'Đúng, vì '+Y+Z+' nối hai điểm ở hai cạnh.', 'Sai, vì '+X+' không phải là đỉnh.']); lyDo='Sai, vì '+Y+Z+' không đi ra từ đỉnh '+X+'.';
+      else { var cau3=Y+Z+' là một cạnh của góc đỉnh '+X+'.'; ch=shuffle(['Không đồng ý, vì '+Y+Z+' không đi ra từ đỉnh '+X+'.', 'Đồng ý, vì '+Y+Z+' nối hai điểm ở hai cạnh.', 'Không đồng ý, vì '+X+' không phải là đỉnh.']); lyDo='Không đồng ý, vì '+Y+Z+' không đi ra từ đỉnh '+X+'.';
         ch.forEach(function(c,i){ if(c!==lyDo) sai[String(i)]='nham-dinh-canh'; });
-        return {type:'mcq', cot:1, _m:'MT1', mt:'MT1', _sp:sp, _lv:3, _X:X, _Y:Y, _Z:Z, _dung:lyDo, q:hinh+'<div class="text-lg font-bold text-slate-700 my-1">Bạn An nói: "'+cau3+'"</div><div>Bạn An nói sai. Vì sao?</div>', choices:ch, correct:ch.indexOf(lyDo), sai:sai,
+        return {type:'mcq', cot:1, _m:'MT1', mt:'MT1', _sp:sp, _lv:3, _X:X, _Y:Y, _Z:Z, _dung:lyDo, q:hinh+'<div class="text-lg font-bold text-slate-700 my-1">Bạn An nói: "'+cau3+'"</div><div>Em thấy thế nào?</div>', choices:ch, correct:ch.indexOf(lyDo), sai:sai,
           goiY:{'nham-dinh-canh':'Hai cạnh của góc đều đi ra từ đỉnh. Đoạn '+Y+Z+' không đi ra từ đỉnh '+X+'.'}}; }
       return {type:'mcq', figFn:dsBtn18, _m:'MT1', mt:'MT1', _sp:sp, _lv:lv, _dd:meta1, _cs:meta2, _dung:dung, q:hinh+'<div class="text-xl font-extrabold text-orange-700 my-1">'+cau+'</div><div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>',
         choices:['Đ','S'], correct:(dung==='Đ'?0:1), sai:sai, goiY:{'nham-dinh-canh':'Đỉnh là điểm chung của hai cạnh. Hai cạnh đều đi ra từ đỉnh.', 'chung':'Bé tìm đỉnh của góc, rồi xem hai cạnh có đi ra từ đỉnh không.'}}; }
@@ -167,9 +167,9 @@ var BAI = {
     var laV = Math.random()<0.5, ang = laV ? 90 : (lv<=1 ? pick(ANG_XA) : pick(ANG_GAN));
     sp=[{ang:ang, rot:5*rnd(0,71), ten:[X,Y,Z]}]; hinh=hinhGoc(sp,{cols:1, cw:230, ch:200, len:80});
     cau='Góc đỉnh '+X+' là góc vuông.'; dung=laV?'Đ':'S'; if(!laV) sai['0'] = (ang===90 ? '' : (lv>=2 ? 'goc-gan-vuong' : 'lech-nhom'));
-    if(lv>=3){ ang = pick(ANG_GAN); sp=[{ang:ang, rot:5*rnd(0,71), ten:[X,Y,Z]}]; hinh=hinhGoc(sp,{cols:1, cw:230, ch:200, len:80}); lyDo='Sai, vì khi đặt ê ke vào thì hai cạnh không khít: góc này chưa vuông.';
-      ch=shuffle([lyDo, 'Đúng, vì góc gần vuông cũng là góc vuông.', 'Sai, vì góc vuông phải có hai cạnh dài bằng nhau.']); sai={}; ch.forEach(function(c,i){ if(c!==lyDo) sai[String(i)] = c.indexOf('Đúng')===0 ? 'goc-gan-vuong' : 'lech-nhom'; });
-      return {type:'mcq', cot:1, _m:'MT2', mt:'MT2', _sp:sp, _lv:3, _dung:lyDo, q:hinh+'<div class="text-lg font-bold text-slate-700 my-1">Bạn An nói: "Góc đỉnh '+X+' là góc vuông vì trông gần vuông."</div><div>Bạn An nói sai. Vì sao?</div>', choices:ch, correct:ch.indexOf(lyDo), sai:sai,
+    if(lv>=3){ ang = pick(ANG_GAN); sp=[{ang:ang, rot:5*rnd(0,71), ten:[X,Y,Z]}]; hinh=hinhGoc(sp,{cols:1, cw:230, ch:200, len:80}); lyDo='Không đồng ý, vì khi đặt ê ke vào thì hai cạnh không khít: góc này chưa vuông.';
+      ch=shuffle([lyDo, 'Đồng ý, vì góc gần vuông cũng là góc vuông.', 'Không đồng ý, vì góc vuông phải có hai cạnh dài bằng nhau.']); sai={}; ch.forEach(function(c,i){ if(c!==lyDo) sai[String(i)] = c.indexOf('Đồng ý')===0 ? 'goc-gan-vuong' : 'lech-nhom'; });
+      return {type:'mcq', cot:1, _m:'MT2', mt:'MT2', _sp:sp, _lv:3, _dung:lyDo, q:hinh+'<div class="text-lg font-bold text-slate-700 my-1">Bạn An nói: "Góc đỉnh '+X+' là góc vuông vì trông gần vuông."</div><div>Em thấy thế nào?</div>', choices:ch, correct:ch.indexOf(lyDo), sai:sai,
         goiY:{'goc-gan-vuong':'Góc gần vuông vẫn chưa vuông: ê ke còn hở.', 'lech-nhom':'Muốn biết góc có vuông không, bé dùng ê ke, không đo độ dài cạnh.'}}; }
     return {type:'mcq', figFn:dsBtn18, _m:'MT2', mt:'MT2', _sp:sp, _lv:lv, _dung:dung, q:hinh+'<div class="text-xl font-extrabold text-orange-700 my-1">'+cau+'</div><div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>',
       choices:['Đ','S'], correct:(dung==='Đ'?0:1), sai:(laV?{}:{'0':(lv>=2?'goc-gan-vuong':'lech-nhom')}), goiY:{'goc-gan-vuong':'Góc gần vuông vẫn chưa vuông. Bé dùng ê ke thử nhé.', 'lech-nhom':'Góc vuông khít với góc của ê ke.', 'chung':'Bé dùng ê ke thử góc.'}};
