@@ -12,7 +12,7 @@ function nhanSai(ds, dung){ var o={}; ds.forEach(function(p){ var v=p[0]; if(v>0
 function kiemMCQ(q){ return q.choices[q.correct]===q._dung && new Set(q.choices).size===q.choices.length; }
 function dsBtn18(ch){ return '<span class="text-2xl font-extrabold text-slate-700">'+ch+'</span><span class="ml-2 text-base font-bold text-slate-600">'+(ch==='Đ'?'Đúng':'Sai')+'</span>'; }
 function svgX(w, h, px){ return svgHinh(w, h, px).replace('<svg ', '<svg class="text-slate-700" '); }
-var CHU=['A','B','C','D','E','G','I','K','M','N','P','Q'];
+var CHU=['A','B','C','D','E','G','H','K','M','N','P','Q'];
 function chuMoi(){ return shuffle(CHU.slice()); }
 var RAD=Math.PI/180;
 function f1(v){ return v.toFixed(1); }

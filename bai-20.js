@@ -12,7 +12,7 @@ function nhanSai(ds, dung){ var o={}; ds.forEach(function(p){ var v=p[0]; if(v>0
 function kiemMCQ(q){ return q.choices[q.correct]===q._dung && new Set(q.choices).size===q.choices.length; }
 function dsBtn20(ch){ return '<span class="text-2xl font-extrabold text-slate-700">'+ch+'</span><span class="ml-2 text-base font-bold text-slate-600">'+(ch==='Đ'?'Đúng':'Sai')+'</span>'; }
 function svgX(w, h, px){ return svgHinh(w, h, px).replace('<svg ', '<svg class="text-slate-700" '); }
-var CHU=['A','B','C','D','E','G','I','K','M','N','P','Q'];
+var CHU=['A','B','C','D','E','G','H','K','M','N','P','Q'];
 function chuMoi(){ return shuffle(CHU.slice()); }
 var RAD=Math.PI/180;
 function f1(v){ return v.toFixed(1); }
@@ -328,7 +328,7 @@ var BAI = {
     var off=[[16,30],[-16,30],[16,-14],[-16,-14]], best=off[0], bd=-1;
     off.forEach(function(o){ var m=1e9; pts.forEach(function(p, k){ if(ty[k]!==0){ m=Math.min(m, Math.hypot(p[0]-(130+o[0]), p[1]-(130+o[1]))); } }); if(m>bd){ bd=m; best=o; } });
     s+='<circle cx="130" cy="130" r="5.5" fill="'+HM.cam+'"/><text x="'+(130+best[0])+'" y="'+(130+best[1])+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+tam+'</text>';
-    P.forEach(function(p, k){ if(T[k]===0) return; var d=donVi([p[0]-C[0], p[1]-C[1]]); s+='<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="5" fill="'+HM.cam+'"/><text x="'+f1(p[0]+d[0]*17)+'" y="'+f1(p[1]+d[1]*17+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+ts[k]+'</text>'; });
+    P.forEach(function(p, k){ if(T[k]===0) return; var d = T[k]<1 ? donVi([C[0]-p[0], C[1]-p[1]]) : donVi([p[0]-C[0], p[1]-C[1]]); s+='<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="5" fill="'+HM.cam+'"/><text x="'+f1(p[0]+d[0]*17)+'" y="'+f1(p[1]+d[1]*17+7)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+ts[k]+'</text>'; });
     var cand=[], dungT=ts[T.indexOf(1)], sai={}; for(i=0;i<P.length;i++) if(T[i]!==0) cand.push(i);
     var ch=cand.map(function(k){ return ts[k]; }); if(T.indexOf(0)>=0){ ch.push(tam); }
     ch=shuffle(ch); ch.forEach(function(c,j){ if(c!==dungT) sai[String(j)]='tam-lech'; });
