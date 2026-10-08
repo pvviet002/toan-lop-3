@@ -9,11 +9,11 @@ Phạm vi sửa: chỉ `bai-12.js` (và file phân tích này). Không đụng `
   Hoạt động 1 (tính nhẩm), Hoạt động 2 (hai phép tính cùng kết quả), Luyện tập (số còn thiếu, Số?, so với 10, giải toán).
   Tôi **chưa đối chiếu lại với sách** (phiên đám mây không có SGK); số thứ tự Luyện tập 1, 2, 3, 4 chưa rõ (xem câu hỏi 1).
 - Hiện `bai-12.js` có 8 tab × 3 mức, **không** có `muctieu`, `mt`, `sai`, `goiY`, `soCau`.
-- **Soát hình hiện trạng** (`phong_tranh.mjs . bai-12 --soat`): **8 lỗi, 2 cảnh báo** — có sẵn từ trước, không do thay đổi này:
-  - Giải toán dùng **emoji hệ thống** (thuyền, cốc sữa/can nước mắm): lỗi chặn.
-  - "So với 10" mức 3: phép tính dài ("63 : 9 + 3") trong `flower` chỉ **11.8px** (cần ≥ 14): lỗi chặn.
-  - "Cùng kết quả" mức 3: "9 × 10 + 9" trong `melon` 12.0px: cảnh báo; màu ngoài bảng HM (hình `melon`, `flower`, `dragon` cũ): cảnh báo.
-  - Bài 12 **không** có trong `chua_chuan.txt`, nên lỗi hình sẽ **chặn đưa lên** cho tới khi sửa. Hai cách sửa nằm ở mục 5 (không vẽ hình mới, không sửa `figures.js`).
+- **Soát hình hiện trạng (cập nhật 08/10/2026, sau commit "Vẽ lại hình Bài 12 theo quy chuẩn mới" trên `main`)**:
+  `phong_tranh.mjs . bai-12 --soat` **ĐẠT, 0 lỗi, 0 cảnh báo** (4 tổ hợp 375/1200 × sáng/tối). Bản phân tích đầu ghi 8 lỗi + 2 cảnh báo
+  (emoji trong Giải toán, chữ 11.8px ở "So với 10" mức 3, `melon`/`flower`/`dragon` cũ) — các lỗi đó **đã hết** vì hình đã vẽ lại:
+  `doiMuaRong(n)`, `thuyen()`, `tuiCam()`, `hangCan()`, `soDo(...)`, `xepHang(...)`. Vì vậy **không còn lý do bỏ hình** ở Giải toán (xem mục 5).
+- Hiện `bai-12.js` có 8 tab × 3 mức, **không** có `muctieu`, `mt`, `sai`, `goiY`, `soCau`.
 
 ## 1. Năm mục tiêu (muctieu) × ba mức (Thông tư 27)
 
@@ -72,13 +72,17 @@ Phân bố: MT1 hai dạng · MT2 bốn dạng (D3, D4, D11 chung) · MT3 bốn 
 3. D3 và D11 phải đặt `q.mt` đúng nhánh nhân hoặc chia.
 4. D7 mức 3: tránh hai đáp án cùng kết quả (`check` chặn).
 
-## 5. Hình: lỗi có sẵn và cách xử lý (cần thầy quyết)
+## 5. Hình (cập nhật: hình đã vẽ lại, soát hình ĐẠT)
 
-Soát hình hiện trạng (mục 0) bắt **lỗi chặn** ở bài 12. Hai việc cần xử lý để đưa lên được, **không cần vẽ hình mới và không sửa `figures.js`**:
+Hình trong `bai-12.js` đã được vẽ lại theo quy chuẩn (`figures.js` trên `main`). Việc của bài này là **giữ** các hình đó, không vẽ mới, không sửa `figures.js`:
 
-- **Emoji trong Giải toán** (thuyền, cốc sữa/can): đề xuất **bỏ hình, chỉ để lời văn** (bài toán vẫn rõ). Muốn có hình thuyền, túi cam, can nước mắm thì giao riêng cho skill `sk-ve-hinh-tieuhoc`, làm sau ở bản trên máy thầy.
-- **Chữ nhỏ ở "So với 10" mức 3**: giới hạn phép tính ≤ 9 ký tự (ví dụ "9 × 2 − 9"); chữ khi đó 13.8px, chỉ còn cảnh báo như bài 11. Bỏ các phép dài như "63 : 9 + 3", "81 : 9 + 1".
-- "Cùng kết quả" dùng `melon` (SGK dưa hấu). Đề xuất **giữ `melon`**; cảnh báo 12.0px ở "9 × 10 + 9" chấp nhận được, hoặc đổi sang `truck` (bài 9) nếu thầy muốn bỏ cảnh báo. Màu ngoài bảng HM của `melon`, `flower`, `dragon` là việc của skill vẽ hình.
+- **Giải toán**: **giữ hình** `thuyen()`, `tuiCam()`, `hangCan(9)` đã vẽ lại (không bỏ như bản nháp đầu). Hình chỉ minh hoạ; số người, số quả, số can phải khớp lời văn
+  (hình thuyền một chiếc, túi cam một túi, 9 can; đếm số nhóm bằng lời văn, không bắt bé đếm hình). Dạng D13 (Chọn phép tính) dùng lại các hình này.
+- **So với 10 mức 3**: vẫn giới hạn phép tính ≤ 9 ký tự (ví dụ "9 × 2 − 9") để chữ trong `flower` không nhỏ hơn 14px sau khi thu; bỏ các phép dài như "63 : 9 + 3". Lý do: hình đã đạt, nhưng bộ sinh mới có thể sinh phép dài hơn bản cũ.
+- **Cùng kết quả**: giữ `melon` (hoặc `truck`); chỉ dùng phép tính ngắn trong hình.
+- **Múa rồng**: dùng `doiMuaRong(n)`; câu "biết tổng số người, tìm số đội" dùng `doiMuaRong(1)` đã có.
+- Hình đếm được phải có `data-dem` và `check()` đếm lại (ở đây: `doiMuaRong`, `thuyen` x n). Hình nào chưa có `data-dem` trong `figures.js` thì `check()` không đếm hình mà kiểm số trong lời văn và đáp án.
+- **Luật hình mới của skill (08/10/2026)** áp dụng: nhãn độ dài nằm giữa đúng đoạn nó đo; câu hỏi "… không?" dùng nút Có / Không; nút Đúng/Sai chỉ đi với mệnh đề; đáp án nhiễu không chứa chính đối tượng đang hỏi (D11, D13).
 
 ## 6. Việc sẽ làm sau khi thầy duyệt
 
@@ -93,8 +97,8 @@ Soát hình hiện trạng (mục 0) bắt **lỗi chặn** ở bài 12. Hai vi�
 ## 7. Cần thầy quyết (kèm phương án đề xuất)
 
 1. **Mục SGK ở mục 0** có đúng không, và Luyện tập đánh số 1, 2, 3, 4 ra sao? Đề xuất: đúng như bảng; thầy (hoặc phiên máy thầy) cho số mục để ghi `sec` chuẩn.
-2. **Giải toán**: bỏ emoji, chỉ lời văn (**đề xuất**) hay chờ vẽ hình?
-3. **Cùng kết quả**: giữ `melon` (**đề xuất**) hay đổi `truck`?
+2. **Giải toán**: giữ hình đã vẽ lại `thuyen()`, `tuiCam()`, `hangCan()` (**đề xuất**, soát hình đã ĐẠT).
+3. **Cùng kết quả**: giữ `melon` (**đề xuất**) hay đổi `truck`? (không còn cảnh báo chữ nhỏ).
 4. **Thứ tự dạng**: xếp lại theo sư phạm như bài 9–11 (**đề xuất**).
 5. D3 "Lập bảng" dùng chung MT2 và MT3 (**đề xuất**), hay tách bảng nhân và bảng chia thành hai dạng?
 6. Xác nhận 13 dạng và 4 dạng "không có trong SGK".
