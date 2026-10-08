@@ -53,7 +53,7 @@ function hinhGoc(specs, o){
 }
 /* Hình mới 2: góc có ê ke áp vào (tam giác vuông xanh nhạt, góc vuông của ê ke đặt khít ở đỉnh, một cạnh trùng tia thứ nhất) */
 function hinhEke(theta, coEke, rot, ten, sp){
-  var O=[130,125], A=diemTu(O,rot,100), B=diemTu(O,rot+theta,106), E1=diemTu(O,rot,74), E2=diemTu(O,rot+90,74), s=svgX(260, 250);
+  var O=[130,130], A=diemTu(O,rot,84), B=diemTu(O,rot+theta,88), E1=diemTu(O,rot,62), E2=diemTu(O,rot+90,62), s=svgX(260, 260);
   var u=donVi([E1[0]-O[0],E1[1]-O[1]]), v=donVi([E2[0]-O[0],E2[1]-O[1]]);
   if(coEke) s+='<path d="M'+f1(O[0])+' '+f1(O[1])+' L'+f1(E1[0])+' '+f1(E1[1])+' L'+f1(E2[0])+' '+f1(E2[1])+' Z" fill="'+HM.troi+'" fill-opacity="0.35" stroke="'+HM.troiDam+'" stroke-width="2.5" stroke-linejoin="round"/>'
     +'<path d="M'+f1(O[0]+u[0]*14)+' '+f1(O[1]+u[1]*14)+' L'+f1(O[0]+(u[0]+v[0])*14)+' '+f1(O[1]+(u[1]+v[1])*14)+' L'+f1(O[0]+v[0]*14)+' '+f1(O[1]+v[1]*14)+'" stroke="'+HM.troiDam+'" stroke-width="2" fill="none"/>';
@@ -198,7 +198,7 @@ var BAI = {
    make:function(lv){
     var nm=chuMoi(), tO=nm[0], tA=nm[1], ts=[nm[2],nm[3],nm[4]], sp=taoDiem7(lv), ch=shuffle(ts.slice()), dung=ts[sp.dung], sai={};
     ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='goc-xien'; });
-    return {type:'mcq', _sp:sp, _t:ts, _dung:dung, q:luoiDiem7(sp, tO, tA, ts)+'<div>Điểm nào cùng với '+tO+', '+tA+' tạo thành <b>góc vuông</b> '+tA+tO+'?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
+    return {type:'mcq', _sp:sp, _t:ts, _dung:dung, q:luoiDiem7(sp, tO, tA, ts)+'<div>Điểm nào cùng với '+tO+', '+tA+' tạo thành <b>góc vuông</b> có đỉnh '+tO+'?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
       goiY:{'goc-xien':'Góc vuông tại '+tO+': hai cạnh '+tO+tA+' và cạnh còn lại phải khít với ê ke. Bé thử từng điểm: cạnh xiên lệch thì không vuông.'}};
   }, check:function(q){ var sp=q._sp, O=sp.O, A=sp.A, nv=sp.P.filter(function(p){ return laVuong(O,A,p); }), ok=sp.P.every(function(p){ return laVuong(O,A,p) || xaVuong(O,A,p); });
     return ok && nv.length===1 && sp.P.indexOf(nv[0])===sp.dung && q._t[sp.dung]===q._dung && kiemMCQ(q); }},
@@ -271,8 +271,8 @@ function taoDiem7(lv){
   var n=6, tries=0;
   while(tries++<600){
     var k=rnd(0,3), m=rnd(0,1), va, vd, vs=[], i;
-    if(lv<=2){ va=bien([rnd(2,3),0],k,m); vd=bien([0,rnd(1,3)*(Math.random()<0.5?1:-1)],k,m); }
-    else { var q1=rnd(1,2); va=bien([q1,q1],k,m); var q2=rnd(1,2); vd=bien([-q2,q2*(Math.random()<0.5?1:-1)],k,m); if(vd[0]*va[0]+vd[1]*va[1]!==0) continue; }
+    if(lv<=2){ va=bien([3,0],k,m); vd=bien([0,rnd(2,3)*(Math.random()<0.5?1:-1)],k,m); }
+    else { var q1=2; va=bien([q1,q1],k,m); var q2=rnd(1,2); vd=bien([-q2,q2*(Math.random()<0.5?1:-1)],k,m); if(vd[0]*va[0]+vd[1]*va[1]!==0) continue; }
     var cho=[];
     for(i=0;i<2;i++){ var w, g=0; do { w=[rnd(-3,3),rnd(-3,3)]; g++; } while(g<200 && (w[0]===0&&w[1]===0 || Math.abs(gocGiua([0,0],va,w)-90)<(lv<=1?25:12) || gocGiua([0,0],va,w)<15 || gocGiua([0,0],va,w)>165)); cho.push(w); }
     var vs3=[vd, cho[0], cho[1]], sig=vs3.map(function(v){ return v[0]+','+v[1]; });
@@ -281,6 +281,8 @@ function taoDiem7(lv){
     for(x=0;x<=n;x++) for(y=0;y<=n;y++){ var inb=function(p){ return p[0]>=0&&p[0]<=n&&p[1]>=0&&p[1]<=n; }, a=[x+va[0],y+va[1]], ps=vs3.map(function(v){ return [x+v[0],y+v[1]]; });
       if(inb(a) && ps.every(inb)) ds.push({O:[x,y],A:a,P:ps}); }
     if(!ds.length) continue;
+    var gan=function(r0){ var all=[r0.O, r0.A].concat(r0.P), i2, j2; for(i2=0;i2<all.length;i2++) for(j2=i2+1;j2<all.length;j2++) if(Math.hypot(all[i2][0]-all[j2][0], all[i2][1]-all[j2][1])<1.9) return false; return true; };
+    ds=ds.filter(gan); if(!ds.length) continue;
     var r=pick(ds), order=shuffle([0,1,2]), P=order.map(function(i){ return r.P[i]; });
     if(!P.slice().every(function(p,i){ return laVuong(r.O,r.A,p) || xaVuong(r.O,r.A,p); })) continue;
     return {O:r.O, A:r.A, P:P, dung:order.indexOf(0), n:n};
@@ -288,14 +290,15 @@ function taoDiem7(lv){
   return null;
 }
 function luoiDiem7(sp, tO, tA, ts){
-  var c=28, n=sp.n, m=26, W=n*c+2*m, H=n*c+2*m, s=svgX(W,H), i;
+  var c=28, n=sp.n, m=32, W=n*c+2*m, H=n*c+2*m, s=svgX(W,H), i;
   for(i=0;i<=n;i++){ s+='<line x1="'+(m+i*c)+'" y1="'+m+'" x2="'+(m+i*c)+'" y2="'+(m+n*c)+'" stroke="'+HM.day+'" stroke-width="1.5"/><line x1="'+m+'" y1="'+(m+i*c)+'" x2="'+(m+n*c)+'" y2="'+(m+i*c)+'" stroke="'+HM.day+'" stroke-width="1.5"/>'; }
   function X(p){ return m+p[0]*c; } function Y(p){ return m+(n-p[1])*c; }
   s+='<path d="M'+X(sp.O)+' '+Y(sp.O)+' L'+X(sp.A)+' '+Y(sp.A)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/>';
-  function diem(p, t, hs){ var dx = p[0]>=n ? -12 : 12, an = p[0]>=n ? 'end' : 'start', dy = p[1]<=0 ? 20 : -8;
-    return '<circle cx="'+X(p)+'" cy="'+Y(p)+'" r="'+(hs?5.5:5)+'" fill="'+HM.cam+'"/><text x="'+(X(p)+dx)+'" y="'+(Y(p)+dy)+'" text-anchor="'+an+'" font-size="18" '+HFONT+' fill="currentColor">'+t+'</text>'; }
-  s+=diem(sp.O, tO, true)+diem(sp.A, tA, false);
-  sp.P.forEach(function(p, i){ s+=diem(p, ts[i], false); });
+  var mid=[(sp.O[0]+sp.A[0])/2, (sp.O[1]+sp.A[1])/2];
+  function diem(p, t, hs, ref){ var d=donVi([p[0]-ref[0], -(p[1]-ref[1])]), lx=X(p)+d[0]*17, ly=Y(p)+d[1]*17+7;
+    return '<circle cx="'+X(p)+'" cy="'+Y(p)+'" r="'+(hs?5.5:5)+'" fill="'+HM.cam+'"/><text x="'+f1(lx)+'" y="'+f1(ly)+'" text-anchor="middle" font-size="18" '+HFONT+' fill="currentColor">'+t+'</text>'; }
+  s+=diem(sp.O, tO, true, mid)+diem(sp.A, tA, false, mid);
+  sp.P.forEach(function(p, i){ s+=diem(p, ts[i], false, sp.O); });
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 
