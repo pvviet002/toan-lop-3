@@ -71,7 +71,9 @@ try {
   if (khongSoat || !bai.length) buoc("3. Soát giao diện — bỏ qua" + (khongSoat ? " (--khong-soat)" : " (không có bài engine)"));
   else {
     buoc("3. Soát giao diện (soat_giao_dien.mjs): " + bai.join(", "));
-    const r = sh("node", [path.join(HERE, "soat_giao_dien.mjs"), REPO, ...bai, "--cau", "2"], { stdio: ["ignore", "pipe", "pipe"], timeout: 1200000 });
+    /* ~4–5 phút mỗi bài (tự chơi Luyện thông minh); 20 phút cố định từng làm hỏng lần đưa bài 12 lên (6 bài, 08/10/2026) */
+    const r = sh("node", [path.join(HERE, "soat_giao_dien.mjs"), REPO, ...bai, "--cau", "2"], { stdio: ["ignore", "pipe", "pipe"], timeout: Math.max(1200000, bai.length * 420000) });
+    if (r.error && r.error.code === "ETIMEDOUT") throw new Error("soát giao diện chạy QUÁ GIỜ (" + bai.length + " bài) — không phải lỗi giao diện; chạy riêng soat_giao_dien.mjs rồi dùng --khong-soat");
     const out = r.stdout + r.stderr, tt = out.slice(out.indexOf("── TÓM TẮT"));
     console.log(tt.split("\n").map((l) => "  " + l).join("\n"));
     if (r.status !== 0) { console.log(out.split("\n").filter((l) => /✗/.test(l)).slice(0, 15).join("\n")); throw new Error("soát giao diện có LỖI — chưa được đưa lên"); }

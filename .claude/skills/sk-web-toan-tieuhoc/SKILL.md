@@ -110,6 +110,9 @@ var BAI = { n:<N>, title:'Tên bài', sub:'...', goal:10, topics:[
 - `goal` = số câu đúng để hoàn thành một hoạt động (mặc định 10).
 - `check(q)` khẳng định đáp án/độ hợp lệ của câu vừa sinh; `kiemtra.js` chạy hàng
   trăm nghìn lượt.
+- **Lời câu hỏi (08/10/2026, bài 16):** nút Đúng/Sai chỉ đi với **mệnh đề** ("M là trung điểm của đoạn thẳng AB.");
+  câu hỏi "… có … không?" thì nút là **Có / Không**. Đáp án nhiễu không được chứa chính đối tượng đang hỏi
+  ("Điểm K ở giữa hai điểm nào?" mà có lựa chọn "C và K").
 - **Quy tắc code:** nối chuỗi `'...'+x+'...'`, KHÔNG backtick và KHÔNG `${` (kể cả trong
   comment). Deploy chính giờ là git nên luật này chỉ còn để giữ được đường dự phòng
   qua trình duyệt — `kiemtra.js` vẫn soát, cứ giữ. Dùng `×` cho nhân, `:` cho chia.
