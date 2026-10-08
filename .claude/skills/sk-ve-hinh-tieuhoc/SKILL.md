@@ -137,6 +137,9 @@ Trạng thái: bài 9–12 đã chuẩn hoá. Bài 13, 14 chưa vẽ lại, có 
   → Điểm ngoài đường cách mọi điểm trên đường ≥ 1,5 cm theo chiều ngang; hai điểm liền kề cách ≥ 2 cm (hoặc đủ để nhãn
   chữ không chạm); bộ sinh loại bộ số vi phạm. **Đám mây (font Linux hẹp hơn Segoe UI) bỏ sót lỗi chữ đè chữ mà Windows
   bắt được** — đừng thiết kế sát biên; hình học phải soát lại trên máy thầy.
+- **Nhãn đặt sát mép khung SVG** (bài 19 D9, 09/10/2026: nhãn tên đoạn cắt phía trên tờ giấy, đáy chữ sát mép `viewBox`;
+  Windows báo 15 lần "chữ TRÀN khỏi hình", Linux 0 lần vì font thấp hơn).
+  → Nhãn ở rìa khung chừa lề ≥ 1,3 lần cỡ chữ; đừng đặt đáy chữ ngay sát mép `viewBox`. Lỗi này chỉ lộ trên máy thầy.
 - **Nhãn độ dài đặt lệch đoạn nó đo** (bài 17: "14 cm" của đường kính nằm trên nửa AO, nhìn như bán kính 14 cm — dạy sai).
   → Nhãn nằm giữa ĐÚNG đoạn được đo (đường kính: giữa cả đoạn, hoặc ngoặc dưới cả đoạn). Nhãn bán kính phải có ĐOẠN
   bán kính được vẽ (tâm → điểm trên đường tròn); không để nhãn cm lơ lửng, không lặp nhãn cho cùng một đoạn.
