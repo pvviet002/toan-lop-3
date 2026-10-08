@@ -25,41 +25,44 @@ function ptOf(P, t){ for(var i=0;i<P.length;i++) if(P[i].t===t) return [P[i].x, 
 /* ---- Hình mới 1: đường thẳng có các điểm, nhãn cm giữa hai điểm liền kề (trên đường). pts = [{t, x, y}] y=1: điểm ngoài đường ---- */
 function duongThang(pts, hienCm){
   var on=pts.filter(function(p){ return !p.y; }).sort(function(a,b){ return a.x-b.x; }), mn=Math.min.apply(null, pts.map(function(p){ return p.x; })), mx=Math.max.apply(null, pts.map(function(p){ return p.x; })), span=Math.max(1, mx-mn);
-  var sc=Math.min(40, 250/span), tot=span*sc, x0=(300-tot)/2, s=svgX(300, 132), i;
+  var sc=Math.min(40, 250/span), tot=span*sc, x0=(300-tot)/2, s=svgX(300, 142), i;
   function X(v){ return x0+(v-mn)*sc; }
   s+='<line x1="'+(X(on[0].x)-18).toFixed(1)+'" y1="62" x2="'+(X(on[on.length-1].x)+18).toFixed(1)+'" y2="62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>';
   var chen = false; for(i=0;i+1<on.length;i++) if((on[i+1].x-on[i].x)*sc<56) chen=true;
-  if(hienCm) for(i=0;i+1<on.length;i++){ var cx=(X(on[i].x)+X(on[i+1].x))/2, cy = 94+(chen ? (i%2)*28 : 0);
+  if(hienCm) for(i=0;i+1<on.length;i++){ var cx=(X(on[i].x)+X(on[i+1].x))/2, cy = 96+(chen ? (i%2)*26 : 0);
     s+='<path d="M'+X(on[i].x).toFixed(1)+' 72 L'+X(on[i].x).toFixed(1)+' '+(cy-12)+' M'+X(on[i+1].x).toFixed(1)+' 72 L'+X(on[i+1].x).toFixed(1)+' '+(cy-12)+'" stroke="'+HM.day+'" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>'
      +nhanVien(cx.toFixed(1), cy, 56, 24, (on[i+1].x-on[i].x)+' cm', 16); }
-  pts.forEach(function(p){ var px=X(p.x), py = p.y ? 28 : 62;
+  pts.forEach(function(p){ var px=X(p.x), py = p.y ? 38 : 62;
     s+='<circle cx="'+px.toFixed(1)+'" cy="'+py+'" r="7" fill="'+HM.cam+'"/><text x="'+px.toFixed(1)+'" y="'+(py-14)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+p.t+'</text>'; });
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 
-/* ---- Hình mới 2: đường gấp khúc A–M–B nối B–N–C (SGK Hoạt động 1). cong = true: B–N–C lệch hướng ---- */
+/* ---- Hình mới 2: đường gấp khúc A–M–B nối B–N–C (SGK Hoạt động 1). cong = true: B–N–C lệch hướng.
+   Khung SVG tự tính từ toạ độ các điểm và nhãn cm nên không có nhãn nào tràn ra ngoài. ---- */
 function gapKhuc(am, mb, bn, nc, cong){
-  var u=17, cs=Math.cos(-40*Math.PI/180), sn=Math.sin(-40*Math.PI/180), c0 = cong ? cs : 1, s0 = cong ? sn : 0, Ax=14, Ay = cong ? 112 : 66, s=svgX(300, 160);
-  var Mx=Ax+am*u, Bx=Mx+mb*u, By=Ay, Nx=Bx+bn*u*c0, Ny=By+bn*u*s0, Cx=Bx+(bn+nc)*u*c0, Cy=By+(bn+nc)*u*s0, R=function(v){ return Math.round(v); };
-  s+='<path d="M'+Ax+' '+Ay+' L'+R(Bx)+' '+By+' L'+R(Cx)+' '+R(Cy)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-  function diem(x, y, t, dx, dy){ return '<circle cx="'+R(x)+'" cy="'+R(y)+'" r="7" fill="'+HM.cam+'"/><text x="'+R(x+dx)+'" y="'+R(y+dy)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+t+'</text>'; }
-  var h1=Ay+26, h2=Ay+52;   /* hai hàng nhãn cm phía dưới, so le để không đè nhau */
-  s+=nhanVien(R((Ax+Mx)/2), h1, 54, 22, am+' cm', 15)+nhanVien(R((Mx+Bx)/2), h2, 54, 22, mb+' cm', 15);
-  if(cong){ var nx=-sn, ny=c0;   /* pháp tuyến hướng xuống bên phải */
-    s+=nhanVien(R((Bx+Nx)/2+nx*26), R((By+Ny)/2+ny*26), 54, 22, bn+' cm', 15)+nhanVien(R((Nx+Cx)/2-nx*26), R((Ny+Cy)/2-ny*26), 54, 22, nc+' cm', 15); }
-  else s+=nhanVien(R((Bx+Nx)/2), h1, 54, 22, bn+' cm', 15)+nhanVien(R((Nx+Cx)/2), h2, 54, 22, nc+' cm', 15);
-  s+=diem(Ax,Ay,'A',0,-13)+diem(Mx,Ay,'M',0,-13)+diem(Bx,By,'B',0,-13)+diem(Nx,Ny,'N',-1,-14)+diem(Cx,Cy,'C',0,-14);
-  return '<div class="flex justify-center my-2">'+s+'</svg></div>';
+  var u=22, ang=(cong ? -40 : 0)*Math.PI/180, c0=Math.cos(ang), s0=Math.sin(ang), R=Math.round;
+  var A=[0,0], M=[am*u,0], B=[(am+mb)*u,0], N=[B[0]+bn*u*c0, B[1]+bn*u*s0], C=[B[0]+(bn+nc)*u*c0, B[1]+(bn+nc)*u*s0], pills=[], xs=[], ys=[];
+  pills.push({x:(A[0]+M[0])/2, y:26, t:am}, {x:(M[0]+B[0])/2, y:26, t:mb});
+  if(cong){ var nx=-s0, ny=c0; pills.push({x:(B[0]+N[0])/2+nx*24, y:(B[1]+N[1])/2+ny*24, t:bn}, {x:(N[0]+C[0])/2+nx*24, y:(N[1]+C[1])/2+ny*24, t:nc}); }
+  else pills.push({x:(B[0]+N[0])/2, y:26, t:bn}, {x:(N[0]+C[0])/2, y:26, t:nc});
+  [A,M,B,N,C].forEach(function(p){ xs.push(p[0]-12, p[0]+12); ys.push(p[1]-36, p[1]+10); });
+  pills.forEach(function(p){ xs.push(p.x-23, p.x+23); ys.push(p.y-13, p.y+13); });
+  var x0=Math.min.apply(null, xs), y0=Math.min.apply(null, ys), W=Math.ceil(Math.max.apply(null, xs)-x0), H=Math.ceil(Math.max.apply(null, ys)-y0), s=svgX(W, H)+'<g transform="translate('+R(-x0)+','+R(-y0)+')">';
+  s+='<path d="M'+A[0]+' '+A[1]+' L'+R(B[0])+' '+B[1]+' L'+R(C[0])+' '+R(C[1])+'" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  function diem(p, t, dx, dy){ return '<circle cx="'+R(p[0])+'" cy="'+R(p[1])+'" r="7" fill="'+HM.cam+'"/><text x="'+R(p[0]+dx)+'" y="'+R(p[1]+dy)+'" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+t+'</text>'; }
+  pills.forEach(function(p){ s+=nhanVien(R(p.x), R(p.y), 42, 22, p.t+' cm', 15); });
+  s+=diem(A,'A',0,-14)+diem(M,'M',0,-14)+diem(B,'B',0,-14)+diem(N,'N',-2,-14)+diem(C,'C',0,-14);
+  return '<div class="flex justify-center my-2">'+s+'</g></svg></div>';
 }
 
 /* ---- Hình mới 3: lưới ô vuông w × h; điểm có nhãn chữ ở giao điểm; vài đoạn nối. pts = [{t, x, y}], segs = [[tên, tên]] ---- */
 function luoiDiem(w, h, pts, segs){
-  var o=28, m=22, W=w*o+2*m, H=h*o+2*m, s=svgX(W, H), i;
+  var o=28, m=32, W=w*o+2*m, H=h*o+2*m, s=svgX(W, H), i;
   for(i=0;i<=w;i++) s+='<line x1="'+(m+i*o)+'" y1="'+m+'" x2="'+(m+i*o)+'" y2="'+(m+h*o)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
   for(i=0;i<=h;i++) s+='<line x1="'+m+'" y1="'+(m+i*o)+'" x2="'+(m+w*o)+'" y2="'+(m+i*o)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
   function P(t){ for(var k=0;k<pts.length;k++) if(pts[k].t===t) return pts[k]; return null; }
   (segs||[]).forEach(function(g){ var a=P(g[0]), b=P(g[1]); s+='<line x1="'+(m+a.x*o)+'" y1="'+(m+a.y*o)+'" x2="'+(m+b.x*o)+'" y2="'+(m+b.y*o)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'; });
-  pts.forEach(function(p){ var cx=m+p.x*o, cy=m+p.y*o, dx = p.x>=w ? -13 : 13, dy = p.y<=0 ? -9 : (p.y>=h ? 20 : -9), an = p.x>=w ? 'end' : 'start';
+  pts.forEach(function(p){ var cx=m+p.x*o, cy=m+p.y*o, dx = p.x>=w ? -13 : 13, dy = p.y<=0 ? -12 : (p.y>=h ? 24 : -9), an = p.x>=w ? 'end' : 'start';
     s+='<circle cx="'+cx+'" cy="'+cy+'" r="6" fill="'+HM.cam+'"/><text x="'+(cx+dx)+'" y="'+(cy+dy)+'" text-anchor="'+an+'" font-size="18" '+HFONT+' fill="currentColor">'+p.t+'</text>'; });
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
@@ -155,8 +158,7 @@ var BAI = {
   {name:'Đ/S gấp khúc', sec:'Hoạt động 1 — Đ, S? (đường gấp khúc)', mt:['MT3'], levels:3,
    muc:['Đ hay S: điểm ở giữa hai đoạn bằng nhau hoặc không bằng nhau.', 'Đ hay S: bẫy ba điểm không thẳng hàng.', 'Đ hay S: ở giữa nhưng không là trung điểm.'],
    make:function(lv){
-    var am=rnd(2,4), mb = Math.random()<0.5 ? am : am+pick([-1,1]), bn=rnd(2,4), nc = lv>=3 ? (bn+pick([-1,1])) : rnd(2,4), cong = lv>=2, loai;
-    if(mb<2) mb=am+1; if(nc<2) nc=bn+1;
+    var am=rnd(2,3), mb = Math.random()<0.5 ? am : (5-am), cong = lv>=2, bn=rnd(2,cong?4:3), nc = lv>=3 ? (bn===2 ? 3 : (bn===4 ? 3 : bn+pick([-1,1]))) : rnd(2,cong?4:3), loai;
     loai = lv<=1 ? pick(['mAB','nGiua']) : (lv===2 ? pick(['bGiua','mAB','nGiua']) : pick(['nTrung','nGiua','mAB']));
     var cau, dung;
     if(loai==='mAB'){ cau='M là trung điểm của đoạn thẳng AB'; dung=(am===mb); }

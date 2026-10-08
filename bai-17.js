@@ -29,7 +29,8 @@ function hinhTron(sp, px){
   var C=130, R=84, s=svgX(260, 260, px||240), i;
   s+='<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="'+HM.troi+'" fill-opacity="0.22" stroke="currentColor" stroke-width="3"/>';
   sp.seg.forEach(function(g){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); s+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'; });
-  sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); s+=nhanVien(Math.round((a[0]+b[0])/2), Math.round((a[1]+b[1])/2), 58, 24, g[2], 16); } });
+  sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); var dx=b[0]-a[0], dy=b[1]-a[1], ln=Math.hypot(dx,dy)||1, nx=-dy/ln, ny=dx/ln; if(ny>0 || (ny===0 && nx>0)){ nx=-nx; ny=-ny; }
+      s+=nhanVien(Math.round((a[0]+b[0])/2+nx*28), Math.round((a[1]+b[1])/2+ny*28), 58, 24, g[2], 16); } });
   s+='<circle cx="'+C+'" cy="'+C+'" r="5.5" fill="'+HM.cam+'"/><text x="'+(C+10)+'" y="'+(C+24)+'" font-size="20" '+HFONT+' fill="currentColor">O</text>';
   sp.pts.forEach(function(p){ var a=p.ang*Math.PI/180, k=p.k||1, x=C+R*k*Math.cos(a), y=C-R*k*Math.sin(a), lx=C+(R*k+18)*Math.cos(a), ly=C-(R*k+18)*Math.sin(a)+7;
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5.5" fill="'+HM.cam+'"/><text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="20" '+HFONT+' fill="currentColor">'+p.t+'</text>'; });
