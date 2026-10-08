@@ -29,9 +29,13 @@ function hinhTron(sp, px){
   var C=130, R=84, s=svgX(260, 260, px||240), i;
   s+='<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="'+HM.troi+'" fill-opacity="0.22" stroke="currentColor" stroke-width="3"/>';
   sp.seg.forEach(function(g){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); s+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'; });
+  /* Nhãn độ dài: kẹp CẢ đoạn nó đo bằng một ngoặc song song với đoạn (hai đầu có vạch), nhãn nằm giữa ngoặc. Ngoặc dời sang bên trái / phía trên. */
   var hop=[];
-  sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]); var dx=b[0]-a[0], dy=b[1]-a[1], ln=Math.hypot(dx,dy)||1, nx=-dy/ln, ny=dx/ln; if(nx>0.05 || (Math.abs(nx)<=0.05 && ny>0)){ nx=-nx; ny=-ny; }   /* nhãn dời sang bên trái / phía trên */
-      var px0=Math.round((a[0]+b[0])/2+nx*34), py0=Math.round((a[1]+b[1])/2+ny*34); hop.push([px0-29, py0-12, px0+29, py0+12]);
+  sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]), dx=b[0]-a[0], dy=b[1]-a[1], ln=Math.hypot(dx,dy)||1, nx=-dy/ln, ny=dx/ln, d=26;
+      if(nx>0.05 || (Math.abs(nx)<=0.05 && ny>0)){ nx=-nx; ny=-ny; }
+      var a2=[a[0]+nx*d, a[1]+ny*d], b2=[b[0]+nx*d, b[1]+ny*d], px0=Math.round((a2[0]+b2[0])/2), py0=Math.round((a2[1]+b2[1])/2), f=function(v){ return v.toFixed(1); };
+      s+='<path d="M'+f(a[0])+' '+f(a[1])+' L'+f(a2[0]+nx*6)+' '+f(a2[1]+ny*6)+' M'+f(b[0])+' '+f(b[1])+' L'+f(b2[0]+nx*6)+' '+f(b2[1]+ny*6)+' M'+f(a2[0])+' '+f(a2[1])+' L'+f(b2[0])+' '+f(b2[1])+'" stroke="'+HM.day+'" stroke-width="1.8" fill="none" stroke-dasharray="3 3"/>';
+      hop.push([px0-29, py0-12, px0+29, py0+12]);
       s+=nhanVien(px0, py0, 58, 24, g[2], 16); } });
   /* chữ O: thử bốn góc quanh tâm, chọn góc không đụng nhãn cm */
   var ox=C+10, oy=C+24, tot=-1;
@@ -64,18 +68,20 @@ function layGoc(nd, nday, nle, sep){
 }
 
 /* ---- Hình mới 2: các hình tròn nằm sát nhau trên một hàng (tâm thẳng hàng); rs = bán kính (cm) từng hình.
-   duong = true: vẽ đường bò A–B–C–D (A ở mép trái hình đầu, D ở mép phải hình cuối, B và C là tâm hai hình ngoài cùng).
-   Hình tròn tô màu nhạt, có chấm tâm và tên; nhãn bán kính cm so le để không đè nhau. ---- */
+   Mỗi hình tròn có MỘT đoạn bán kính vẽ thẳng từ tâm lên điểm trên đường tròn, nhãn cm nằm ngay trên đầu đoạn đó (mỗi đoạn một nhãn).
+   duong = true: vẽ đường bò A–B–C–D (A ở mép trái hình đầu, D ở mép phải hình cuối, B và C là tâm hai hình ngoài cùng). ---- */
 function baHoaTron(rs, duong){
-  var tong=rs.reduce(function(a,b){ return a+b; },0), mx=Math.max.apply(null, rs), k=Math.min(80/mx, 270/(2*tong)), W=300, x0=(W-2*tong*k)/2, y=92, s=svgX(W, 190), cx=[], x=x0, i, ten;
+  var tong=rs.reduce(function(a,b){ return a+b; },0), mx=Math.max.apply(null, rs), k=Math.min(80/mx, 250/(2*tong)), W=300, x0=(W-2*tong*k)/2, y=Math.round(mx*k+36), H=Math.round(y+mx*k+12), s=svgX(W, H), cx=[], x=x0, i, ten, f=function(v){ return v.toFixed(1); };
   ten = rs.length===3 ? ['B','O','C'] : (rs.length===2 ? ['B','C'] : ['B']);
   for(i=0;i<rs.length;i++){ cx.push(x+rs[i]*k); x+=2*rs[i]*k; }
-  for(i=0;i<rs.length;i++) s+='<circle cx="'+cx[i].toFixed(1)+'" cy="'+y+'" r="'+(rs[i]*k).toFixed(1)+'" fill="'+HM.xanhLa+'" fill-opacity="0.28" stroke="currentColor" stroke-width="2.5"/>';
-  if(duong){ s+='<path d="M'+x0.toFixed(1)+' '+y+' L'+(x0+2*tong*k).toFixed(1)+' '+y+'" stroke="'+HM.doDam+'" stroke-width="5" stroke-linecap="round"/>'; }
-  for(i=0;i<rs.length;i++){ var cy2 = y; s+='<circle cx="'+cx[i].toFixed(1)+'" cy="'+cy2+'" r="5.5" fill="'+HM.cam+'"/><text x="'+cx[i].toFixed(1)+'" y="'+(y-14)+'" text-anchor="middle" font-size="20" '+HFONT+' fill="currentColor">'+ten[i]+'</text>';
-    s+=nhanVien(Math.round(cx[i]), y+30+(i%2)*28, 54, 24, rs[i]+' cm', 16); }
-  if(duong){ s+='<circle cx="'+x0.toFixed(1)+'" cy="'+y+'" r="5.5" fill="'+HM.cam+'"/><text x="'+x0.toFixed(1)+'" y="'+(y-14)+'" text-anchor="middle" font-size="20" '+HFONT+' fill="currentColor">A</text>'
-    +'<circle cx="'+(x0+2*tong*k).toFixed(1)+'" cy="'+y+'" r="5.5" fill="'+HM.cam+'"/><text x="'+(x0+2*tong*k).toFixed(1)+'" y="'+(y-14)+'" text-anchor="middle" font-size="20" '+HFONT+' fill="currentColor">D</text>'; }
+  for(i=0;i<rs.length;i++) s+='<circle cx="'+f(cx[i])+'" cy="'+y+'" r="'+f(rs[i]*k)+'" fill="'+HM.xanhLa+'" fill-opacity="0.28" stroke="currentColor" stroke-width="2.5"/>';
+  if(duong){ s+='<path d="M'+f(x0)+' '+y+' L'+f(x0+2*tong*k)+' '+y+'" stroke="'+HM.doDam+'" stroke-width="5" stroke-linecap="round"/>'; }
+  for(i=0;i<rs.length;i++){ var top=y-rs[i]*k;
+    s+='<path d="M'+f(cx[i])+' '+y+' L'+f(cx[i])+' '+f(top)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="'+f(cx[i])+'" cy="'+f(top)+'" r="4.5" fill="'+HM.cam+'"/>'
+     +nhanVien(Math.round(cx[i]), Math.round(top-18), 48, 24, rs[i]+' cm', 16);
+    s+='<circle cx="'+f(cx[i])+'" cy="'+y+'" r="5.5" fill="'+HM.cam+'"/><text x="'+f(cx[i])+'" y="'+(y+26)+'" text-anchor="middle" font-size="20" '+HFONT+' fill="currentColor">'+ten[i]+'</text>'; }
+  if(duong){ s+='<circle cx="'+f(x0)+'" cy="'+y+'" r="5.5" fill="'+HM.cam+'"/><text x="'+f(x0-8)+'" y="'+(y+26)+'" text-anchor="end" font-size="20" '+HFONT+' fill="currentColor">A</text>'
+    +'<circle cx="'+f(x0+2*tong*k)+'" cy="'+y+'" r="5.5" fill="'+HM.cam+'"/><text x="'+f(x0+2*tong*k+8)+'" y="'+(y+26)+'" text-anchor="start" font-size="20" '+HFONT+' fill="currentColor">D</text>'; }
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 /* khoảng cách hai tâm ngoài cùng B và C (cm) từ danh sách bán kính */

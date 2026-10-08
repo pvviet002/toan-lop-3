@@ -21,6 +21,18 @@ function thangHang(a,b,c){ return cross(a,b,c)===0; }
 function giuaDiem(p,a,b){ return cross(a,b,p)===0 && ((p[0]-a[0])*(p[0]-b[0])+(p[1]-a[1])*(p[1]-b[1]))<0; }
 function laTrungDiem(m,a,b){ return m[0]*2===a[0]+b[0] && m[1]*2===a[1]+b[1]; }
 function ptOf(P, t){ for(var i=0;i<P.length;i++) if(P[i].t===t) return [P[i].x, P[i].y||0]; return null; }
+/* Luật vẽ điểm trên đường thẳng: hai điểm liền kề trên đường cách nhau >= 2 cm; điểm NGOÀI đường cách mọi điểm trên đường >= 1,5 cm theo chiều ngang
+   (để nhãn chữ không đè nhau). xNgoai chọn hoành độ hợp lệ; datLuat kiểm lại từ danh sách điểm. */
+function xNgoai(xs){
+  var a=xs.slice().sort(function(u,v){ return u-v; }), c=[a[0]-2, a[a.length-1]+2], i;
+  for(i=0;i+1<a.length;i++) if(a[i+1]-a[i]>=3) c.push((a[i]+a[i+1])/2);
+  return pick(c);
+}
+function datLuat(P){
+  var on=P.filter(function(p){ return !p.y; }).map(function(p){ return p.x; }).sort(function(u,v){ return u-v; }), i;
+  for(i=0;i+1<on.length;i++) if(on[i+1]-on[i]<2) return false;
+  return P.filter(function(p){ return p.y; }).every(function(p){ return on.every(function(x){ return Math.abs(p.x-x)>=1.5; }); });
+}
 
 /* ---- Hình mới 1: đường thẳng có các điểm, nhãn cm giữa hai điểm liền kề (trên đường). pts = [{t, x, y}] y=1: điểm ngoài đường ---- */
 function duongThang(pts, hienCm){
@@ -79,15 +91,18 @@ function thuocCm(pts, dau, cuoi){
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 
-/* ---- Hình mới 5: thanh chia n ô đều từ A đến B; ghim chữ ở các vạch; cào cào ở vạch cao (vẽ đơn giản: thân + hai mắt) ---- */
+/* ---- Hình mới 5: thanh chia n ô đều từ A đến B; ghim chữ ở các vạch; cào cào ở vạch cao (thân thon, đầu nhỏ, hai râu, chân sau gập chữ V ngược) ---- */
 function thanhChiaO(n, ghim, cao){
-  var W=300, x0=20, sc=(W-2*x0)/n, s=svgX(W, 110), i;
+  var W=300, x0=38, sc=(W-2*x0)/n, s=svgX(W, 110), i;
   for(i=0;i<n;i++) s+='<rect x="'+(x0+i*sc).toFixed(1)+'" y="56" width="'+sc.toFixed(1)+'" height="30" fill="'+(i%2?HM.goNhat:HM.vang)+'"/>';
   s+='<text x="'+x0+'" y="106" text-anchor="middle" font-size="18" '+HFONT+' fill="currentColor">A</text><text x="'+(x0+n*sc)+'" y="106" text-anchor="middle" font-size="18" '+HFONT+' fill="currentColor">B</text>';
   (ghim||[]).forEach(function(g){ var x=x0+g.v*sc; s+='<path d="M'+(x-6).toFixed(1)+' 38 L'+(x+6).toFixed(1)+' 38 L'+x.toFixed(1)+' 54 Z" fill="'+HM.cam+'"/><text x="'+x.toFixed(1)+'" y="30" text-anchor="middle" font-size="19" '+HFONT+' fill="currentColor">'+g.t+'</text>'; });
-  if(cao!==undefined && cao!==null){ var cx=x0+cao*sc;
-    s+='<ellipse cx="'+cx.toFixed(1)+'" cy="44" rx="14" ry="9" fill="'+HM.xanhLa+'"/><circle cx="'+(cx+9).toFixed(1)+'" cy="38" r="5" fill="'+HM.xanhLa+'"/><circle cx="'+(cx+11).toFixed(1)+'" cy="37" r="2.2" fill="#fff"/>'
-     +'<path d="M'+(cx-12).toFixed(1)+' 49 L'+(cx-18).toFixed(1)+' 56 M'+(cx+2).toFixed(1)+' 51 L'+(cx+4).toFixed(1)+' 56" stroke="'+HM.xanhLa+'" stroke-width="3" stroke-linecap="round" fill="none"/>'; }
+  if(cao!==undefined && cao!==null){ var cx=x0+cao*sc, g=HM.xanhLa, f=function(v){ return v.toFixed(1); };
+    /* cào cào nhìn từ bên: thân dài thon nằm ngang, đầu nhỏ phía phải, hai râu, chân sau dài gập hình chữ V ngược */
+    s+='<path d="M'+f(cx-8)+' 46 L'+f(cx-18)+' 30 L'+f(cx-30)+' 53 M'+f(cx-3)+' 47 L'+f(cx-11)+' 33 L'+f(cx-21)+' 53" stroke="'+g+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
+     +'<path d="M'+f(cx+6)+' 48 L'+f(cx+8)+' 54 M'+f(cx+12)+' 48 L'+f(cx+15)+' 54" stroke="'+g+'" stroke-width="3" stroke-linecap="round" fill="none"/>'
+     +'<ellipse cx="'+f(cx)+'" cy="43" rx="19" ry="5.5" fill="'+g+'"/><circle cx="'+f(cx+21)+'" cy="41" r="5" fill="'+g+'"/><circle cx="'+f(cx+23)+'" cy="40" r="1.6" fill="'+HM.chu+'"/>'
+     +'<path d="M'+f(cx+23)+' 37 L'+f(cx+30)+' 27 M'+f(cx+26)+' 38 L'+f(cx+36)+' 31" stroke="'+g+'" stroke-width="2" stroke-linecap="round" fill="none"/>'; }
   return '<div class="flex justify-center my-2">'+s+'</svg></div>';
 }
 
@@ -118,32 +133,30 @@ var BAI = {
   {name:'Điểm ở giữa', sec:'Khám phá a — Điểm ở giữa', mt:['MT1'], levels:3,
    muc:['Ba điểm thẳng hàng có nhãn độ dài, chọn điểm ở giữa.', 'Tên điểm bị đổi chỗ, chọn điểm ở giữa.', 'Có điểm ngoài đường thẳng và điểm nằm ngoài đoạn (bẫy).'],
    make:function(lv){
-    var nm=ten(4), g1=rnd(2,3), g2=rnd(2,3), g3=rnd(2,3), p;
+    var nm=ten(5), g1=rnd(2,3), g2=rnd(2,3), g3=rnd(2,3);
     if(lv<=2){ var ns = lv<=1 ? nm.slice(0,3).sort() : nm.slice(0,3), pts=[{t:ns[0],x:0},{t:ns[1],x:g1},{t:ns[2],x:g1+g2}], ch=ns.slice(), dung=ns[1];
       var sai={}; ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='lech-nhom'; });
       return {type:'mcq', _pts:pts, _dung:dung, q:duongThang(pts,true)+'<div>Ba điểm '+ns[0]+', '+ns[1]+', '+ns[2]+' thẳng hàng. Điểm nào ở giữa hai điểm còn lại?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
         goiY:{'lech-nhom':'Điểm ở giữa nằm giữa hai điểm kia trên đường thẳng. Bé nhìn thứ tự các điểm.'}}; }
-    var a=nm[0], b=nm[1], c=nm[2], f=nm[3], pts3=[{t:a,x:0},{t:b,x:g1},{t:c,x:g1+g2},{t:f,x:g1+g2+g3},{t:'D',x:1,y:1}];
-    if(nm.indexOf('D')>=0) pts3[4].t='K'; var dn=pts3[4].t;
-    if([a,b,c,f].indexOf(dn)>=0){ pts3[4].t = ['E','H','M','N','P'].filter(function(x){ return [a,b,c,f].indexOf(x)<0; })[0]; dn=pts3[4].t; }
+    var a=nm[0], b=nm[1], c=nm[2], f=nm[3], dn=nm[4], pts3=[{t:a,x:0},{t:b,x:g1},{t:c,x:g1+g2},{t:f,x:g1+g2+g3},{t:dn,x:xNgoai([0,g1,g1+g2,g1+g2+g3]),y:1}];
     var ch3=shuffle([b, dn, f]), sai3={}; ch3.forEach(function(x,i){ if(x===dn) sai3[String(i)]='khong-thang-hang'; else if(x===f) sai3[String(i)]='lech-nhom'; });
     return {type:'mcq', _pts:pts3, _a:a, _c:c, _dung:b, q:duongThang(pts3,true)+'<div>Điểm nào ở giữa hai điểm '+a+' và '+c+'?</div>', choices:ch3, correct:ch3.indexOf(b), sai:sai3,
       goiY:{'khong-thang-hang':'Điểm '+dn+' không nằm trên đường thẳng, nên không ở giữa.', 'lech-nhom':'Điểm '+f+' nằm ngoài đoạn '+a+c+', không ở giữa '+a+' và '+c+'.'}};
   }, check:function(q){ var P=q._pts, ds;
-    if(q._a){ var A=ptOf(P,q._a), C=ptOf(P,q._c); ds=q.choices.filter(function(t){ return giuaDiem(ptOf(P,t),A,C); }); return ds.length===1 && ds[0]===q._dung && kiemMCQ(q); }
+    if(q._a){ if(!datLuat(P)) return false; var A=ptOf(P,q._a), C=ptOf(P,q._c); ds=q.choices.filter(function(t){ return giuaDiem(ptOf(P,t),A,C); }); return ds.length===1 && ds[0]===q._dung && kiemMCQ(q); }
     var T=q.choices.map(function(t){ return ptOf(P,t); }); ds=q.choices.filter(function(t,i){ var o=T.filter(function(_,j){ return j!==i; }); return giuaDiem(T[i], o[0], o[1]); }); return ds.length===1 && ds[0]===q._dung && kiemMCQ(q); }},
 
   /* D2 — Trung điểm (Khám phá b) */
   {name:'Trung điểm', sec:'Khám phá b — Trung điểm của đoạn thẳng', mt:['MT2'], levels:3,
    muc:['H ở giữa D và E, DH = HE: H là trung điểm của đoạn nào.', 'Chọn điểm là trung điểm của đoạn DE trong các điểm.', 'DH khác HE: chọn đoạn nhận H làm trung điểm.'],
    make:function(lv){
-    var nm=ten(4), h=rnd(2,4), D=nm[0], H=nm[1], E=nm[2], F=nm[3];
+    var nm=ten(5), h=rnd(2,4), D=nm[0], H=nm[1], E=nm[2], F=nm[3];
     if(lv<=1){ var pts=[{t:D,x:0},{t:H,x:h},{t:E,x:2*h}], ch=[D+E, D+H, H+E], dung=D+E, sai={}; ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='lech-nhom'; }); shuffle(ch);
       sai={}; ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='lech-nhom'; });
       return {type:'mcq', _pts:pts, _H:H, _dung:dung, q:duongThang(pts,true)+'<div>Điểm '+H+' là trung điểm của đoạn thẳng nào?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
         goiY:{'lech-nhom':'Trung điểm ở giữa hai đầu của đoạn VÀ cách đều hai đầu: '+D+H+' = '+H+E+'.'}}; }
-    if(lv===2){ var Q=h, Pp, pts2; do { Pp=rnd(1,2*h-1); } while(Pp===Q); pts2=[{t:D,x:0},{t:H,x:Pp},{t:F,x:Q},{t:E,x:2*h},{t:nm[3]==='K'?'M':'K',x:1,y:1}];
-      var r=pts2[4].t; if([D,H,E,F].indexOf(r)>=0){ r=['N','P','A','B','C'].filter(function(x){ return [D,H,E,F].indexOf(x)<0; })[0]; pts2[4].t=r; }
+    if(lv===2){ var h2=rnd(4,5), Q=h2, cands=[], k0; for(k0=2;k0<=2*h2-2;k0++) if(Math.abs(k0-Q)>=2) cands.push(k0);
+      var Pp=pick(cands), r=nm[4], pts2=[{t:D,x:0},{t:H,x:Pp},{t:F,x:Q},{t:E,x:2*h2},{t:r,x:xNgoai([0,Pp,Q,2*h2]),y:1}];
       var ch2=shuffle([H, F, r]), sai2={}; ch2.forEach(function(x,i){ if(x===H) sai2[String(i)]='nham-giua-trung-diem'; else if(x===r) sai2[String(i)]='khong-thang-hang'; });
       return {type:'mcq', _pts:pts2, _D:D, _E:E, _dung:F, q:duongThang(pts2,true)+'<div>Điểm nào là trung điểm của đoạn thẳng '+D+E+'?</div>', choices:ch2, correct:ch2.indexOf(F), sai:sai2,
         goiY:{'nham-giua-trung-diem':'Điểm '+H+' ở giữa '+D+' và '+E+' nhưng hai đoạn không bằng nhau, nên chưa là trung điểm.', 'khong-thang-hang':'Điểm '+r+' không nằm trên đoạn '+D+E+'.'}}; }
@@ -151,8 +164,8 @@ var BAI = {
     return {type:'mcq', _pts:pts3, _H:H, _dung:dung3, q:duongThang(pts3,true)+'<div>Điểm '+H+' là trung điểm của đoạn thẳng nào?</div>', choices:ch3, correct:ch3.indexOf(dung3), sai:sai3,
       goiY:{'nham-giua-trung-diem':'Điểm '+H+' có thể ở giữa mà hai đoạn không bằng nhau. Bé so hai độ dài từ '+H+' tới hai đầu.'}};
   }, check:function(q){ var P=q._pts, c;
-    if(q._H){ var Hh=ptOf(P,q._H); c=q.choices.filter(function(s){ return laTrungDiem(Hh, ptOf(P,s[0]), ptOf(P,s[1])); }); return c.length===1 && c[0]===q._dung && kiemMCQ(q); }
-    var A=ptOf(P,q._D), B=ptOf(P,q._E); c=q.choices.filter(function(t){ return laTrungDiem(ptOf(P,t),A,B); }); return c.length===1 && c[0]===q._dung && kiemMCQ(q); }},
+    if(q._H){ if(!datLuat(P)) return false; var Hh=ptOf(P,q._H); c=q.choices.filter(function(s){ return laTrungDiem(Hh, ptOf(P,s[0]), ptOf(P,s[1])); }); return c.length===1 && c[0]===q._dung && kiemMCQ(q); }
+    if(!datLuat(P)) return false; var A=ptOf(P,q._D), B=ptOf(P,q._E); c=q.choices.filter(function(t){ return laTrungDiem(ptOf(P,t),A,B); }); return c.length===1 && c[0]===q._dung && kiemMCQ(q); }},
 
   /* D3 — Đ, S trên đường gấp khúc (Hoạt động 1) */
   {name:'Đ/S gấp khúc', sec:'Hoạt động 1 — Đ, S? (đường gấp khúc)', mt:['MT3'], levels:3,
@@ -184,17 +197,17 @@ var BAI = {
     if(lv<=1){ var d=pick(tri), ds=shuffle(non.slice()).slice(0,2), ch=shuffle([bien(d), bien(ds[0]), bien(ds[1])]);
       return {type:'mcq', _pts:pts, _dung:bien(d), q:hinh+'<div>Ba điểm nào thẳng hàng?</div>', choices:ch, correct:ch.indexOf(bien(d)), cot:1, sai:(function(){ var o={}; ch.forEach(function(c,i){ if(c!==bien(d)) o[String(i)]='khong-thang-hang'; }); return o; })(),
         goiY:{'khong-thang-hang':'Ba điểm thẳng hàng cùng nằm trên một đường thẳng. Bé kiểm tra nét thẳng nối ba điểm.'}}; }
-    if(lv===2){ var cases=[['H','A','B'],['K','C','D'],['M','H','K']], cs=pick(cases), mid=cs[0], ext=[cs[1],cs[2]], dis=[[cs[1], 'M'],[ 'H','K'].filter(function(x){ return x!==mid; }).concat(['D'])];
-      var op=[ext.join(' và '), (mid==='M' ? 'A và B' : 'M và '+ext[0]), (mid==='M' ? 'C và D' : ext[0]+' và K')]; op=op.filter(function(x,i,a){ return a.indexOf(x)===i; });
-      var cc=shuffle(op), dung2=ext.join(' và ');
-      return {type:'mcq', _pts:pts, _mid:mid, _ext:ext, _dung:dung2, q:hinh+'<div>Điểm '+mid+' ở giữa hai điểm nào?</div>', choices:cc, correct:cc.indexOf(dung2), cot:1, sai:(function(){ var o={}; cc.forEach(function(c,i){ if(c!==dung2) o[String(i)]='khong-thang-hang'; }); return o; })(),
-        goiY:{'khong-thang-hang':'Điểm ở giữa phải cùng nằm trên một đường thẳng với hai điểm kia.'}}; }
+    if(lv===2){ var cs=pick([['H','A','B'],['K','C','D'],['M','H','K']]), mid=cs[0], dung2=cs[1]+' và '+cs[2], tenD=pts.map(function(p){ return p.t; }).filter(function(t){ return t!==mid; }), cap=[], u, v;
+      for(u=0;u<tenD.length;u++) for(v=u+1;v<tenD.length;v++) if(!giuaDiem(P(mid), P(tenD[u]), P(tenD[v]))) cap.push(tenD[u]+' và '+tenD[v]);
+      var cc=shuffle([dung2].concat(shuffle(cap).slice(0,2)));
+      return {type:'mcq', _pts:pts, _mid:mid, _ext:[cs[1],cs[2]], _dung:dung2, q:hinh+'<div>Điểm '+mid+' ở giữa hai điểm nào?</div>', choices:cc, correct:cc.indexOf(dung2), cot:1, sai:(function(){ var o={}; cc.forEach(function(c,i){ if(c!==dung2){ var t=c.split(' và '); o[String(i)] = thangHang(P(mid),P(t[0]),P(t[1])) ? 'lech-nhom' : 'khong-thang-hang'; } }); return o; })(),
+        goiY:{'khong-thang-hang':'Điểm ở giữa phải cùng nằm trên một đường thẳng với hai điểm kia.', 'lech-nhom':'Bé xem điểm đó có nằm GIỮA hai điểm kia không, hay nằm ở một bên.'}}; }
     var nd=pick(non), sa=shuffle(tri.slice()).slice(0,2), ch3=shuffle([bien(nd), bien(sa[0]), bien(sa[1])]);
     return {type:'mcq', _pts:pts, _dung:bien(nd), _khong:true, q:hinh+'<div>Ba điểm nào <b>KHÔNG</b> thẳng hàng?</div>', choices:ch3, correct:ch3.indexOf(bien(nd)), cot:1, sai:(function(){ var o={}; ch3.forEach(function(c,i){ if(c!==bien(nd)) o[String(i)]='lech-nhom'; }); return o; })(),
       goiY:{'lech-nhom':'Bé tìm bộ ba KHÔNG thẳng hàng. Hai bộ kia cùng nằm trên một nét thẳng.'}};
   }, check:function(q){ var P=q._pts;
     function bo(c){ var t=c.split(', ').map(function(x){ return ptOf(P,x); }); return thangHang(t[0],t[1],t[2]); }
-    if(q._mid){ var M=ptOf(P,q._mid); var okc=q.choices.filter(function(c){ var t=c.split(' và ').map(function(x){ return ptOf(P,x); }); return giuaDiem(M,t[0],t[1]); }); return okc.length===1 && okc[0]===q._dung && kiemMCQ(q); }
+    if(q._mid){ var M=ptOf(P,q._mid); if(q.choices.some(function(c){ return c.split(' và ').indexOf(q._mid)>=0; })) return false; var okc=q.choices.filter(function(c){ var t=c.split(' và ').map(function(x){ return ptOf(P,x); }); return giuaDiem(M,t[0],t[1]); }); return okc.length===1 && okc[0]===q._dung && kiemMCQ(q); }
     var n=q.choices.filter(function(c){ return bo(c); }).length; return q._khong ? (n===2 && !bo(q._dung) && kiemMCQ(q)) : (n===1 && bo(q._dung) && kiemMCQ(q)); }},
 
   /* D5 — Trung điểm trên lưới (Hoạt động 3, Luyện tập 2) */
@@ -221,9 +234,9 @@ var BAI = {
    muc:['Đọc vạch: M có ở chính giữa A và B không.', 'B có là trung điểm của AC không.', 'Thước không bắt đầu từ vạch 0.'],
    make:function(lv){
     var dau = lv>=3 ? rnd(1,3) : 0, a, b, m, c, cau, dung, lab={}, pts, cuoi;
-    if(lv!==2){ var h=rnd(2,5); a=dau; b=a+2*h; var sai = Math.random()<0.5; m = sai ? a+h+pick([-1,1]) : a+h; dung=(m===a+h); cuoi=b+2; pts=[{t:'A',v:a},{t:'M',v:m},{t:'B',v:b}]; cau='M có là trung điểm của đoạn thẳng AB không?';
+    if(lv!==2){ var h=rnd(2,5); a=dau; b=a+2*h; var sai = Math.random()<0.5; m = sai ? a+h+pick([-1,1]) : a+h; dung=(m===a+h); cuoi=b+2; pts=[{t:'A',v:a},{t:'M',v:m},{t:'B',v:b}]; cau='M là trung điểm của đoạn thẳng AB.';
       if(!dung) lab={'0': Math.abs(m-(a+h))===1 ? 'doc-sai-thuoc' : 'nham-giua-trung-diem'}; }
-    else { var h2=rnd(2,5); a=0; b=h2; var sai2=Math.random()<0.5; c = sai2 ? 2*h2+pick([-1,1]) : 2*h2; dung=(c===2*h2); cuoi=Math.max(c,b)+1; pts=[{t:'A',v:a},{t:'B',v:b},{t:'C',v:c}]; cau='B có là trung điểm của đoạn thẳng AC không?';
+    else { var h2=rnd(2,5); a=0; b=h2; var sai2=Math.random()<0.5; c = sai2 ? 2*h2+pick([-1,1]) : 2*h2; dung=(c===2*h2); cuoi=Math.max(c,b)+1; pts=[{t:'A',v:a},{t:'B',v:b},{t:'C',v:c}]; cau='B là trung điểm của đoạn thẳng AC.';
       if(!dung) lab={'0':'doc-sai-thuoc'}; a=0; m=b; b=c; }
     return {type:'mcq', figFn:dsBtn16, _A:a, _M:m, _B:b, _dung:(dung?'Đ':'S'), q:thuocCm(pts, dau, cuoi)+'<div class="text-xl font-extrabold text-orange-700 my-2">'+cau+'</div><div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>',
       choices:['Đ','S'], correct:(dung?0:1), sai:lab, goiY:{'doc-sai-thuoc':'Bé đọc lại vạch của từng điểm trên thước, rồi tính khoảng cách.', 'nham-giua-trung-diem':'M ở giữa A và B nhưng chưa cách đều hai đầu. Bé so hai khoảng cách.', 'chung':'Bé đọc vạch của từng điểm, so hai khoảng cách.'}};
@@ -242,7 +255,7 @@ var BAI = {
         sai:nhanSai([[n2-k,'chia-doi-sai'],[n2/2,'chia-doi-sai'],[ans-1,'lech-nhom'],[ans+1,'lech-nhom']], ans), goiY:{'chia-doi-sai':'Trung điểm cách A '+(n2/2)+' ô. Cào cào đã nhảy '+k+' ô rồi.', 'lech-nhom':'Bé đếm lại số ô cần nhảy thêm.'}}; }
     var n3=rnd(5,13);
     if(Math.random()<0.5){ var chan=(n3%2===0), dung3=chan?'Đ':'S';
-      return {type:'mcq', figFn:dsBtn16, _n:n3, _dung:dung3, _kieu:'dd', q:thanhChiaO(n3, [], 0)+'<div>Thanh AB chia thành '+n3+' ô bằng nhau. Cào cào nhảy từng ô một, mỗi bước 1 ô. Cào cào có thể dừng ĐÚNG ở trung điểm của AB không?</div><div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>',
+      return {type:'mcq', figFn:dsBtn16, _n:n3, _dung:dung3, _kieu:'dd', q:thanhChiaO(n3, [], 0)+'<div>Thanh AB chia thành '+n3+' ô bằng nhau. Cào cào nhảy từng ô một, mỗi bước 1 ô.</div><div class="text-xl font-extrabold text-orange-700 my-2">Cào cào có thể dừng ĐÚNG ở trung điểm của AB.</div><div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>',
         choices:['Đ','S'], correct:(chan?0:1), sai:(chan?{}:{'0':'chia-doi-sai'}), goiY:{'chia-doi-sai':'Số ô lẻ thì không chia đôi được thành hai phần có số ô bằng nhau: trung điểm nằm GIỮA một ô, cào cào không dừng đúng ở đó.', 'chung':'Bé xem số ô là chẵn hay lẻ.'}}; }
     var n4=pick([6,8,10,12,14]);
     return {type:'num', _n:n4, _kieu:'o', _e:n4/2, q:thanhChiaO(n4, [], 0)+'<div>Thanh AB chia thành '+n4+' ô bằng nhau. Từ A đi mấy ô thì tới trung điểm của AB?</div>', ans:n4/2, unit:'ô',
