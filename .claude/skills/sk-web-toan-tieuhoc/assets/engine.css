@@ -1,0 +1,103 @@
+/* Engine v2 — style dùng chung cho mọi bài luyện Toán tiểu học */
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background-color: #fff7ed; }
+.btn-press:active:not(:disabled){ transform: scale(0.96); }
+.shake { animation: shk .4s; }
+@keyframes shk { 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.pop { animation: pp .25s ease; }
+@keyframes pp { 0%{opacity:.35} 100%{opacity:1} }
+.toast-in { animation: tin .4s ease; }
+@keyframes tin { 0%{transform:translateY(-14px) scale(.9);opacity:0} 100%{transform:translateY(0) scale(1);opacity:1} }
+.star-pop { animation: sp .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes sp { 0%{transform:scale(0) rotate(-40deg);opacity:0} 100%{transform:scale(1) rotate(0);opacity:1} }
+.end-in { animation: ein .3s ease; }
+@keyframes ein { 0%{opacity:0} 100%{opacity:1} }
+
+/* Số trên hạt màu nhạt (vòng tròn / hình thoi / ô trong dãy số, sơ đồ mũi tên):
+   chữ trắng trên nền -400 quá mờ -> đổi sang chữ tối, đọc rõ ở mọi giao diện. */
+#card .bg-amber-400.text-white,
+#card .bg-sky-400.text-white,
+#card .bg-emerald-400.text-white { color: #1f2937; }
+/* Giao diện Sáng: chữ màu trong thẻ câu hỏi đậm thêm một nấc cho đạt tương phản 4.5:1 */
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-orange-600 { color: #c2410c; }
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-amber-600 { color: #b45309; }
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-amber-700 { color: #92400e; }
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-sky-600 { color: #0369a1; }
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-emerald-600 { color: #047857; }
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-slate-400 { color: #64748b; }
+html:not([data-theme="dark"]):not([data-theme="sepia"]) #card .text-rose-500 { color: #be123c; }
+html[data-theme="sepia"] .text-rose-500 { color: #be123c; }
+
+/* ================= GIAO DIỆN TỐI ================= */
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="dark"] body { background-color: #0b1220; }
+html[data-theme="dark"] .bg-white { background-color: #1e293b; }
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .hover\:bg-slate-200:hover,
+html[data-theme="dark"] .hover\:bg-amber-50:hover { background-color: #334155; }
+html[data-theme="dark"] .bg-slate-100 { background-color: #111a2e; }
+html[data-theme="dark"] .bg-amber-50 { background-color: #172135; }
+html[data-theme="dark"] .bg-amber-100 { background-color: #3f3110; }
+html[data-theme="dark"] .bg-amber-200 { background-color: #5c4511; }
+html[data-theme="dark"] .bg-emerald-100 { background-color: #064e3b; }
+html[data-theme="dark"] .bg-rose-100 { background-color: #4c0519; }
+html[data-theme="dark"] .text-slate-700 { color: #e2e8f0; }
+html[data-theme="dark"] .text-slate-600 { color: #cbd5e1; }
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 { color: #94a3b8; }
+html[data-theme="dark"] .text-slate-300 { color: #475569; }
+html[data-theme="dark"] .text-orange-600 { color: #fb923c; }
+html[data-theme="dark"] .text-orange-700 { color: #fdba74; }
+html[data-theme="dark"] .text-amber-600 { color: #fbbf24; }
+html[data-theme="dark"] .text-amber-700 { color: #fcd34d; }
+html[data-theme="dark"] .text-emerald-600,
+html[data-theme="dark"] .text-emerald-700 { color: #34d399; }
+html[data-theme="dark"] .text-sky-700 { color: #7dd3fc; }
+html[data-theme="dark"] .bg-sky-50,
+html[data-theme="dark"] .bg-sky-100 { background-color: #0c3552; }
+html[data-theme="dark"] .bg-orange-50,
+html[data-theme="dark"] .bg-orange-100 { background-color: #431407; }
+html[data-theme="dark"] .bg-green-100,
+html[data-theme="dark"] .bg-emerald-50 { background-color: #052e2b; }
+html[data-theme="dark"] .bg-yellow-100 { background-color: #422006; }
+html[data-theme="dark"] .text-sky-600 { color: #38bdf8; }
+html[data-theme="dark"] .text-rose-500 { color: #fb7185; }
+html[data-theme="dark"] .border-slate-200 { border-color: #334155; }
+html[data-theme="dark"] .border-amber-100,
+html[data-theme="dark"] .border-amber-200 { border-color: #4b3a17; }
+html[data-theme="dark"] input { background-color: #0f172a; color: #f8fafc; }
+/* nền trắng viết thẳng trong hình (bảng nhân...) */
+html[data-theme="dark"] #card [style*="background:#fff"] { background-color: #1e293b !important; }
+html[data-theme="dark"] #siteCounter { opacity: .8; }
+
+/* ================= GIAO DIỆN DỊU MẮT (nền kem, giảm chói) ================= */
+html[data-theme="sepia"] body { background-color: #efe4cf; }
+html[data-theme="sepia"] .bg-white { background-color: #fbf5e8; }
+html[data-theme="sepia"] .bg-slate-50,
+html[data-theme="sepia"] .hover\:bg-slate-50:hover,
+html[data-theme="sepia"] .hover\:bg-slate-200:hover,
+html[data-theme="sepia"] .hover\:bg-amber-50:hover { background-color: #efe3cb; }
+html[data-theme="sepia"] .bg-slate-100 { background-color: #eadfc8; }
+html[data-theme="sepia"] .bg-amber-50 { background-color: #f5ead2; }
+html[data-theme="sepia"] .text-slate-700 { color: #3b342b; }
+html[data-theme="sepia"] .text-slate-600 { color: #4a4238; }
+html[data-theme="sepia"] .text-slate-500,
+html[data-theme="sepia"] .text-slate-400 { color: #5f5242; }
+html[data-theme="sepia"] .text-orange-600,
+html[data-theme="sepia"] .text-orange-700 { color: #9a3412; }
+html[data-theme="sepia"] .text-amber-500,
+html[data-theme="sepia"] .text-amber-600,
+html[data-theme="sepia"] .text-amber-700 { color: #92400e; }
+html[data-theme="sepia"] .text-emerald-600 { color: #047857; }
+html[data-theme="sepia"] .text-sky-600 { color: #0369a1; }
+html[data-theme="sepia"] .border-slate-200 { border-color: #dccdb1; }
+html[data-theme="sepia"] input { background-color: #fffaf0; }
+html[data-theme="sepia"] #card [style*="background:#fff"] { background-color: #fbf5e8 !important; }
+
+/* ================= NGỌN LỬA CẤP ĐỘ TƯ DUY (lua.js) ================= */
+.lua-song { transform-origin: 50% 100%; animation: luaSong 1.8s ease-in-out infinite; }
+.lua-bung { animation: luaBung .7s ease-out 1, luaSong 1.8s ease-in-out .7s infinite; }
+@keyframes luaSong { 0%,100% { transform: scale(1,1); } 50% { transform: scale(1.05,0.96); } }
+@keyframes luaBung { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .lua-song, .lua-bung { animation: none; } }
+html[data-theme="dark"] .text-rose-700 { color: #fda4af; }
