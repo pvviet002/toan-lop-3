@@ -34,7 +34,8 @@ function hinhTron(sp, px){
   sp.seg.forEach(function(g){ if(g[2]){ var a=viTri(sp,g[0]), b=viTri(sp,g[1]), dx=b[0]-a[0], dy=b[1]-a[1], ln=Math.hypot(dx,dy)||1, nx=-dy/ln, ny=dx/ln, d=26;
       if(nx>0.05 || (Math.abs(nx)<=0.05 && ny>0)){ nx=-nx; ny=-ny; }
       var a2=[a[0]+nx*d, a[1]+ny*d], b2=[b[0]+nx*d, b[1]+ny*d], px0=Math.round((a2[0]+b2[0])/2), py0=Math.round((a2[1]+b2[1])/2), f=function(v){ return v.toFixed(1); };
-      s+='<path d="M'+f(a[0])+' '+f(a[1])+' L'+f(a2[0]+nx*6)+' '+f(a2[1]+ny*6)+' M'+f(b[0])+' '+f(b[1])+' L'+f(b2[0]+nx*6)+' '+f(b2[1]+ny*6)+' M'+f(a2[0])+' '+f(a2[1])+' L'+f(b2[0])+' '+f(b2[1])+'" stroke="'+HM.day+'" stroke-width="1.8" fill="none" stroke-dasharray="3 3"/>';
+      s+='<path d="M'+f(a[0])+' '+f(a[1])+' L'+f(a2[0]+nx*6)+' '+f(a2[1]+ny*6)+' M'+f(b[0])+' '+f(b[1])+' L'+f(b2[0]+nx*6)+' '+f(b2[1]+ny*6)+'" stroke="currentColor" stroke-width="1.5" fill="none" stroke-dasharray="3 3" stroke-opacity="0.7"/>'
+       +'<path d="M'+f(a2[0]+nx*6)+' '+f(a2[1]+ny*6)+' L'+f(a2[0]-nx*6)+' '+f(a2[1]-ny*6)+' M'+f(b2[0]+nx*6)+' '+f(b2[1]+ny*6)+' L'+f(b2[0]-nx*6)+' '+f(b2[1]-ny*6)+' M'+f(a2[0])+' '+f(a2[1])+' L'+f(b2[0])+' '+f(b2[1])+'" stroke="'+HM.doDam+'" stroke-width="2.5" stroke-linecap="round" fill="none"/>';
       hop.push([px0-29, py0-12, px0+29, py0+12]);
       s+=nhanVien(px0, py0, 58, 24, g[2], 16); } });
   /* chữ O: thử bốn góc quanh tâm, chọn góc không đụng nhãn cm */

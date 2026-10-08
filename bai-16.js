@@ -246,7 +246,7 @@ var BAI = {
   {name:'Cào cào nhảy', sec:'Luyện tập 3 — Cào cào nhảy', mt:['MT5'], levels:3,
    muc:['Thanh chia ô đều, chọn vạch là trung điểm của AB.', 'Cào cào đã nhảy vài bước: cần nhảy thêm mấy bước tới trung điểm.', 'Cào cào nhảy từng ô có dừng ĐÚNG ở trung điểm được không; trung điểm cách A mấy ô.'],
    make:function(lv){
-    if(lv<=1){ var n=pick([6,8,10]), nm=ten(3), v=[n/2, n/2-1, n/2+1], ch=shuffle(nm.slice()), gh=nm.map(function(t,i){ return {t:t, v:v[i]}; }), dung=nm[0], sai={};
+    if(lv<=1){ var n=pick([6,8,10]), nm=ten(3), v=[n/2, n/2-2, n/2+2], ch=shuffle(nm.slice()), gh=nm.map(function(t,i){ return {t:t, v:v[i]}; }), dung=nm[0], sai={};
       ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='chia-doi-sai'; });
       return {type:'mcq', _n:n, _gh:gh, _dung:dung, q:thanhChiaO(n, gh)+'<div>Thanh AB chia thành '+n+' ô bằng nhau. Điểm nào là trung điểm của AB?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
         goiY:{'chia-doi-sai':'Trung điểm cách A đúng một nửa số ô: '+n+' ô thì cách A '+(n/2)+' ô.'}}; }
