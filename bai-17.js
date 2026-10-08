@@ -182,9 +182,9 @@ var BAI = {
     var cau='<div class="text-lg font-bold text-slate-700 my-1">Bạn An nói: "'+X2+' là đường kính vì '+X2+' nối hai điểm trên đường tròn."</div>';
     if(lv===2) return {type:'mcq', figFn:dsBtn17, _sp:sp2, _X:X2, _dung:'S', q:hinhTron(sp2)+cau+'<div class="text-base text-slate-500">Bạn An nói đúng (Đ) hay sai (S)?</div>',
       choices:['Đ','S'], correct:1, sai:{'0':'nham-day-duong-kinh'}, goiY:{'nham-day-duong-kinh':'Đường kính phải đi qua TÂM O. '+X2+' không đi qua O.', 'chung':'Bé xem '+X2+' có đi qua tâm O không.'}};
-    var dung3='Sai, vì '+X2+' không đi qua tâm O.', ch=shuffle([dung3, 'Sai, vì '+X2+' ngắn hơn bán kính.', 'Đúng, vì '+X2+' nối hai điểm trên đường tròn.']), sai={};
-    ch.forEach(function(c,i){ if(c!==dung3) sai[String(i)] = c.indexOf('Đúng')===0 ? 'nham-day-duong-kinh' : 'nham-ban-kinh-duong-kinh'; });
-    return {type:'mcq', cot:1, _sp:sp2, _X:X2, _dung:dung3, _ly:true, q:hinhTron(sp2)+cau+'<div>Bạn An nói sai. Vì sao?</div>', choices:ch, correct:ch.indexOf(dung3), sai:sai,
+    var dung3='Không đồng ý, vì '+X2+' không đi qua tâm O.', ch=shuffle([dung3, 'Không đồng ý, vì '+X2+' ngắn hơn bán kính.', 'Đồng ý, vì '+X2+' nối hai điểm trên đường tròn.']), sai={};
+    ch.forEach(function(c,i){ if(c!==dung3) sai[String(i)] = c.indexOf('Đồng ý')===0 ? 'nham-day-duong-kinh' : 'nham-ban-kinh-duong-kinh'; });
+    return {type:'mcq', cot:1, _sp:sp2, _X:X2, _dung:dung3, _ly:true, q:hinhTron(sp2)+cau+'<div>Em thấy thế nào?</div>', choices:ch, correct:ch.indexOf(dung3), sai:sai,
       goiY:{'nham-day-duong-kinh':'Nối hai điểm trên đường tròn chưa đủ: đường kính còn phải đi qua tâm O.', 'nham-ban-kinh-duong-kinh':'Bé xem lại: '+X2+' không đi qua tâm O, và nó dài hơn bán kính.'}};
   }, check:function(q){ var sp=q._sp, t=(loaiDoan(sp, q._X[0], q._X[1])==='dk');
     if(q._ly) return !t && kiemMCQ(q); return (q._dung==='Đ')===t && q.correct===(t?0:1) && q.choices.join()==='Đ,S'; }},

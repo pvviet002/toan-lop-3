@@ -307,9 +307,9 @@ var BAI = {
     if(lv<=2){ var lab = that ? {} : {'0':'nham-giua-trung-diem'};
       return {type:'mcq', figFn:dsBtn16, _kieu:kieu, _ab:ab, _bc:bc, _dung:(that?'Đ':'S'), q:hinh+'<div class="text-lg font-bold text-slate-700 my-2">'+cau+'</div><div class="text-base text-slate-500">Bạn An nói đúng (Đ) hay sai (S)?</div>',
         choices:['Đ','S'], correct:(that?0:1), sai:lab, goiY:{'nham-giua-trung-diem':'Trung điểm phải ở giữa VÀ hai đoạn bằng nhau. Bé so '+A+B+' với '+B+C+'.', 'chung':'Bé so hai độ dài '+A+B+' và '+B+C+'.'}}; }
-    var lyDo={lech:'Sai, vì '+A+B+' không bằng '+B+C+'.', cong:'Sai, vì ba điểm '+A+', '+B+', '+C+' không thẳng hàng.', dung:'Đúng, vì '+A+B+' = '+B+C+'.'}, dung=lyDo[kieu], ch=shuffle([lyDo.lech, lyDo.cong, lyDo.dung]), sai={};
+    var lyDo={lech:'Không đồng ý, vì '+A+B+' không bằng '+B+C+'.', cong:'Không đồng ý, vì ba điểm '+A+', '+B+', '+C+' không thẳng hàng.', dung:'Đồng ý, vì '+A+B+' = '+B+C+'.'}, dung=lyDo[kieu], ch=shuffle([lyDo.lech, lyDo.cong, lyDo.dung]), sai={};
     ch.forEach(function(c,i){ if(c===lyDo.dung) sai[String(i)]='nham-giua-trung-diem'; else if(c!==dung) sai[String(i)] = kieu==='cong' ? 'nham-giua-trung-diem' : 'khong-thang-hang'; });
-    return {type:'mcq', cot:1, _kieu:kieu, _ab:ab, _bc:bc, _dung:dung, _ly:true, q:hinh+'<div class="text-lg font-bold text-slate-700 my-2">'+cau+'</div><div>Bạn An nói sai. Vì sao?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
+    return {type:'mcq', cot:1, _kieu:kieu, _ab:ab, _bc:bc, _dung:dung, _ly:true, q:hinh+'<div class="text-lg font-bold text-slate-700 my-2">'+cau+'</div><div>Em thấy thế nào?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai,
       goiY:{'khong-thang-hang':'Bé xem ba điểm có nằm trên một đường thẳng không.', 'nham-giua-trung-diem':'Bé so hai đoạn có bằng nhau không, và ba điểm có thẳng hàng không.'}};
   }, check:function(q){ if(q._ly) return (q._kieu==='lech' ? q._ab!==q._bc : q._kieu==='cong') && kiemMCQ(q);
     var t=(q._kieu==='dung'); return (q._dung==='Đ')===t && q.correct===(t?0:1) && q.choices.join()==='Đ,S' && (t ? q._ab===q._bc : q._ab!==q._bc); }}

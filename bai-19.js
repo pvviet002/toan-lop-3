@@ -104,7 +104,7 @@ var MAU_G3={pts:{a:[3,5],b:[0,3],c:[1,0],d:[5,0],e:[6,3]}, segs:[['a','b'],['b',
 /* ---- Hình mới 4 (D5): tờ giấy hình chữ nhật ABCD có điểm M trên AB, N trên DC; cat = cặp tên điểm vẽ nét đứt (hoặc null) ---- */
 function toaDoGiay(m, n, w, h){ return {A:[0,h], M:[m,h], B:[w,h], C:[w,0], N:[n,0], D:[0,0]}; }
 function giayCat(m, n, w, h, cat, tenM, tenN){
-  var P=toaDoGiay(m,n,w,h), W=280, H=170, k=Math.min(220/w, 100/h), ox=(W-w*k)/2, oy=34, s=svgX(W,H);
+  var P=toaDoGiay(m,n,w,h), W=280, H=186, k=Math.min(220/w, 100/h), ox=(W-w*k)/2, oy=50, s=svgX(W,H);
   function X(p){ return ox+p[0]*k; } function Y(p){ return oy+(h-p[1])*k; }
   s+='<rect x="'+f1(ox)+'" y="'+f1(oy)+'" width="'+f1(w*k)+'" height="'+f1(h*k)+'" fill="'+HM.vang+'" fill-opacity="0.35" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>';
   if(cat){ var a=P[cat[0]], b=P[cat[1]]; s+='<path d="M'+f1(X(a))+' '+f1(Y(a))+' L'+f1(X(b))+' '+f1(Y(b))+'" stroke="'+HM.camDam+'" stroke-width="3" stroke-dasharray="7 5" fill="none"/>'; }
@@ -148,7 +148,7 @@ function datLuoi(P, n, xoay, mir){
 
 /* ---- Hình mới 6 (D9): tờ giấy có mép rách bên phải trên lưới; các đường cắt đặt tên A, B, C. huong='ngang': đường cắt thẳng đứng; 'doc': đường cắt nằm ngang ---- */
 function giayRach(W, H, ks, huong, ten){
-  var c=26, mt=34, ml=30, ph=huong==='ngang' ? 1 : 1, gw=W*c, gh=H*c, VW=gw+ml+34, VH=gh+mt+30, s=svgX(VW, VH), i, jag=[], t;
+  var c=26, mt=56, ml=30, gw=W*c, gh=H*c, VW=gw+ml+34, VH=gh+mt+30, s=svgX(VW, VH), i, jag=[], t;
   function X(x){ return ml+x*c; } function Y(y){ return mt+(H-y)*c; }
   /* mép rách ở phía xa của hướng cắt */
   var pts=[];
