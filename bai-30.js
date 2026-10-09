@@ -112,7 +112,7 @@ var BAI = {
     var ans, bt, sai;
     if(lv<=1){ if(Math.random()<0.5){ ans=1; bt='1 000 mm = '+oHoi()+' m'; sai=[[10,'nham-boi'],[100,'nham-boi'],[1000,'quen-doi']]; } else { ans=1000; bt='1 m = '+oHoi()+' mm'; sai=[[100,'nham-boi'],[10,'nham-boi'],[1,'quen-doi']]; } }
     else if(lv===2){ var c=pick([[1,'1 m = '+oHoi()+' cm',100],[2,'1 m = '+oHoi()+' mm',1000],[3,'1 cm = '+oHoi()+' mm',10],[4,'100 cm = '+oHoi()+' m',1]]); ans=c[2]; bt=c[1]; sai=[[ans*10,'nham-boi'],[ans*100,'nham-boi'],[ans%10===0 ? ans/10 : 0,'nham-boi'],[ans%100===0 ? ans/100 : 0,'nham-boi']]; }
-    else { var k=rnd(2,9); if(Math.random()<0.5){ ans=100*k; bt=k+' m = '+oHoi()+' cm'; sai=[[k,'quen-doi'],[10*k,'nham-boi'],[1000*k,'nham-boi']]; } else { ans=k; bt=(1000*k)+' mm = '+oHoi()+' m'; sai=[[100*k,'nham-boi'],[10*k,'nham-boi'],[1000*k,'quen-doi']]; } }
+    else { var k=rnd(2,9); if(Math.random()<0.5){ ans=100*k; bt=k+' m = '+oHoi()+' cm'; sai=[[k,'quen-doi'],[10*k,'nham-boi'],[1000*k,'nham-boi']]; } else { ans=k; bt=so(1000*k)+' mm = '+oHoi()+' m'; sai=[[100*k,'nham-boi'],[10*k,'nham-boi'],[1000*k,'quen-doi']]; } }
     return {type:'num', _lv:lv, _ans:ans, q:kyHieu('Đổi đơn vị', bt), ans:ans, sai:nhanSai(sai, ans), goiY:gy()};
   }, check:function(q){ return q.ans===q._ans && q.ans>=1 && q.ans<=1000; }},
 
@@ -214,13 +214,19 @@ var BAI = {
     if(lv<=1){ k=rnd(2,9); var dung=Math.random()<0.5, dir=Math.random()<0.5, x = dung ? 10*k : pick([k, 100*k, 10*k+10]), tr=(x===10*k), tag = x===k ? 'nham-don-vi' : (x===100*k ? 'nham-boi' : 'nham-bang');
       var ph = dir ? k+' cm = '+x+' mm.' : x+' mm = '+k+' cm.'; if(!dir){ x = dung ? 10*k : pick([k, 100*k]); tr=(x===10*k); tag = x===k ? 'nham-don-vi' : 'nham-boi'; ph=x+' mm = '+k+' cm.'; }
       return {type:'mcq', figFn:dsBtn30, _lv:1, _k:k, _x:x, _dir:dir, _dung:(tr?'Đ':'S'), q:'<div class="text-xl font-extrabold text-orange-700 my-2">'+ph+'</div><div class="text-base text-slate-500">Đúng (Đ) hay sai (S)?</div>', choices:['Đ','S'], correct:(tr?0:1), sai:(tr?{}:{'0':tag}), goiY:gy()}; }
-    if(lv===2){ k=rnd(2,9); var T=10*k, x2 = Math.random()<0.5 ? T : pick([k,100*k]), mo=function(n){ return k+' × 10 = '+n; }, hn=haiNhanXet(x2,T,mo), sai={}; sai[String(1-hn.correct)] = x2===T ? 'nham-bang' : (x2===k ? 'nham-don-vi' : 'nham-boi');
-      return {type:'mcq', cot:1, _lv:2, _k:k, _x:x2, _T:T, _ds:hn.ds, _dung:hn.choices[hn.correct], q:nguoi('boy','Bạn An')+'<div>Bạn An nói: «<b>'+k+' cm</b> bằng <b>'+x2+' mm</b>.» Em thấy thế nào?</div>', choices:hn.choices, correct:hn.correct, sai:sai, goiY:gy({'chung':'Bé nhớ 1 cm = 10 mm, rồi tính '+k+' × 10.'})}; }
-    k=rnd(2,9); var T3=100*k, x3 = Math.random()<0.5 ? T3 : pick([k,10*k]), mo3=function(n){ return '1 m = 100 cm, '+k+' × 100 = '+n; }, hn3=haiNhanXet(x3,T3,mo3), sai3={}; sai3[String(1-hn3.correct)] = x3===T3 ? 'nham-bang' : (x3===k ? 'nham-don-vi' : 'nham-boi');
-    return {type:'mcq', cot:1, _lv:3, _k:k, _x:x3, _T:T3, _ds:hn3.ds, _dung:hn3.choices[hn3.correct], q:nguoi('boy','Bạn An')+'<div>Bạn An nói: «<b>'+k+' m</b> bằng <b>'+x3+' cm</b>.» Em thấy thế nào?</div>', choices:hn3.choices, correct:hn3.correct, sai:sai3, goiY:gy({'chung':'Bé nhớ 1 m = 100 cm, rồi tính '+k+' × 100.'})};
+    var f = lv===2 ? 10 : 100, don1 = lv===2 ? 'cm' : 'm', don2 = lv===2 ? 'mm' : 'cm', T, x, fx, ch, dung, sai={};
+    k=rnd(2,9); T=f*k; fx = Math.random()<0.5 ? f : pick(lv===2 ? [1,100] : [1,10]); x=k*fx;
+    var ptT=k+' × '+f+' = '+so(T), ptX=k+' × '+fx+' = '+so(x);
+    if(fx===f){ dung='Đồng ý, vì '+ptT; var sa='Không đồng ý, vì '+k+' × '+(lv===2 ? 100 : 10)+' = '+so(k*(lv===2 ? 100 : 10)); ch=[dung, sa]; }
+    else { dung='Không đồng ý, vì '+ptT; var sb='Đồng ý, vì '+ptX; ch=[dung, sb]; }
+    shuffle(ch); sai[String(1-ch.indexOf(dung))] = fx===f ? 'nham-bang' : (fx===1 ? 'nham-don-vi' : 'nham-boi');
+    return {type:'mcq', cot:1, _lv:lv, _k:k, _x:x, _T:T, _f:f, _fx:fx, _dung:dung, q:nguoi('boy','Bạn An')+'<div>Bạn An nói: «<b>'+k+' '+don1+'</b> bằng <b>'+so(x)+' '+don2+'</b>.» Em thấy thế nào?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai, goiY:gy({'chung':'Bé nhớ 1 '+don1+' = '+f+' '+don2+', rồi tính '+k+' × '+f+'.'})};
   }, check:function(q){
     var k=q._k;
     if(q._lv<=1) return q.choices.join()==='Đ,S' && (q._dung==='Đ')===(q._x===10*k) && q.correct===(q._x===10*k?0:1);
-    return kiemNhanXet(q) && q._T===(q._lv===2 ? 10*k : 100*k) && q._T<=1000; }}
+    var f=q._lv===2 ? 10 : 100, eq=/^(Đồng ý|Không đồng ý), vì (\d+) × (\d+) = ([\d ]+)$/;
+    var okEq=q.choices.every(function(c){ var m=eq.exec(c); return m && (+m[2])*(+m[3])===+m[4].replace(/ /g,''); });
+    var agree=(q._x===q._T), dungDong = q._dung.indexOf(agree ? 'Đồng ý' : 'Không đồng ý')===0;
+    return okEq && dungDong && q.choices.length===2 && new Set(q.choices).size===2 && q._T===f*k && q._x===k*q._fx && q.choices[q.correct]===q._dung && q._dung.indexOf(k+' × '+f+' = '+so(q._T))>0 && q._T<=1000 && k<=9; }}
  ]
 };
