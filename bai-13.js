@@ -10,10 +10,10 @@
 /* Ca đựng nước */
 function jug(){
   return '<svg width="46" height="58" viewBox="0 0 60 74" style="display:inline-block">'
-   +'<path d="M14 16 h30 a3 3 0 0 1 3 3 v44 a7 7 0 0 1 -7 7 h-22 a7 7 0 0 1 -7 -7 v-44 a3 3 0 0 1 3 -3 z" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>'
-   +'<path d="M47 26 q11 1 11 12 q0 11 -11 12" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round"/>'
-   +'<path d="M13 40 h34 v20 a7 7 0 0 1 -7 7 h-20 a7 7 0 0 1 -7 -7 z" fill="#38bdf8"/>'
-   +'<ellipse cx="30" cy="16" rx="17" ry="4" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>'
+   +'<path d="M14 16 h30 a3 3 0 0 1 3 3 v44 a7 7 0 0 1 -7 7 h-22 a7 7 0 0 1 -7 -7 v-44 a3 3 0 0 1 3 -3 z" fill="#FFFFFF" stroke="'+HM.troiDam+'" stroke-width="2"/>'
+   +'<path d="M47 26 q11 1 11 12 q0 11 -11 12" fill="none" stroke="'+HM.troiDam+'" stroke-width="3" stroke-linecap="round"/>'
+   +'<path d="M13 40 h34 v20 a7 7 0 0 1 -7 7 h-20 a7 7 0 0 1 -7 -7 z" fill="'+HM.troi+'"/>'
+   +'<ellipse cx="30" cy="16" rx="17" ry="4" fill="#F4F4F4" stroke="'+HM.troiDam+'" stroke-width="2"/>'
    +'</svg>';
 }
 /* Ô ẩn (?) màu hổ phách trong phép tính */

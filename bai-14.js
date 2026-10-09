@@ -35,44 +35,44 @@ function phanLech(n){
 function pt(c, r, deg){ var a=deg*Math.PI/180; return (c+r*Math.cos(a)).toFixed(1)+' '+(c+r*Math.sin(a)).toFixed(1); }
 function nanQuat(c, r, a0, a1){ return 'M'+c+' '+c+' L'+pt(c,r,a0)+' A'+r+' '+r+' 0 '+((a1-a0)>180?1:0)+' 1 '+pt(c,r,a1)+' Z'; }
 function svgMo(w, h){ return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" style="max-width:100%;height:auto;display:inline-block">'; }
-function tia(c, r, a){ var p=pt(c,r,a).split(' '); return '<line x1="'+c+'" y1="'+c+'" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#1f2937" stroke-width="2.5"/>'; }
+function tia(c, r, a){ var p=pt(c,r,a).split(' '); return '<line x1="'+c+'" y1="'+c+'" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+HM.den+'" stroke-width="2.5"/>'; }
 
 /* Hình tròn chia n phần, tô phần s. goc (tuỳ chọn) = mảng n tỉ lệ -> các phần KHÔNG bằng nhau */
 function tronPS(n, s, mau, size, goc){
   size=size||150; var c=size/2, r=c-4, h=svgMo(size,size), g=goc||null, a=[], cur=-90-(g?g[0]*180:180/n);
   for(var i=0;i<=n;i++){ a.push(cur); if(i<n) cur+= g ? g[i]*360 : 360/n; }
   h+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="#ffffff"/>';
-  h+='<path d="'+nanQuat(c,r,a[s],a[s+1])+'" fill="'+(mau||'#38bdf8')+'"/>';
+  h+='<path d="'+nanQuat(c,r,a[s],a[s+1])+'" fill="'+(mau||HM.troi)+'"/>';
   for(var j=0;j<n;j++) h+=tia(c,r,a[j]);
-  return h+'<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="#1f2937" stroke-width="3"/></svg>';
+  return h+'<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+HM.den+'" stroke-width="3"/></svg>';
 }
 /* Hình chữ nhật chia n cột, tô cột s. rong (tuỳ chọn) = mảng n tỉ lệ bề rộng -> cột KHÔNG bằng nhau */
 function hcnPS(n, s, rong){
   var W=210, H=90, x0=3, y0=3, w=W-6, hh=H-6, h=svgMo(W,H), x=[x0];
   for(var i=0;i<n;i++) x.push(x[i] + (rong ? rong[i] : 1/n)*w);
   h+='<rect x="'+x0+'" y="'+y0+'" width="'+w+'" height="'+hh+'" fill="#ffffff"/>';
-  h+='<rect x="'+x[s].toFixed(1)+'" y="'+y0+'" width="'+(x[s+1]-x[s]).toFixed(1)+'" height="'+hh+'" fill="#38bdf8"/>';
-  for(var j=1;j<n;j++) h+='<line x1="'+x[j].toFixed(1)+'" y1="'+y0+'" x2="'+x[j].toFixed(1)+'" y2="'+(y0+hh)+'" stroke="#1f2937" stroke-width="2.5"/>';
-  return h+'<rect x="'+x0+'" y="'+y0+'" width="'+w+'" height="'+hh+'" fill="none" stroke="#1f2937" stroke-width="3"/></svg>';
+  h+='<rect x="'+x[s].toFixed(1)+'" y="'+y0+'" width="'+(x[s+1]-x[s]).toFixed(1)+'" height="'+hh+'" fill="'+HM.troi+'"/>';
+  for(var j=1;j<n;j++) h+='<line x1="'+x[j].toFixed(1)+'" y1="'+y0+'" x2="'+x[j].toFixed(1)+'" y2="'+(y0+hh)+'" stroke="'+HM.den+'" stroke-width="2.5"/>';
+  return h+'<rect x="'+x0+'" y="'+y0+'" width="'+w+'" height="'+hh+'" fill="none" stroke="'+HM.den+'" stroke-width="3"/></svg>';
 }
 /* Chiếc bánh chia n miếng bằng nhau; miếng trên cùng tô cam, có ghi 1/n nếu ghi=true */
 function banh(n, ghi){
   var S=150, c=75, st=-90-180/n, d=360/n, h=svgMo(S,S);
-  h+='<circle cx="75" cy="75" r="71" fill="#fcd34d" stroke="#b45309" stroke-width="2"/>';
-  h+='<circle cx="75" cy="75" r="61" fill="#fff7ed"/>';
-  h+='<path d="'+nanQuat(c,61,st,st+d)+'" fill="#fdba74"/>';
-  for(var i=0;i<n;i++){ var p=pt(c,71,st+i*d).split(' '); h+='<line x1="75" y1="75" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#b45309" stroke-width="2"/>'; }
+  h+='<circle cx="75" cy="75" r="71" fill="'+HM.vang+'" stroke="'+HM.go+'" stroke-width="2"/>';
+  h+='<circle cx="75" cy="75" r="61" fill="#FFFFFF"/>';
+  h+='<path d="'+nanQuat(c,61,st,st+d)+'" fill="'+HM.goNhat+'"/>';
+  for(var i=0;i<n;i++){ var p=pt(c,71,st+i*d).split(' '); h+='<line x1="75" y1="75" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+HM.go+'" stroke-width="2"/>'; }
   if(ghi){
     var q=pt(c, n<=2?34:40, -90).split(' '), x=+q[0], y=+q[1], fs=(n>=7?15:17);
-    h+='<text x="'+x+'" y="'+(y-6)+'" text-anchor="middle" font-size="'+fs+'" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">1</text>';
-    h+='<line x1="'+(x-7)+'" y1="'+y+'" x2="'+(x+7)+'" y2="'+y+'" stroke="#7c2d12" stroke-width="2"/>';
-    h+='<text x="'+x+'" y="'+(y+15)+'" text-anchor="middle" font-size="'+fs+'" font-weight="800" fill="#7c2d12" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+n+'</text>';
+    h+='<text x="'+x+'" y="'+(y-6)+'" text-anchor="middle" font-size="'+fs+'" font-weight="800" fill="'+HM.chu+'" font-family="system-ui,Segoe UI,Roboto,sans-serif">1</text>';
+    h+='<line x1="'+(x-7)+'" y1="'+y+'" x2="'+(x+7)+'" y2="'+y+'" stroke="'+HM.chu+'" stroke-width="2"/>';
+    h+='<text x="'+x+'" y="'+(y+15)+'" text-anchor="middle" font-size="'+fs+'" font-weight="800" fill="'+HM.chu+'" font-family="system-ui,Segoe UI,Roboto,sans-serif">'+n+'</text>';
   }
   return h+'</svg>';
 }
 /* Hình tô màu (LT2): 'dai:m:s' | 'luoi:m:r:c:ri:ci' | 'kim:8' | 'tam:4' | 'tron:m:s' | 'lech:m:s:w1-w2-…' (dải KHÔNG bằng nhau) */
 function hinhTo(ch){
-  var p=ch.split(':'), t=p[0], S=112, a=4, b=108, m=(b-a), V='#fbbf24', K='stroke="#1f2937" stroke-width="2.5"', h;
+  var p=ch.split(':'), t=p[0], S=112, a=4, b=108, m=(b-a), V=HM.vang, K='stroke="'+HM.den+'" stroke-width="2.5"', h;
   if(t==='tron') return tronPS(+p[1], +p[2], V, 112);
   h=svgMo(S,S)+'<rect x="'+a+'" y="'+a+'" width="'+m+'" height="'+m+'" fill="#ffffff"/>';
   if(t==='dai' || t==='lech'){
@@ -92,7 +92,7 @@ function hinhTo(ch){
     h+='<path d="M4 4 L108 4 L56 56 Z" fill="'+V+'"/>';
     h+='<line x1="4" y1="4" x2="108" y2="108" '+K+'/><line x1="108" y1="4" x2="4" y2="108" '+K+'/>';
   }
-  return h+'<rect x="'+a+'" y="'+a+'" width="'+m+'" height="'+m+'" fill="none" stroke="#1f2937" stroke-width="3"/></svg>';
+  return h+'<rect x="'+a+'" y="'+a+'" width="'+m+'" height="'+m+'" fill="none" stroke="'+HM.den+'" stroke-width="3"/></svg>';
 }
 /* Số phần BẰNG NHAU của hình (hình 'lech' không phải "một phần mấy" -> 0) */
 function soPhanHinh(ch){ return ch.split(':')[0]==='lech' ? 0 : parseInt(ch.split(':')[1],10); }
@@ -109,13 +109,13 @@ function hinhLech(m){ var w=phanLech(m).map(function(x){ return Math.round(x*100
 
 /* Vật nhỏ vẽ lại (tâm x,y) */
 function vat(loai, x, y){
-  if(loai==='hatde') return '<ellipse cx="'+x+'" cy="'+(y+3)+'" rx="8" ry="9" fill="#b45309"/><ellipse cx="'+x+'" cy="'+(y-4)+'" rx="9.5" ry="5" fill="#78350f"/><rect x="'+(x-1)+'" y="'+(y-12)+'" width="2" height="5" fill="#78350f"/>';
-  if(loai==='caibap') return '<circle cx="'+x+'" cy="'+y+'" r="11" fill="#86efac" stroke="#15803d" stroke-width="1.5"/><circle cx="'+x+'" cy="'+y+'" r="6" fill="#bbf7d0" stroke="#16a34a" stroke-width="1"/><path d="M'+x+' '+(y-10)+' Q'+(x+3)+' '+y+' '+x+' '+(y+10)+'" stroke="#15803d" stroke-width="1.2" fill="none"/>';
-  if(loai==='xalach') return '<ellipse cx="'+x+'" cy="'+(y-1)+'" rx="4.5" ry="11" fill="#a3e635" stroke="#4d7c0f" stroke-width="1.2"/>'
-      +'<ellipse cx="'+(x-6)+'" cy="'+(y+1)+'" rx="4" ry="9.5" fill="#bef264" stroke="#4d7c0f" stroke-width="1.2" transform="rotate(-28 '+(x-6)+' '+(y+1)+')"/>'
-      +'<ellipse cx="'+(x+6)+'" cy="'+(y+1)+'" rx="4" ry="9.5" fill="#bef264" stroke="#4d7c0f" stroke-width="1.2" transform="rotate(28 '+(x+6)+' '+(y+1)+')"/>';
-  if(loai==='tao') return '<circle cx="'+x+'" cy="'+(y+1)+'" r="9" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2"/><rect x="'+(x-0.8)+'" y="'+(y-11)+'" width="1.6" height="5" fill="#78350f"/><ellipse cx="'+(x+4)+'" cy="'+(y-8)+'" rx="4" ry="2" fill="#16a34a"/>';
-  return '<circle cx="'+x+'" cy="'+(y+1)+'" r="9" fill="#fb923c" stroke="#c2410c" stroke-width="1.2"/><ellipse cx="'+(x+3)+'" cy="'+(y-8)+'" rx="4" ry="2" fill="#16a34a"/>';
+  if(loai==='hatde') return '<ellipse data-dem="vat" cx="'+x+'" cy="'+(y+3)+'" rx="8" ry="9" fill="'+HM.go+'"/><ellipse cx="'+x+'" cy="'+(y-4)+'" rx="9.5" ry="5" fill="'+HM.goDam+'"/><rect x="'+(x-1)+'" y="'+(y-12)+'" width="2" height="5" fill="'+HM.goDam+'"/>';
+  if(loai==='caibap') return '<circle data-dem="vat" cx="'+x+'" cy="'+y+'" r="11" fill="'+HM.xanhLa+'" stroke="'+HM.den+'" stroke-opacity=".35" stroke-width="1.5"/><circle cx="'+x+'" cy="'+y+'" r="6" fill="'+HM.la+'"/><path d="M'+x+' '+(y-10)+' Q'+(x+3)+' '+y+' '+x+' '+(y+10)+'" stroke="'+HM.den+'" stroke-opacity=".35" stroke-width="1.2" fill="none"/>';
+  if(loai==='xalach') return '<ellipse data-dem="vat" cx="'+x+'" cy="'+(y-1)+'" rx="4.5" ry="11" fill="'+HM.xanhLa+'" stroke="'+HM.den+'" stroke-opacity=".35" stroke-width="1.2"/>'
+      +'<ellipse cx="'+(x-6)+'" cy="'+(y+1)+'" rx="4" ry="9.5" fill="'+HM.la+'" stroke="'+HM.den+'" stroke-opacity=".35" stroke-width="1.2" transform="rotate(-28 '+(x-6)+' '+(y+1)+')"/>'
+      +'<ellipse cx="'+(x+6)+'" cy="'+(y+1)+'" rx="4" ry="9.5" fill="'+HM.la+'" stroke="'+HM.den+'" stroke-opacity=".35" stroke-width="1.2" transform="rotate(28 '+(x+6)+' '+(y+1)+')"/>';
+  if(loai==='tao') return '<circle data-dem="vat" cx="'+x+'" cy="'+(y+1)+'" r="9" fill="'+HM.do+'" stroke="'+HM.doDam+'" stroke-width="1.2"/><rect x="'+(x-0.8)+'" y="'+(y-11)+'" width="1.6" height="5" fill="'+HM.goDam+'"/><ellipse cx="'+(x+4)+'" cy="'+(y-8)+'" rx="4" ry="2" fill="'+HM.xanhLa+'"/>';
+  return '<circle data-dem="vat" cx="'+x+'" cy="'+(y+1)+'" r="9" fill="'+HM.cam+'" stroke="'+HM.camDam+'" stroke-width="1.2"/><ellipse cx="'+(x+3)+'" cy="'+(y-8)+'" rx="4" ry="2" fill="'+HM.xanhLa+'"/>';
 }
 /* Hình khoanh (HĐ3, LT3): mã 'CHỮ:r:c:h|c:chỉ số:vật' — lưới r hàng × c cột, khoanh 1 hàng (1/r) hoặc 1 cột (1/c) */
 function khoanhPS(ch){ var p=ch.split(':'); return p[3]==='h' ? +p[1] : +p[2]; }
@@ -123,10 +123,10 @@ function khoanhPS(ch){ var p=ch.split(':'); return p[3]==='h' ? +p[1] : +p[2]; }
 function soVatKhoanh(ch){ var p=ch.split(':'); return p[3]==='h' ? +p[2] : +p[1]; }
 function khoanh(ch){
   var p=ch.split(':'), L=p[0], r=+p[1], c=+p[2], md=p[3], k=+p[4], lo=p[5], o=30, pd=9, W=c*o+pd*2, H=r*o+pd*2, h=svgMo(W,H);
-  h+='<rect x="1" y="1" width="'+(W-2)+'" height="'+(H-2)+'" rx="10" fill="#fef9ec" stroke="#a8a29e" stroke-width="1.5"/>';
+  h+='<rect x="1" y="1" width="'+(W-2)+'" height="'+(H-2)+'" rx="10" fill="#F4F4F4" stroke="'+HM.day+'" stroke-width="1.5"/>';
   for(var i=0;i<r;i++) for(var j=0;j<c;j++) h+=vat(lo, pd+j*o+o/2, pd+i*o+o/2);
-  if(md==='h') h+='<rect x="'+(pd+1)+'" y="'+(pd+k*o+1)+'" width="'+(c*o-2)+'" height="'+(o-2)+'" rx="'+((o-2)/2)+'" fill="none" stroke="#dc2626" stroke-width="2.5"/>';
-  else h+='<rect x="'+(pd+k*o+1)+'" y="'+(pd+1)+'" width="'+(o-2)+'" height="'+(r*o-2)+'" rx="'+((o-2)/2)+'" fill="none" stroke="#dc2626" stroke-width="2.5"/>';
+  if(md==='h') h+='<rect x="'+(pd+1)+'" y="'+(pd+k*o+1)+'" width="'+(c*o-2)+'" height="'+(o-2)+'" rx="'+((o-2)/2)+'" fill="none" stroke="'+HM.do+'" stroke-width="2.5"/>';
+  else h+='<rect x="'+(pd+k*o+1)+'" y="'+(pd+1)+'" width="'+(o-2)+'" height="'+(r*o-2)+'" rx="'+((o-2)/2)+'" fill="none" stroke="'+HM.do+'" stroke-width="2.5"/>';
   return '<div class="flex flex-col items-center gap-1">'+h+'</svg><div class="text-lg font-extrabold text-slate-700">'+L+'</div></div>';
 }
 
@@ -308,12 +308,12 @@ var BAI = {
     k = lv<=1 ? rnd(2,3) : rnd(2,5); m = lv<=1 ? rnd(2,4) : rnd(2,6); N=k*m;
     if(lv<=1){   /* như Mẫu: đã chia sẵn thành k nhóm */
       var cc=Math.min(m,3), rr=Math.ceil(m/cc), o=24;
-      for(var g=0;g<k;g++){ var W=cc*o+12, H=rr*o+12, s=svgMo(W,H)+'<rect x="1" y="1" width="'+(W-2)+'" height="'+(H-2)+'" rx="14" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.5"/>';
+      for(var g=0;g<k;g++){ var W=cc*o+12, H=rr*o+12, s=svgMo(W,H)+'<rect x="1" y="1" width="'+(W-2)+'" height="'+(H-2)+'" rx="14" fill="#F4F4F4" stroke="'+HM.troi+'" stroke-width="1.5"/>';
         for(var i=0;i<m;i++) s+=vat(lo, 6+(i%cc)*o+o/2, 6+Math.floor(i/cc)*o+o/2);
         hinh+=s+'</svg>'; }
       hinh='<div class="flex flex-wrap justify-center gap-2 mb-2">'+hinh+'</div>';
     } else {     /* như câu hỏi SGK: quả để rời, bé tự chia */
-      var cols=(N<=6?N:(N%5===0?5:(N%4===0?4:6))), rows=Math.ceil(N/cols), o2=26, W2=cols*o2+12, H2=rows*o2+12, s2=svgMo(W2,H2)+'<rect x="1" y="1" width="'+(W2-2)+'" height="'+(H2-2)+'" rx="12" fill="#fef9ec" stroke="#a8a29e" stroke-width="1.5"/>';
+      var cols=(N<=6?N:(N%5===0?5:(N%4===0?4:6))), rows=Math.ceil(N/cols), o2=26, W2=cols*o2+12, H2=rows*o2+12, s2=svgMo(W2,H2)+'<rect x="1" y="1" width="'+(W2-2)+'" height="'+(H2-2)+'" rx="12" fill="#F4F4F4" stroke="'+HM.day+'" stroke-width="1.5"/>';
       for(var i2=0;i2<N;i2++) s2+=vat(lo, 6+(i2%cols)*o2+o2/2, 6+Math.floor(i2/cols)*o2+o2/2);
       hinh='<div class="flex justify-center mb-2">'+s2+'</svg></div>';
     }
