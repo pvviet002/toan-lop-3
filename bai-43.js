@@ -114,15 +114,15 @@ function canDia(trai, phai, nghieng){
 }
 function docCanNhieu(html){ return String(html).split('<svg ').slice(1).map(function(seg){ var o=[], re=/<rect (?:data-dem="vat" )?data-g="(\d+)" data-s="(\w)" data-k="(\w+)"/g, m, n=/data-nghieng="(\w+)"/.exec(seg); while((m=re.exec(seg))) o.push({g:+m[1], s:m[2], k:m[3]}); return {items:o, nghieng:n ? n[1] : null}; }); }
 function tongBen(o, s){ var t=0; o.forEach(function(d){ if(d.s===s) t+=d.g; }); return t; }
-function gapKhuc(ds){
+function gapKhuc(ds, dv){ dv=dv||'cm';
   var tong=ds.reduce(function(x,y){ return x+y; },0), nho=Math.min.apply(null, ds), sc=Math.min(22, 300/tong), P=[[0,0]], i, ang=[-0.45, 0.35, -0.3];
   for(i=0;i<ds.length;i++){ var L=ds[i]*sc, a=ang[i%3], p=P[P.length-1]; P.push([p[0]+L*Math.cos(a), p[1]+L*Math.sin(a)]); }
   var minY=Math.min.apply(null, P.map(function(p){ return p[1]; })), maxY=Math.max.apply(null, P.map(function(p){ return p[1]; })), PX=40, PT=46, PB=46, W=Math.round(P[P.length-1][0]+2*PX), H=Math.round(maxY-minY+PT+PB), ox=PX, oy=PT-minY, s=svgX(W,H), TEN='ABCDE';
   var Q=P.map(function(p){ return [p[0]+ox, p[1]+oy]; });
   s+='<path d="M'+Q.map(function(p){ return p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' L')+'" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>';
-  Q.forEach(function(p,j){ s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.5" fill="none" stroke="currentColor" stroke-width="6"/>'; var up = (j===0) ? false : (ang[(j-1)%3]<0), tx = j===0 ? p[0]-22 : (j===Q.length-1 ? p[0]+22 : p[0]), ty = (j===0 || j===Q.length-1) ? p[1]+8 : (up ? p[1]-14 : p[1]+28); s+='<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="middle" font-size="22" '+HFONT+' fill="currentColor">'+TEN.charAt(j)+'</text>'; });
+  Q.forEach(function(p,j){ s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.5" fill="none" stroke="currentColor" stroke-width="6"/>'; var up = (j===0) ? false : (ang[(j-1)%3]<0), tx = j===0 ? p[0]-22 : (j===Q.length-1 ? p[0]+22 : p[0]-16), ty = (j===0 || j===Q.length-1) ? p[1]+8 : (up ? p[1]-14 : p[1]+28); s+='<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="middle" font-size="22" '+HFONT+' fill="currentColor">'+TEN.charAt(j)+'</text>'; });
   for(i=0;i<ds.length;i++){ var mx=(Q[i][0]+Q[i+1][0])/2, my=(Q[i][1]+Q[i+1][1])/2, up2=ang[i%3]<0, lx=mx, ly = up2 ? my+24 : my-24;
-    s+='<g data-seg="'+i+'" data-cm="'+ds[i]+'">'+nhanVien(+lx.toFixed(1), +ly.toFixed(1), String(ds[i]).length*12+44, 30, ds[i]+' cm', 18)+'</g>'; }
+    s+='<g data-seg="'+i+'" data-cm="'+ds[i]+'">'+nhanVien(+lx.toFixed(1), +ly.toFixed(1), String(ds[i]).length*12+44, 30, ds[i]+' '+dv, 18)+'</g>'; }
   return khungHinh(s);
 }
 function docGK(s){ var o=[], re=/data-seg="(\d+)" data-cm="(\d+)"/g, m; while((m=re.exec(String(s)))) o.push(+m[2]); return o; }
@@ -250,7 +250,7 @@ var BAI = {
    muc:['Đường gấp khúc ba đoạn bằng nhau.', 'Cân đĩa: hai quả cân một bên, vật và một quả cân bên kia.', 'Cân với ba quả cân; đường gấp khúc bốn đoạn.'],
    make:function(lv){
     if(lv<=1 || (lv===3 && Math.random()<0.5)){ var n = lv===3 ? 4 : 3, d=pick([28,25,30,32,35,24]), ds=[], i; for(i=0;i<n;i++) ds.push(d); var T=d*n;
-      return {type:'num', _lv:lv, _kieu:'gk', _ds:ds, q:gapKhuc(ds)+'<div>Đường gấp khúc '+'ABCDE'.slice(0,n+1)+' có '+n+' đoạn thẳng bằng nhau, mỗi đoạn dài <b>'+d+' mm</b>. Đường gấp khúc dài bao nhiêu mi-li-mét?</div>', ans:T, unit:'mm', sai:nhanSai([[d+n,'cong-thay-nhan'],[d*(n-1),'dem-sot'],[T+10,'nham-bang'],[d,'thieu-buoc']], T), goiY:gy({'dem-sot':'Đường gấp khúc có '+n+' đoạn: '+d+' × '+n+'.'})}; }
+      return {type:'num', _lv:lv, _kieu:'gk', _ds:ds, q:gapKhuc(ds,'mm')+'<div>Đường gấp khúc '+'ABCDE'.slice(0,n+1)+' có '+n+' đoạn thẳng bằng nhau, mỗi đoạn dài <b>'+d+' mm</b>. Đường gấp khúc dài bao nhiêu mi-li-mét?</div>', ans:T, unit:'mm', sai:nhanSai([[d+n,'cong-thay-nhan'],[d*(n-1),'dem-sot'],[T+10,'nham-bang'],[d,'thieu-buoc']], T), goiY:gy({'dem-sot':'Đường gấp khúc có '+n+' đoạn: '+d+' × '+n+'.'})}; }
     var P=[100,200,500,50], tl=[], tp=[], L, R, vat, g=0, ten=pick(['Quả bưởi','Quả dưa','Túi gạo','Hộp bánh']);
     do{ g++; tl=[pick(P),pick(P)]; if(lv===3 && Math.random()<0.5) tl.push(pick(P)); tp=[pick(P)]; L=tl.reduce(function(a,b){ return a+b; },0); R=tp[0]; vat=L-R; }while(g<300 && (vat<=0 || vat>999 || L>999));
     var trai=tl.map(function(x){ return {g:x,k:'can'}; }), phai=[{g:vat,k:'goi',an:true}].concat(tp.map(function(x){ return {g:x,k:'can'}; }));
