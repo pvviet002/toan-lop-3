@@ -47,15 +47,15 @@ function theTinh(ds){
 function docThe(s){ var o=[], re=/<span class="inline-block px-3 py-2[^>]*>([^<]*)<\/span>/g, m; while((m=re.exec(String(s)))) o.push(m[1]); return o; }
 
 function soDoGT(nut, cua){
-  var nhieu=nut.length>=3, ml=0, D=nhieu?48:56, A,  W, s, x=4, i; var dong=function(c){ var m=/^(.+?) (đơn vị)$/.exec(c); return m ? [m[1], m[2]] : [c]; }; cua.forEach(function(c){ dong(c).forEach(function(d){ ml=Math.max(ml, d.length); }); }); A=Math.max(nhieu?108:128, Math.ceil(ml*8.8)+8); W=nut.length*D+(nut.length-1)*A+8; s=svgX(W,76);
+  var nhieu=nut.length>=3, ml=0, D=nhieu?48:56, A,  W, s, x=4, i; var dong=function(c){ var m=/^(.+?) (đơn vị)$/.exec(c); return m ? [m[1], m[2]] : [c]; }; cua.forEach(function(c){ dong(c).forEach(function(d){ ml=Math.max(ml, d.length); }); }); A=Math.max(nhieu?108:128, Math.ceil(ml*8.8)+8); W=nut.length*D+(nut.length-1)*A+8; s=svgX(W,92);
   for(i=0;i<nut.length;i++){
     var v=nut[i].v, hoi=(v===null || v===undefined), trong=(v===''), cx=x+D/2;
-    if(trong) s+='<circle cx="'+cx+'" cy="46" r="'+(D/2-1.5)+'" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="5 4" opacity=".55"/>';
-    else s+='<circle cx="'+cx+'" cy="46" r="'+(D/2-1.5)+'" fill="'+(hoi ? '#fff' : HM.vang)+'"'+(hoi ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '')+'/>'+chuSo(cx, 46, hoi ? '?' : v, hoi ? 24 : (String(v).length>2 ? 18 : 22));
+    if(trong) s+='<circle cx="'+cx+'" cy="62" r="'+(D/2-1.5)+'" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="5 4" opacity=".55"/>';
+    else s+='<circle cx="'+cx+'" cy="62" r="'+(D/2-1.5)+'" fill="'+(hoi ? '#fff' : HM.vang)+'"'+(hoi ? ' stroke="'+HM.vangDam+'" stroke-width="3"' : '')+'/>'+chuSo(cx, 62, hoi ? '?' : v, hoi ? 24 : (String(v).length>2 ? 18 : 22));
     x+=D;
     if(i<cua.length){
-      var ls=dong(cua[i]); s+=ls.map(function(t,j){ return '<text x="'+(x+A/2)+'" y="'+(ls.length>1 ? 17+j*21 : 30)+'" text-anchor="middle" font-size="17" '+HFONT+' fill="currentColor">'+t+'</text>'; }).join('')
-       +'<path d="M'+(x+8)+' 46 H'+(x+A-8)+' M'+(x+A-15)+' 40 L'+(x+A-8)+' 46 L'+(x+A-15)+' 52" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>';
+      var ls=dong(cua[i]); s+=ls.map(function(t,j){ return '<text x="'+(x+A/2)+'" y="'+(ls.length>1 ? 22+j*24 : 42)+'" text-anchor="middle" font-size="17" '+HFONT+' fill="currentColor">'+t+'</text>'; }).join('')
+       +'<path d="M'+(x+8)+' 62 H'+(x+A-8)+' M'+(x+A-15)+' 56 L'+(x+A-8)+' 62 L'+(x+A-15)+' 68" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>';
       x+=A;
     }
   }

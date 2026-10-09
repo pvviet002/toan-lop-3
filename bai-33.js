@@ -79,7 +79,7 @@ var BAI = {
     var v=shuffle([['Cốc A','nước nóng',3],['Chai B','nước nguội (nước thường)',2],['Cốc C','nước đá',1]]), ch, dung, sai={}, cau, tag='nham-cao-thap';
     var lead='<div>'+v.map(function(x){ return x[0]+' đựng '+x[1]; }).join('. ')+'.</div>';
     if(lv<=1){ var nong=Math.random()<0.5; cau = nong ? 'Cốc hoặc chai nào có nước nóng nhất?' : 'Cốc hoặc chai nào có nước lạnh nhất?'; ch=v.map(function(x){ return x[0]; }); var best=v.slice().sort(function(a,b){ return nong ? b[2]-a[2] : a[2]-b[2]; })[0]; dung=best[0]; }
-    else if(lv===2){ var p=shuffle(v.slice()).slice(0,2), a=p[0], b=p[1]; ch=['nóng hơn','lạnh hơn']; dung = a[2]>b[2] ? 'nóng hơn' : 'lạnh hơn'; cau='Nước ở '+a[0].toLowerCase()+' nóng hơn hay lạnh hơn nước ở '+b[0].toLowerCase()+'?'; lead='<div>'+a[0]+' đựng '+a[1]+'. '+b[0]+' đựng '+b[1]+'.</div>'; }
+    else if(lv===2){ var p=shuffle(v.slice()).slice(0,2), a=p[0], b=p[1]; ch=['nóng hơn','lạnh hơn']; dung = a[2]>b[2] ? 'nóng hơn' : 'lạnh hơn'; cau='Nước ở '+a[0].charAt(0).toLowerCase()+a[0].slice(1)+' nóng hơn hay lạnh hơn nước ở '+b[0].charAt(0).toLowerCase()+b[0].slice(1)+'?'; lead='<div>'+a[0]+' đựng '+a[1]+'. '+b[0]+' đựng '+b[1]+'.</div>'; }
     else { var ord=function(arr){ return arr.slice().sort(function(a,b){ return a[2]-b[2]; }).map(function(x){ return x[0]; }).join(', '); };
       var perms=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]].map(function(p){ return p.map(function(i){ return v[i]; }).map(function(x){ return x[0]; }).join(', '); });
       ch=shuffle(perms).slice(0,4); dung=ord(v); if(ch.indexOf(dung)<0) ch[0]=dung; ch=shuffle(ch); cau='Xếp từ lạnh nhất đến nóng nhất:'; }
@@ -126,7 +126,7 @@ var BAI = {
     if(lv===2){ var ch=[ten[0],ten[1]], dung = ta>tb ? ten[0] : ten[1], sai={}; sai[String(1-ch.indexOf(dung))]='nham-cao-thap';
       return {type:'mcq', cot:1, _lv:2, _ta:ta, _tb:tb, _ten:ten, _dung:dung, q:cap(ten[0])+fig+cap(ten[1])+fig2+'<div>Bác sĩ đo nhiệt độ cơ thể hai bạn. Bạn nào có nhiệt độ cao hơn?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai, goiY:gy()}; }
     var e=Math.abs(ta-tb);
-    return {type:'num', _lv:3, _ta:ta, _tb:tb, q:cap(ten[0])+fig+cap(ten[1])+fig2+'<div>Bác sĩ đo nhiệt độ cơ thể hai bạn. Nhiệt độ cao hơn cao hơn nhiệt độ kia bao nhiêu độ C?</div>', ans:e, unit:'°C', sai:nhanSai([[ta+tb,'chon-sai-phep'],[Math.max(ta,tb),'thieu-buoc'],[e+1,'nham-bang']], e), goiY:gy()};
+    return {type:'num', _lv:3, _ta:ta, _tb:tb, q:cap(ten[0])+fig+cap(ten[1])+fig2+'<div>Bác sĩ đo nhiệt độ cơ thể hai bạn. Nhiệt độ cơ thể của hai bạn chênh nhau bao nhiêu độ C?</div>', ans:e, unit:'°C', sai:nhanSai([[ta+tb,'chon-sai-phep'],[Math.max(ta,tb),'thieu-buoc'],[e+1,'nham-bang']], e), goiY:gy()};
   }, check:function(q){
     if(q._lv<=1){ var d=docNhiet(q.q); return !!d && d.lo===35 && d.hi===42 && d.vach===8 && d.t===q._t && q.ans===d.t; }
     var o=docNhietNhieu(q.q); if(o.length!==2 || o[0].t!==q._ta || o[1].t!==q._tb || o.some(function(x){ return x.lo!==35 || x.hi!==42; }) || q._ta===q._tb) return false;
@@ -137,15 +137,16 @@ var BAI = {
   {name:'Nhiệt độ các nơi', sec:'Hoạt động 1 — Buổi sáng: Hà Nội 30 °C, Lào Cai 26 °C, Sa Pa 10 °C', mt:['MT3'], levels:3,
    muc:['Hai nơi: nơi nào có nhiệt độ cao hơn.', 'Ba nơi: nơi nào có nhiệt độ thấp nhất.', 'Một nơi cao hơn nơi khác bao nhiêu độ.'],
    make:function(lv){
-    var nơi=shuffle(['Hà Nội','Lào Cai','Sa Pa','Huế','Đà Lạt','Hải Phòng']).slice(0,3), tt=shuffle([10,12,15,18,20,24,26,28,30,32,34]).slice(0,3).sort(function(a,b){ return b-a; }), rows=[], i;
-    nơi=shuffle(nơi); for(i=0;i<3;i++) rows.push([nơi[i], tt[i]]);
+    var DK={'Hà Nội':[15,34],'Lào Cai':[12,28],'Sa Pa':[8,20],'Huế':[15,34],'Đà Lạt':[14,24],'Hải Phòng':[15,34]};   /* nhiệt độ buổi sáng hợp thực tế theo từng nơi */
+    var nơi=shuffle(Object.keys(DK)).slice(0,3), rows=[], i;
+    do { rows=nơi.map(function(n){ return [n, rnd(DK[n][0], DK[n][1])]; }); } while(rows[0][1]===rows[1][1] || rows[0][1]===rows[2][1] || rows[1][1]===rows[2][1]);
     var lead='<div class="text-slate-600">Nhiệt độ không khí buổi sáng:</div>'+tenBang(rows), ch, dung, cau, sai={}, ans;
     if(lv<=1){ var p=shuffle(rows.slice()).slice(0,2), cao=Math.random()<0.5; ch=[p[0][0],p[1][0]]; var best=p[0][1]>p[1][1] ? p[0] : p[1], low=p[0][1]>p[1][1] ? p[1] : p[0]; dung = cao ? best[0] : low[0]; cau='Hỏi '+p[0][0]+' và '+p[1][0]+', nơi nào có nhiệt độ '+(cao ? 'cao hơn' : 'thấp hơn')+'?';
       ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='nham-cao-thap'; });
       return {type:'mcq', cot:1, _lv:1, _rows:rows, _p:[p[0][0],p[1][0]], _cao:cao, _dung:dung, q:lead+'<div>'+cau+'</div>', choices:ch, correct:ch.indexOf(dung), sai:sai, goiY:gy()}; }
     if(lv===2){ ch=rows.map(function(r){ return r[0]; }); dung=rows.slice().sort(function(a,b){ return a[1]-b[1]; })[0][0]; ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='nham-cao-thap'; });
       return {type:'mcq', cot:1, _lv:2, _rows:rows, _dung:dung, q:lead+'<div>Hỏi nơi nào có nhiệt độ thấp nhất?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai, goiY:gy()}; }
-    var hi=rows[0], lo=rows[2]; ans=hi[1]-lo[1];
+    var srt=rows.slice().sort(function(a,b){ return b[1]-a[1]; }), hi=srt[0], lo=srt[2]; ans=hi[1]-lo[1];
     return {type:'num', _lv:3, _rows:rows, q:lead+'<div>Hỏi '+hi[0]+' có nhiệt độ cao hơn '+lo[0]+' bao nhiêu độ C?</div>', ans:ans, unit:'°C', sai:nhanSai([[hi[1]+lo[1],'chon-sai-phep'],[hi[1],'thieu-buoc'],[lo[1],'thieu-buoc'],[ans+1,'nham-bang']], ans), goiY:gy()};
   }, check:function(q){
     var r=docBang(q.q); if(r.length!==3 || r.map(function(x){ return x[0]; }).join()!==q._rows.map(function(x){ return x[0]; }).join() || r.map(function(x){ return x[1]; }).join()!==q._rows.map(function(x){ return x[1]; }).join()) return false;
