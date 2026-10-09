@@ -281,7 +281,7 @@ var BAI = {
       return {type:'num', _lv:1, _bt:t, q:'<div>'+vat[2]+' có <b>'+h+' '+vat[0]+'</b>, mỗi '+vat[0].split(' ')[0]+' có <b>'+moi+' '+vat[1]+'</b>. '+vat[2]+' cho '+vat[3]+' <b>'+cho+' '+vat[0].split(' ')[0]+'</b>. '+vat[2]+' còn lại bao nhiêu '+vat[1]+'?</div><div class="text-base text-slate-500">Biểu thức: '+t+'</div>', ans:T, unit:vat[1].split(' ')[0], sai:nhanSai([[tinhBoNgoac(t),'bo-ngoac'],[h-cho,'thieu-buoc'],[moi*h,'thieu-buoc'],[T+moi,'nham-bang']], T), goiY:gy({'thieu-buoc':'Bước 1: còn '+h+' − '+cho+' '+vat[0].split(' ')[0]+'. Bước 2: nhân với '+moi+'.'})}; }
     if(lv===2){ var c=10*rnd(2,8), b=100-c, a=rnd(21,99), g=0; while(g<50 && (a%10===0 || (a+b)%10===0)){ g++; a=rnd(21,99); } var tron=a+' + ('+b+' + '+c+')', khac='('+a+' + '+b+') + '+c, ch=shuffle([tron, khac]), sai={}; sai[String(ch.indexOf(khac))]='nham-bang';
       return {type:'mcq', cot:1, _lv:2, _a:a, _b:b, _c:c, _dung:tron, q:'<div>Ba thùng nước mắm có <b>'+a+' l</b>, <b>'+b+' l</b> và <b>'+c+' l</b>. Cả ba thùng có '+a+' + '+b+' + '+c+' lít. Cách ghép nào tính <b>thuận tiện hơn</b>?</div>', choices:ch, correct:ch.indexOf(tron), sai:sai, goiY:gy({'nham-bang':b+' + '+c+' = 100 là số tròn trăm, cộng tiếp với '+a+' rất dễ.'})}; }
-    if(Math.random()<0.5){ var c3=10*rnd(1,9), b3=pick([100,10*rnd(1,9)]), g3=0; while(g3<20 && b3+c3!==100 && (b3+c3)%10!==0){ g3++; b3=10*rnd(1,9); } var a3=rnd(101,500), T3=a3+b3+c3; while(T3>999){ a3-=100; T3=a3+b3+c3; }
+    if(Math.random()<0.5){ var tron=pick([100,100,200]), b3=rnd(11,tron-11), c3=tron-b3, a3=rnd(101,500), T3=a3+b3+c3; while(b3%10===0){ b3=rnd(11,tron-11); c3=tron-b3; T3=a3+b3+c3; } while(T3>999){ a3-=100; T3=a3+b3+c3; }
       return {type:'num', _lv:3, _bt:a3+' + '+b3+' + '+c3, q:kyHieu('Tính thuận tiện', a3+' + '+b3+' + '+c3+' ='+oHoi())+'<div class="text-base text-slate-500">Gợi ý: ghép hai số có tổng là số tròn chục hoặc tròn trăm.</div>', ans:T3, sai:nhanSai([[a3+b3,'thieu-buoc'],[T3+10,'nham-bang'],[T3-10,'nham-bang'],[T3+100,'nham-bang']], T3), goiY:gy({'thieu-buoc':'Ghép '+b3+' + '+c3+' = '+(b3+c3)+' rồi cộng với '+a3+'.'})}; }
     var t4, T4, x, trong, m2, m3, ngoai, g4;
     for(g4=0;g4<300;g4++){ t4=btNgoac(); T4=tinhBT2(t4); x=tinhBoNgoac(t4); trong=/\(([^()]+)\)/.exec(t4)[1]; m2=/^(\d+) ([+−×:]) \((\d+) ([+−]) (\d+)\)$/.exec(t4); m3=/^\((\d+) ([+−]) (\d+)\) ([+−×:]) (\d+)$/.exec(t4); ngoai = m2 ? m2[1]+' '+m2[2]+' '+m2[3] : m3[3]+' '+m3[4]+' '+m3[5]; if(okSo(x) && okSo(tinhBT(ngoai)) && x!==T4) break; }
@@ -291,7 +291,7 @@ var BAI = {
   }, check:function(q){
     if(q._lv<=1){ var m=/^(\d+) × \((\d+) − (\d+)\)$/.exec(q._bt); return !!m && q.ans===(+m[1])*((+m[2])-(+m[3])) && q.ans>0; }
     if(q._lv===2) return kiemMCQ(q) && q.choices.length===2 && q._b+q._c===100 && q._dung===q._a+' + ('+q._b+' + '+q._c+')' && tinhBT2(q.choices[0])===tinhBT2(q.choices[1]);
-    if(q.type==='num'){ var p=q._bt.split(' + ').map(Number); return p.length===3 && q.ans===p[0]+p[1]+p[2] && (p[1]+p[2])%10===0 && q.ans<=999; }
+    if(q.type==='num'){ var p=q._bt.split(' + ').map(Number); return p.length===3 && q.ans===p[0]+p[1]+p[2] && (p[1]+p[2]===100 || p[1]+p[2]===200) && q.ans<=999; }
     return okBuoc(q._bt) && q._x===tinhBoNgoac(q._bt) && q._x!==tinhBT2(q._bt) && q.choices.length===2 && q.choices.every(okEq) && kiemMCQ(q) && /^Không đồng ý/.test(q._dung); }}
  ]
 };

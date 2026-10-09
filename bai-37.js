@@ -273,10 +273,10 @@ var BAI = {
     if(lv<=2){ var n = lv<=1 ? 3 : rnd(2,4), e = lv<=1 ? 125 : rnd(50, Math.floor(999/n)), T=n*e, ch=shuffle([e, e-10, e+10, e+5]).filter(function(x,i,a){ return a.indexOf(x)===i && x>0; }).slice(0,3); if(ch.indexOf(e)<0) ch[0]=e; ch=shuffle(ch); ch=ch.map(String);
       var dung=String(e), sai={}; ch.forEach(function(c,i){ if(c!==dung) sai[String(i)]='nham-bang'; });
       return {type:'mcq', cot:1, _lv:lv, _n:n, _e:e, _dung:dung, q:'<div>Mỗi phi tiêu trúng vòng vàng được số điểm như nhau. Bạn Mai ném <b>'+n+' phi tiêu</b> trúng vòng vàng, được <b>'+T+' điểm</b>. Bạn Việt ném <b>1 phi tiêu</b> trúng vòng vàng. Việt được bao nhiêu điểm?</div>', choices:ch, correct:ch.indexOf(dung), sai:sai, goiY:gy({'nham-bang':'Một phi tiêu được '+T+' : '+n+' điểm. Bé chia rồi so với các đáp án.'})}; }
-    var mot=rnd(5,40), hai=rnd(20,300), tong=mot+2*hai; while(tong>999){ hai-=10; tong=mot+2*hai; }
+    var mot=rnd(5,30), hai=rnd(10,55), tong=mot+2*hai;
     return {type:'num', _lv:3, _mot:mot, _hai:hai, q:'<div>Trang trại có <b>'+mot+' con lạc đà một bướu</b>, còn lại là lạc đà hai bướu. Đếm tất cả có <b>'+tong+' cái bướu</b>. Trang trại có bao nhiêu con lạc đà hai bướu?</div>', ans:hai, unit:'con', sai:nhanSai([[tong-mot,'thieu-buoc'],[Math.floor(tong/2),'thieu-buoc'],[hai+1,'nham-bang'],[hai-1,'nham-bang'],[tong-mot*2,'chon-sai-phep']], hai), goiY:gy({'thieu-buoc':'Bước 1: số bướu của lạc đà hai bướu là '+tong+' − '+mot+' = '+(tong-mot)+'. Bước 2: mỗi con có 2 bướu nên chia cho 2.'})};
   }, check:function(q){ if(q._lv<=2) return kiemMCQ(q) && q.choices.length===3 && +q._dung===q._e && q._n*q._e<=999 && (q._lv<=1 ? q._n===3 && q._e===125 : true);
-    var tong=q._mot+2*q._hai; return tong<=999 && q.ans===q._hai && (tong-q._mot)%2===0; }},
+    var tong=q._mot+2*q._hai; return tong<=150 && q.ans===q._hai && (tong-q._mot)%2===0; }},
 
   /* D11 — Phép chia đúng hay sai (Hoạt động 3 trang 2 + mở rộng) */
   {name:'Phép chia đúng hay sai', sec:'Hoạt động 3 — Đ, S?: 216 : 7 = 30 (dư 6) Đ; 808 : 8 = 11 S (đúng là 101); 423 : 6 = 7 (dư 3) S (đúng là 70 dư 3)', mt:['MT4'], levels:3,
