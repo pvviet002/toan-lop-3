@@ -36,15 +36,15 @@ Tham số engine: `goal:10, soCau:18, soCauToiDa:24`. 4 mục tiêu × tối thi
 
 | # | Dạng | Nguồn | MT | Mức 1 / Mức 2 / Mức 3 | Hình | Nhãn lỗi chính |
 |---|---|---|---|---|---|---|
-| D1 | Đọc ca đong | SGK (Khám phá) | MT2 | M1: mức nước 500 ml: đọc (vạch có nhãn) · M2: mức nước ở vạch 250, 750 · M3: mức nước giữa hai vạch nhãn (đếm vạch nhỏ 100 ml) | **hình mới** `caDong` (ca có vạch, mức nước) | `nham-bang`, `nham-ml-l` |
-| D2 | Nửa ca và một lít | SGK (Khám phá) | MT1 | M1: ca đầy là 1 l = ? ml · M2: 500 ml là nửa ca; hai ca 500 ml đầy mấy lít · M3: 1 l gồm mấy ca 250 ml (đếm 4 ca) | `caDong`, chữ | `nham-boi`, `dem-sot-phep` |
+| D1 | Đọc ca đong | SGK (Khám phá) | MT2 | M1: mức nước 500 ml: đọc (vạch có nhãn) · M2: đếm vạch 100 ml từ đáy ca (100 đến 400 ml) · M3: mức nước trên nhãn 500 ml, đếm khoảng vạch tiếp theo (600 đến 900 ml) | **hình mới** `caDong` (ca có vạch, mức nước) | `nham-bang`, `nham-ml-l` |
+| D2 | Nửa ca và một lít | SGK (Khám phá) | MT1 | M1: ca đầy là 1 l = ? ml · M2: 500 ml là nửa ca; hai ca 500 ml đầy mấy lít · M3: 1 l gồm mấy ca 100 ml (đếm 10 ca trong hình) | `caDong`, chữ | `nham-boi`, `dem-sot-phep` |
 | D3 | Đổi l và ml | SGK (Khám phá) | MT1 | M1: 1 l = ? ml · M2: 2 l = ? ml; 3 000 ml = ? l · M3: 5 l = ? ml; 7 000 ml = ? l | chữ | `nham-boi`, `quen-doi` |
 | D4 | Ba ca vào bình | SGK (Hoạt động 1) | MT2 | M1: hai ca (500 ml + 200 ml) · M2: ba ca (500 + 200 + 300 = 1 000) · M3: ba ca khác số; bình chứa 1 l còn thiếu bao nhiêu | `caDong` (ba ca cạnh nhau) | `thieu-buoc`, `tra-loi-sai-buoc` |
 | D5 | Phích nước | SGK (Hoạt động 2) | MT4 | M1: phích 1 000 ml, rót 200 ml: còn bao nhiêu · M2: rót ba lần (200 + 200 + 100): còn 500 ml (hai bước) · M3: số khác (rót 150 + 250 + 100) | chữ, `caDong` | `chon-sai-phep`, `thieu-buoc` |
 | D6 | Tính với ml | SGK (Luyện tập 1) | MT3 | M1: 100 ml + 20 ml; 8 ml × 4 · M2: 120 ml − 20 ml; 12 ml × 3 · M3: số lớn (386 ml + 214 ml; 25 ml × 3; 96 ml : 4) | chữ | `nham-bang`, `cong-thay-nhan` |
 | D7 | Chai dầu ăn | SGK (Luyện tập 2) | MT4 | M1: chai 750 ml, còn 350 ml: đã dùng bao nhiêu (hình hai mức) · M2: số khác (900 ml, còn 450 ml) · M3: biết đã dùng, tìm còn lại; chọn phép tính | `caDong` hoặc chai (hai mức nước) | `chon-sai-phep`, `dao-vai` |
 | D8 | Gấp và giảm số đo | **không có trong SGK** | MT3 | M1: 12 ml gấp 3 lần · M2: 96 ml giảm 4 lần; phép nào cho kết quả 60 ml (chọn một) · M3: trong tám thẻ, có mấy thẻ cho kết quả 60 ml | `theTinh` (chép từ bài 24) | `nham-gap-them`, `nham-chieu`, `dem-sot-phep` |
-| D9 | Chọn ml hay l | **không có trong SGK** | MT1 | M1: thìa thuốc ho 5 … (ml / l) · M2: chai nước, bình nước, bể bơi · M3: so sánh 800 ml với 1 l (cùng đơn vị) | chữ | `nham-ml-l`, `quen-doi` |
+| D9 | Chọn ml hay l | **không có trong SGK** | MT1 | M1: thìa thuốc ho 5 … (ml / l) · M2: chai nước, bình nước, xô nước, ly nước, nồi canh · M3: so sánh 800 ml với 1 l (cùng đơn vị) | chữ | `nham-ml-l`, `quen-doi` |
 | D10 | Bạn nói đúng hay sai | **không có trong SGK** | MT4 | M1: Đúng / Sai: "1 l = 1 000 ml" · M2: "Bạn An nói: 200 ml nhiều hơn 2 l" (em thấy thế nào) · M3: "Bạn An nói: 3 l = 300 ml" với "Đồng ý, vì… / Không đồng ý, vì…" | `anh('boy')` | `nham-ml-l`, `nham-boi` |
 
 Dạng không có trong SGK: **Gấp và giảm số đo (D8)**, **Chọn ml hay l (D9)**, **Bạn nói đúng hay sai (D10)** (3 dạng). Bảy dạng còn lại bám các mục của sách.
@@ -66,7 +66,7 @@ Theo quy chuẩn `sk-ve-hinh-tieuhoc`: bảng màu `HM`, `svgHinh`, `nhanTron` /
 
 | Hàm | Mô tả | Tham số | Kiểm do mã |
 |---|---|---|---|
-| `caDong(ml, tuy)` | Một ca đong cao (hình chữ nhật bo góc, có quai), vạch chia đều cạnh trái (dài mỗi 250 ml, ngắn mỗi 50 ml hoặc 100 ml), nhãn số ở vạch dài (0, 250, 500, 750, 1 000 ml hoặc "1 l"); mức nước màu `HM.troi` tới đúng độ cao ứng với `ml`. `tuy.nhan` = chữ dưới ca ("Ca 1"). | ml (bội số 50), tuỳ chọn | `check()` đọc `data-ml` của mức nước, độ cao tính ra từ `ml`. |
+| `caDong(ml, tuy)` | Một ca đong cao (hình chữ nhật bo góc, có quai), vạch chia đều cạnh trái (dài mỗi 250 ml, ngắn mỗi 50 ml hoặc 100 ml), nhãn số ở vạch dài (500 và "1 l"); mức nước màu `HM.troi` tới đúng độ cao ứng với `ml`. `tuy.nhan` = chữ dưới ca ("Ca 1"). | ml (bội số 100), cap, tên | `check()` đọc `data-ml` của mức nước, độ cao tính ra từ `ml`. |
 | `hangCa(ds)` | Nhiều ca đong cạnh nhau (tối đa 3), mỗi ca là một `caDong` thu nhỏ trong cùng một SVG; nhãn tên ca dưới mỗi ca. | ds = danh sách ml | `check()` đọc `data-ml` từng ca; tổng khớp đáp. |
 | `theTinh(ds)` (chép từ `bai-24.js`) | Dãy thẻ phép tính. | ds | tính lại từng thẻ. |
 
@@ -88,7 +88,7 @@ Hình dùng lại từ `figures.js`: `anh`, `oHoi`, `svgHinh`, `HM`, `nhanVien`,
 ## 5. Rủi ro đã biết
 
 1. **Ca đong:** mức nước phải đúng độ cao theo ml, nhãn số ≥ 14px ở 375px; ba ca cạnh nhau (D4) có thể chật: mỗi ca rộng ≥ 70 đơn vị khung, chỉ nhãn vạch dài; không để chữ đè quai ca hoặc đè mức nước.
-2. **Đọc giữa hai vạch (D1 mức 3):** chỉ dùng ml bội số 50 và vạch nhỏ đủ rõ; đáp án nhiễu cách ít nhất 50 ml.
+2. **Đọc mức nước (D1):** mức nước chỉ ở bội của 100 ml; đáp án nhiễu cách ít nhất 100 ml.
 3. **Chai dầu (D7):** dùng ca đong hai mức (lúc đầu, lúc sau) thay cho chai nếu không vẽ chuẩn; không vẽ vật thật gây hiểu sai.
 4. **Phích nước (D5):** chỉ chữ và số, không vẽ phích; rót ra nhiều lần là phép trừ liên tiếp, kết quả không âm.
 5. **Số lớn:** viết "1 000"; `check()` kiểm kết quả ≤ 1 000.
