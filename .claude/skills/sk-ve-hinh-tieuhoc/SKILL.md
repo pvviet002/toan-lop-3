@@ -37,7 +37,7 @@ Từ 02/10/2026 skill có **ba lớp kiểm**, mỗi lớp bắt một loại l�
 
 Hai lớp đầu đã thử cài lỗi cố ý và bắt đủ: bọ rùa thiếu chấm, quả cam chạm nhau, nhãn xe tải hẹp làm chữ tràn, hạt dãy số đè nhau. `dang_web.mjs` (skill sk-web-toan-tieuhoc) chạy lớp 1 + 2 trước khi commit; có lỗi thì **không đưa lên**.
 
-Trạng thái: bài 9–12 đã chuẩn hoá. Bài 13, 14 chưa vẽ lại, có tên trong `assets/chua_chuan.txt` nên lỗi hình ở đó chỉ bị cảnh báo. **Vẽ xong bài nào thì xoá tên bài đó khỏi file.**
+Trạng thái: bài 9–14 đã chuẩn hoá (bài 13, 14 đưa về bảng màu HM ngày 09/10/2026); `assets/chua_chuan.txt` hiện trống. Bài nào chưa vẽ lại thì ghi tên vào file để lỗi hình ở đó chỉ bị cảnh báo. **Vẽ xong bài nào thì xoá tên bài đó khỏi file.**
 
 ## Chọn đúng nguồn hình
 
