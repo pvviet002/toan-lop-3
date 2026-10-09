@@ -140,6 +140,10 @@ Trạng thái: bài 9–12 đã chuẩn hoá. Bài 13, 14 chưa vẽ lại, có 
 - **Nhãn đặt sát mép khung SVG** (bài 19 D9, 09/10/2026: nhãn tên đoạn cắt phía trên tờ giấy, đáy chữ sát mép `viewBox`;
   Windows báo 15 lần "chữ TRÀN khỏi hình", Linux 0 lần vì font thấp hơn).
   → Nhãn ở rìa khung chừa lề ≥ 1,3 lần cỡ chữ; đừng đặt đáy chữ ngay sát mép `viewBox`. Lỗi này chỉ lộ trên máy thầy.
+- **Chữ hai dòng và số trong nhãn trắng** (bài 29, 09/10/2026: cửa "thêm 4 / đơn vị" hai dòng cách 21 đơn vị, cỡ 17; số trong
+  nhãn trắng cao 24, cỡ 18; Windows báo 168 lỗi "ĐÈ chữ", "TRÀN khỏi hình", "TRÀN khỏi nhãn trắng", Linux 0 lỗi).
+  → Hai dòng chữ cách nhau ≥ 1,4 lần cỡ chữ và dòng đầu cách mép trên ≥ 1,3 lần cỡ chữ; nhãn trắng cao ≥ 1,6 lần cỡ chữ
+  số (cỡ 18 → cao ≥ 30). Chạy `phong_tranh --soat` trên máy thầy trước khi báo xong.
 - **Nhãn độ dài đặt lệch đoạn nó đo** (bài 17: "14 cm" của đường kính nằm trên nửa AO, nhìn như bán kính 14 cm — dạy sai).
   → Nhãn nằm giữa ĐÚNG đoạn được đo (đường kính: giữa cả đoạn, hoặc ngoặc dưới cả đoạn). Nhãn bán kính phải có ĐOẠN
   bán kính được vẽ (tâm → điểm trên đường tròn); không để nhãn cm lơ lửng, không lặp nhãn cho cùng một đoạn.
