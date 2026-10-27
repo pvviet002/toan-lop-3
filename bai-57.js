@@ -84,7 +84,7 @@ function capChia(bs, kieu, zq, qmin, qmax){
 function bangChia(a, b, q, r, an){
  var s=svgX(300,104,300).replace('<svg ','<svg data-bc="'+a+','+b+','+q+','+r+','+an+'" '), cs=[['sbc',['Số bị','chia'],a],['sc',['Số','chia'],b],['th',['Thương',''],q],['du',['Số dư',''],r]], i;
  cs.forEach(function(c,i2){ var x=6+i2*72, hien = c[0]===an ? '?' : String(c[2]);
-  s+='<rect x="'+x+'" y="4" width="68" height="44" rx="8" fill="'+HM.vang+'"/><text x="'+(x+34)+'" y="'+(c[1][1] ? 22 : 31)+'" text-anchor="middle" font-size="15" '+HFONT+' fill="'+HM.chu+'">'+c[1][0]+'</text>'+(c[1][1] ? '<text x="'+(x+34)+'" y="40" text-anchor="middle" font-size="15" '+HFONT+' fill="'+HM.chu+'">'+c[1][1]+'</text>' : '');
+  s+='<rect x="'+x+'" y="4" width="68" height="44" rx="8" fill="'+HM.vang+'"/><text x="'+(x+34)+'" y="'+(c[1][1] ? 19 : 31)+'" text-anchor="middle" font-size="14" '+HFONT+' fill="'+HM.chu+'">'+c[1][0]+'</text>'+(c[1][1] ? '<text x="'+(x+34)+'" y="40" text-anchor="middle" font-size="14" '+HFONT+' fill="'+HM.chu+'">'+c[1][1]+'</text>' : '');
   s+='<rect x="'+x+'" y="52" width="68" height="46" rx="8" fill="#fff" stroke="'+(hien==='?' ? HM.hoi : HM.day)+'" stroke-width="3" '+(hien==='?' ? 'stroke-dasharray="5 3"' : '')+'/><text data-pt="'+c[0]+'" x="'+(x+34)+'" y="84" text-anchor="middle" font-size="22" '+HFONT+' fill="'+(hien==='?' ? HM.hoi : HM.chu)+'">'+(hien==='?' ? '?' : sx(c[2]))+'</text>'; });
  return s;
 }

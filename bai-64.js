@@ -73,7 +73,7 @@ function soDoXe(tong, bs){
  var n=bs.length, w=Math.floor((280-4*n)/(n+1)), s=svgX(300,112,300).replace('<svg ','<svg data-xe="'+tong+':'+bs.join(',')+'" '), i, x;
  s+='<text x="10" y="16" font-size="14" '+HFONT+' fill="currentColor">Nhà máy làm được</text><rect x="10" y="22" width="280" height="30" rx="8" fill="'+HM.troi+'"/>'+chuSo(150, 37, sx(tong)+' xe', 17);
  for(i=0;i<n;i++){ x=10+i*(w+4); s+='<rect x="'+x+'" y="62" width="'+w+'" height="44" rx="8" fill="'+HM.cam+'"/><text x="'+(x+w/2)+'" y="80" text-anchor="middle" font-size="14" '+HFONT+' fill="'+HM.chu+'">Bán '+(i+1)+'</text><text x="'+(x+w/2)+'" y="98" text-anchor="middle" font-size="14" '+HFONT+' fill="'+HM.chu+'">'+sx(bs[i])+'</text>'; }
- x=10+n*(w+4); s+='<rect x="'+x+'" y="62" width="'+w+'" height="44" rx="8" fill="none" stroke="'+HM.hoi+'" stroke-width="2.5" stroke-dasharray="5 3"/><text x="'+(x+w/2)+'" y="80" text-anchor="middle" font-size="14" '+HFONT+' fill="currentColor">Còn lại</text>'+chuSo(x+w/2, 94, '?', 18);
+ x=10+n*(w+4); s+='<rect x="'+x+'" y="62" width="'+w+'" height="44" rx="8" fill="none" stroke="'+HM.hoi+'" stroke-width="2.5" stroke-dasharray="5 3"/><text x="'+(x+w/2)+'" y="77" text-anchor="middle" font-size="14" '+HFONT+' fill="currentColor">Còn lại</text>'+chuSo(x+w/2, 96, '?', 18);
  return s;
 }
 function docSoDoXe(html){ var m=/data-xe="(\d+):([\d,]+)"/.exec(html); return m ? {t:+m[1], bs:m[2].split(',').map(Number)} : null; }
