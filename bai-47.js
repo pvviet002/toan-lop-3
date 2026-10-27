@@ -37,13 +37,13 @@ function gy(extra){ var o={}, k; for(k in GOI) o[k]=GOI[k]; for(k in (extra||{})
 /* ---- Hình ---- */
 /* đồng hồ mặt số La Mã: giờ h (1..12), phút m */
 function dongHoLaMa(h, m){
- var s=svgHinh(140,140,190).replace('<svg ','<svg data-gio="'+h+'" data-phut="'+m+'" '), n, a;
- s+='<circle cx="70" cy="70" r="66" fill="#fff" stroke="'+HM.vangDam+'" stroke-width="5"/>';
- for(n=1;n<=12;n++){ a=(n/12)*2*Math.PI-Math.PI/2; s+='<text x="'+(70+49*Math.cos(a)).toFixed(1)+'" y="'+(70+49*Math.sin(a)+5).toFixed(1)+'" text-anchor="middle" font-size="14" '+HFONT+' fill="'+HM.chu+'">'+laMa(n)+'</text>'; }
+ var s=svgHinh(150,150,200).replace('<svg ','<svg data-gio="'+h+'" data-phut="'+m+'" '), n, a;
+ s+='<circle cx="75" cy="75" r="71" fill="#fff" stroke="'+HM.vangDam+'" stroke-width="5"/>';
+ for(n=1;n<=12;n++){ a=(n/12)*2*Math.PI-Math.PI/2; s+='<text x="'+(75+55*Math.cos(a)).toFixed(1)+'" y="'+(75+55*Math.sin(a)+5).toFixed(1)+'" text-anchor="middle" font-size="13" '+HFONT+' fill="'+HM.chu+'">'+laMa(n)+'</text>'; }
  var ha=(((h%12)+m/60)/12)*2*Math.PI-Math.PI/2, ma=(m/60)*2*Math.PI-Math.PI/2;
- s+='<line x1="70" y1="70" x2="'+(70+26*Math.cos(ha)).toFixed(1)+'" y2="'+(70+26*Math.sin(ha)).toFixed(1)+'" stroke="'+HM.den+'" stroke-width="5" stroke-linecap="round"/>';
- s+='<line x1="70" y1="70" x2="'+(70+38*Math.cos(ma)).toFixed(1)+'" y2="'+(70+38*Math.sin(ma)).toFixed(1)+'" stroke="'+HM.troiDam+'" stroke-width="3" stroke-linecap="round"/>';
- return s+'<circle cx="70" cy="70" r="4" fill="'+HM.do+'"/></svg>';
+ s+='<line x1="75" y1="75" x2="'+(75+28*Math.cos(ha)).toFixed(1)+'" y2="'+(75+28*Math.sin(ha)).toFixed(1)+'" stroke="'+HM.den+'" stroke-width="5" stroke-linecap="round"/>';
+ s+='<line x1="75" y1="75" x2="'+(75+40*Math.cos(ma)).toFixed(1)+'" y2="'+(75+40*Math.sin(ma)).toFixed(1)+'" stroke="'+HM.troiDam+'" stroke-width="3" stroke-linecap="round"/>';
+ return s+'<circle cx="75" cy="75" r="4" fill="'+HM.do+'"/></svg>';
 }
 function docDongHo(html){ var m=/data-gio="(\d+)" data-phut="(\d+)"/.exec(html); return m ? {h:+m[1], m:+m[2]} : null; }
 /* số La Mã xếp bằng que tính: mỗi chữ I một que, V hai que, X hai que; mỗi que là một <line data-dem="que"> */
