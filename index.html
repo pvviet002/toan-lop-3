@@ -4,104 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mục Lục - Toán Lớp 3 Tập 1</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        /* Giao diện Sáng / Tối / Dịu mắt: dùng CHUNG khoá với các trang bài (toanlop3-cfg.theme), đặt trước khi vẽ để khỏi nháy màu */
+        (function(){ try{ var c = JSON.parse(localStorage.getItem('toanlop3-cfg') || '{}'); if(c && c.theme) document.documentElement.setAttribute('data-theme', c.theme); }catch(e){} })();
+    </script>
     <style>
+        :root {
+            --bg: #fff7ed; --card: #ffffff; --text: #334155; --muted: #64748b;
+            --title: #7c5aa6; --title-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, 4px 4px 6px rgba(0,0,0,.15);
+            --head-bg: #6f4f98; --head-fg: #ffffff;
+            --topic-bg: #d9cdee; --topic-fg: #2e2350;
+            --row-a: #ffffff; --row-b: #f6f3f9; --row-hover: #ede4fa; --line: #ffffff;
+            --link: #1e293b; --accent: #7e22ce; --focus: #7e22ce; --btn-bg: #ffffff; --btn-line: #cbd5e1;
+            --soon-bg: #ede9fe; --soon-fg: #6d28d9; --soon-line: #ddd6fe; --off: #64748b;
+        }
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #0b1220; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+            --title: #c9b6ec; --title-shadow: 0 2px 10px rgba(0,0,0,.55);
+            --head-bg: #5b3f84; --head-fg: #ffffff;
+            --topic-bg: #3b2f5b; --topic-fg: #f1e9ff;
+            --row-a: #1e293b; --row-b: #172135; --row-hover: #334155; --line: #0b1220;
+            --link: #f1f5f9; --accent: #c4b5fd; --focus: #c4b5fd; --btn-bg: #1e293b; --btn-line: #475569;
+            --soon-bg: #3b2f5b; --soon-fg: #ddd6fe; --soon-line: #5b4a86; --off: #94a3b8;
+        }
+        html[data-theme="sepia"] {
+            --bg: #efe4cf; --card: #fbf5e8; --text: #3b342b; --muted: #5f5242;
+            --title: #6b4a93; --title-shadow: 0 2px 6px rgba(80,60,30,.25);
+            --head-bg: #6a4c8f; --head-fg: #ffffff;
+            --topic-bg: #d8c8e6; --topic-fg: #2e2350;
+            --row-a: #fbf5e8; --row-b: #f3e8d2; --row-hover: #e8d9bb; --line: #efe4cf;
+            --link: #3b342b; --accent: #6d28d9; --focus: #6d28d9; --btn-bg: #fbf5e8; --btn-line: #cdbd9d;
+            --soon-bg: #e9defa; --soon-fg: #5b21b6; --soon-line: #cdbdf0; --off: #5f5242;
+        }
+        * { box-sizing: border-box; }
         body {
+            margin: 0; padding: 16px 12px 56px;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #fdfdfd;
+            background: var(--bg); color: var(--text);
         }
-
-        /* Hiệu ứng Text cho Tiêu đề MỤC LỤC giống SGK */
+        .wrap { max-width: 64rem; margin: 0 auto; }
+        .top { position: relative; text-align: center; padding: 12px 52px 8px; }
         .title-mucluc {
-            font-size: 3rem;
-            font-weight: 900;
-            color: #9275b6;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            text-shadow: 
-                -2px -2px 0 #fff,  
-                 2px -2px 0 #fff,
-                -2px  2px 0 #fff,
-                 2px  2px 0 #fff,
-                 4px  4px 6px rgba(0,0,0,0.15);
+            margin: 0 0 16px; font-size: 2.6rem; line-height: 1.1; font-weight: 900;
+            color: var(--title); text-transform: uppercase; letter-spacing: .05em; text-shadow: var(--title-shadow);
         }
+        @media (min-width: 768px) { .title-mucluc { font-size: 3.6rem; } body { padding: 32px 24px 64px; } }
+        .theme-btn {
+            position: absolute; top: 0; right: 0; width: 48px; height: 48px; border-radius: 12px; cursor: pointer;
+            border: 2px solid var(--btn-line); background: var(--btn-bg); color: var(--text); font-size: 24px; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .theme-btn:hover { background: var(--row-hover); }
+        .theme-btn:active { transform: scale(.95); }
 
-        @media (min-width: 768px) {
-            .title-mucluc {
-                font-size: 4rem;
-            }
+        /* Bảng mục lục: lưới 4 cột (Chủ đề | Nội dung | Trang | mũi tên) */
+        .toc { border-radius: 14px; overflow: hidden; background: var(--card); box-shadow: 0 10px 15px -3px rgba(0,0,0,.12), 0 4px 6px -2px rgba(0,0,0,.06); }
+        .toc-head, .toc-topic, .toc-row {
+            display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 4rem 2rem; align-items: center; column-gap: 0;
         }
+        .toc-head { background: var(--head-bg); color: var(--head-fg); font-weight: 700; font-size: 1.05rem; }
+        .toc-head > span, .toc-topic > span { padding: 12px 8px; }
+        .toc-head > span:nth-child(2) { text-align: center; }
+        .toc-head > span:nth-child(1), .toc-head > span:nth-child(3),
+        .toc-topic > span:nth-child(1), .toc-topic > span:nth-child(3) { text-align: center; }
+        .toc-topic { background: var(--topic-bg); color: var(--topic-fg); font-weight: 800; border-top: 2px solid var(--line); }
+        .toc-topic > span:nth-child(1) { font-size: 1.25rem; }
+        .toc-topic > span:nth-child(2) { text-transform: uppercase; letter-spacing: .03em; font-size: .95rem; line-height: 1.3; }
+        .toc-topic > span:nth-child(3) { font-size: 1.05rem; }
+        .toc-row { color: var(--link); text-decoration: none; background: var(--row-a); min-height: 48px; position: relative; transition: background-color .15s ease; }
+        .toc-row.alt { background: var(--row-b); }
+        .toc-row > .t { padding: 10px 8px 10px 14px; line-height: 1.4; font-size: 1rem; transition: transform .15s ease; }
+        .toc-row > .p { text-align: center; font-weight: 600; color: var(--muted); }
+        .toc-row > .go { text-align: center; font-size: 1.7rem; line-height: 1; padding-bottom: .15em; color: var(--accent); opacity: .8; transition: transform .15s ease, opacity .15s ease; }
+        a.toc-row { cursor: pointer; }
+        a.toc-row:hover { background: var(--row-hover); }
+        a.toc-row:hover > .t { transform: translateX(4px); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+        a.toc-row:hover > .go { opacity: 1; transform: translateX(3px); }
+        a.toc-row:active { background: var(--row-hover); }
+        a.toc-row:focus-visible, .theme-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+        .toc-row.off { color: var(--off); cursor: default; }
+        .toc-row.off > .go { visibility: hidden; }
+        .toc-row .soon { margin-left: 8px; font-size: .75rem; font-weight: 700; color: var(--soon-fg); background: var(--soon-bg); border: 1px solid var(--soon-line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; vertical-align: middle; }
+        .toc-row.note > .t { font-style: italic; }
 
-        /* Định dạng Bảng */
-        .toc-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        @media (max-width: 520px) {
+            .title-mucluc { font-size: 2.1rem; }
+            .top { padding: 8px 56px 4px 0; text-align: left; }
+            .toc-head, .toc-topic, .toc-row { grid-template-columns: 3.1rem minmax(0, 1fr) 2.6rem 1.5rem; }
+            .toc-head { font-size: .8rem; }
+            .toc-head > span, .toc-topic > span { padding: 10px 2px; }
+            .toc-topic > span:nth-child(2) { font-size: .85rem; padding-left: 8px; padding-right: 4px; }
+            .toc-topic > span:nth-child(3) { font-size: .9rem; }
+            .toc-row > .t { padding: 10px 4px 10px 10px; font-size: .95rem; }
+            .toc-row > .go { font-size: 1.5rem; }
         }
-
-        .toc-table th, .toc-table td {
-            border-left: 2px solid #ffffff;
-            border-right: 2px solid #ffffff;
+        /* iPad / máy tính bảng: chữ bảng to hơn, dòng cao hơn */
+        @media (min-width: 768px) and (max-width: 1279px) {
+            .toc-head { font-size: 1.2rem; }
+            .toc-topic > span:nth-child(2) { font-size: 1.1rem; }
+            .toc-row { min-height: 56px; }
+            .toc-row > .t { font-size: 1.15rem; padding: 14px 8px 14px 16px; }
+            .toc-row > .p { font-size: 1.1rem; }
         }
-        
-        .toc-table th:first-child, .toc-table td:first-child { border-left: none; }
-        .toc-table th:last-child, .toc-table td:last-child { border-right: none; }
-
-        /* Header Tím đậm */
-        .toc-header {
-            background-color: #8c6eb0;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        /* Dòng Chủ đề Tím nhạt */
-        .toc-topic {
-            background-color: #bcaadb;
-            font-weight: 700;
-            color: #334155;
-        }
-
-        /* Dòng xen kẽ */
-        .toc-row-even { background-color: #f6f3f9; }
-        .toc-row-odd { background-color: #ffffff; }
-
-        .hover-link {
-            transition: color 0.2s ease-in-out;
-        }
-        .hover-link:hover {
-            color: #7e22ce;
-            text-decoration: underline;
-        }
+        @media (pointer: coarse) { .toc-row, .theme-btn { min-height: 48px; } }
+        @media (prefers-reduced-motion: reduce) { .toc-row, .toc-row > .t, .toc-row > .go { transition: none; } }
     </style>
 </head>
-<body class="p-4 md:p-8 lg:p-12">
+<body>
 
-    <div class="max-w-5xl mx-auto w-full flex-grow flex flex-col">
-        
+    <div class="wrap">
         <!-- Header -->
-        <div class="mb-8 text-center mt-6">
-            <h1 class="title-mucluc mb-6">Mục Lục</h1>
+        <div class="top">
+            <h1 class="title-mucluc">Mục Lục</h1>
+            <button type="button" id="btnTheme" class="theme-btn" aria-label="Đổi giao diện" title="Đổi giao diện (Sáng / Tối / Dịu mắt)"></button>
         </div>
 
         <!-- Bảng Mục Lục -->
-        <div class="w-full bg-white rounded-xl mb-12">
-            <table class="toc-table">
-                <thead>
-                    <tr class="toc-header">
-                        <th class="py-3 px-2 w-[10%] text-center">Chủ đề</th>
-                        <th class="py-3 px-6 w-[80%] text-center">Nội dung</th>
-                        <th class="py-3 px-2 w-[10%] text-center">Trang</th>
-                    </tr>
-                </thead>
-                <tbody id="toc-body" class="text-slate-700 text-[15px] md:text-base">
-                    <!-- Nội dung sẽ được render bằng JS -->
-                </tbody>
-            </table>
+        <div class="toc" role="table" aria-label="Mục lục Toán lớp 3 Tập 1">
+            <div class="toc-head" role="row">
+                <span role="columnheader">Chủ đề</span>
+                <span role="columnheader">Nội dung</span>
+                <span role="columnheader">Trang</span>
+                <span aria-hidden="true"></span>
+            </div>
+            <div id="toc-body" role="rowgroup">
+                <!-- Nội dung sẽ được render bằng JS -->
+            </div>
         </div>
-
     </div>
 
     <script>
@@ -116,7 +146,7 @@
             { type: 'lesson', num: 6, title: 'Bài 6. Bảng nhân 4, bảng chia 4', page: '19' },
             { type: 'lesson', num: 7, title: 'Bài 7. Ôn tập hình học và đo lường', page: '21' },
             { type: 'lesson', num: 8, title: 'Bài 8. Luyện tập chung', page: '24' },
-            
+
             { type: 'header', topic: '2', title: 'BẢNG NHÂN, BẢNG CHIA', page: '28' },
             { type: 'lesson', num: 9, title: 'Bài 9. Bảng nhân 6, bảng chia 6', page: '28' },
             { type: 'lesson', num: 10, title: 'Bài 10. Bảng nhân 7, bảng chia 7', page: '31' },
@@ -172,55 +202,57 @@
             const tbody = document.getElementById('toc-body');
       const AVAILABLE = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]);
             let html = '';
-            
-            // Theo dõi dòng chẵn/lẻ để tô màu nền
-            let rowColorFlag = false; // false = odd (trắng), true = even (tím nhạt)
+
+            // Theo dõi dòng chẵn/lẻ để tô màu nền xen kẽ
+            let alt = false;
 
             tocData.forEach(item => {
                 if (item.type === 'header') {
                     // Dòng Chủ Đề
-                    html += `
-                        <tr class="toc-topic">
-                            <td class="py-2.5 px-2 text-center text-xl">${item.topic}</td>
-                            <td class="py-2.5 px-6 uppercase tracking-wide">${item.title}</td>
-                            <td class="py-2.5 px-2 text-center text-lg">${item.page}</td>
-                        </tr>
-                    `;
-                    // Reset cờ xen kẽ màu sau mỗi dòng chủ đề
-                    rowColorFlag = false; 
-                } 
+                    html += `<div class="toc-topic" role="row"><span role="cell">${item.topic}</span><span role="cell">${item.title}</span><span role="cell">${item.page}</span><span aria-hidden="true"></span></div>`;
+                    alt = false;
+                }
                 else if (item.type === 'lesson') {
-                    // Dòng Bài Học
-                    let rowClass = rowColorFlag ? 'toc-row-even' : 'toc-row-odd';
-                    html += `
-                        <tr class="${rowClass}">
-                            <td class="py-2.5 px-2 text-center"></td>
-                            <td class="py-2.5 px-6 pl-8">
-                                ${AVAILABLE.has(item.num) ? `<a href="bai-${item.num}.html" class="hover-link block w-full h-full">${item.title}</a>` : `<span class="text-slate-300 cursor-not-allowed block w-full h-full">${item.title}<span class="ml-2 text-xs font-bold text-violet-400 bg-violet-100 border border-violet-200 rounded-full px-2 py-0.5 align-middle whitespace-nowrap">Sắp có</span></span>`}
-                            </td>
-                            <td class="py-2.5 px-2 text-center font-medium">${item.page}</td>
-                        </tr>
-                    `;
-                    rowColorFlag = !rowColorFlag; // Đảo cờ
+                    // Dòng Bài Học: cả dòng là một thẻ <a> (vùng bấm rộng, có hover, có mũi tên)
+                    const cls = alt ? ' alt' : '';
+                    if (AVAILABLE.has(item.num)) {
+                        html += `<a class="toc-row${cls}" href="bai-${item.num}.html" role="row"><span role="cell"></span><span class="t" role="cell">${item.title}</span><span class="p" role="cell">${item.page}</span><span class="go" aria-hidden="true">&rsaquo;</span></a>`;
+                    } else {
+                        html += `<div class="toc-row off${cls}" role="row" aria-disabled="true"><span role="cell"></span><span class="t" role="cell">${item.title}<span class="soon">Sắp có</span></span><span class="p" role="cell">${item.page}</span><span class="go" aria-hidden="true">&rsaquo;</span></div>`;
+                    }
+                    alt = !alt;
                 }
                 else if (item.type === 'extra') {
-                    // Dòng thông tin bổ sung (Phụ lục)
-                    let rowClass = rowColorFlag ? 'toc-row-even' : 'toc-row-odd';
-                    html += `
-                        <tr class="${rowClass}">
-                            <td class="py-2.5 px-2 text-center"></td>
-                            <td class="py-2.5 px-6 pl-8 italic">
-                                <a href="#" class="hover-link block w-full h-full">${item.title}</a>
-                            </td>
-                            <td class="py-2.5 px-2 text-center font-medium">${item.page}</td>
-                        </tr>
-                    `;
-                    rowColorFlag = !rowColorFlag;
+                    // Dòng thông tin bổ sung (Phụ lục): chưa có trang riêng nên không phải liên kết
+                    const cls = alt ? ' alt' : '';
+                    html += `<div class="toc-row note${cls}" role="row"><span role="cell"></span><span class="t" role="cell">${item.title}</span><span class="p" role="cell">${item.page}</span><span class="go" aria-hidden="true"></span></div>`;
+                    alt = !alt;
                 }
             });
 
             tbody.innerHTML = html;
         }
+
+        // Nút đổi giao diện: Sáng -> Tối -> Dịu mắt, lưu chung với các trang bài
+        (function(){
+            const THEMES = [['light', 'Sáng', '☀️'], ['dark', 'Tối', '🌙'], ['sepia', 'Dịu mắt', '📖']];
+            const btn = document.getElementById('btnTheme');
+            function cfg(){ try{ return JSON.parse(localStorage.getItem('toanlop3-cfg') || '{}') || {}; }catch(e){ return {}; } }
+            function idx(){ const t = cfg().theme || 'light'; for(let i = 0; i < THEMES.length; i++) if(THEMES[i][0] === t) return i; return 0; }
+            function ve(){
+                const t = THEMES[idx()];
+                document.documentElement.setAttribute('data-theme', t[0]);
+                btn.textContent = t[2];
+                btn.setAttribute('aria-label', 'Đổi giao diện. Đang dùng: ' + t[1]);
+                btn.title = 'Đổi giao diện (đang dùng: ' + t[1] + ')';
+            }
+            btn.addEventListener('click', function(){
+                const c = cfg(); c.theme = THEMES[(idx() + 1) % THEMES.length][0];
+                try{ localStorage.setItem('toanlop3-cfg', JSON.stringify(c)); }catch(e){}
+                ve();
+            });
+            ve();
+        })();
 
         // Chạy hàm render khi tải trang
         renderTable();

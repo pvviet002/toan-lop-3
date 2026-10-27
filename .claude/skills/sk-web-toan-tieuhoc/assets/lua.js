@@ -36,7 +36,7 @@
       var m = /^bai-(\d+)\.html/.exec(a.getAttribute('href')||''); if(!m || a.querySelector('.lua')) return;
       var muc = mucCuaBai(+m[1]); if(muc<0) return;
       var sp = document.createElement('span'); sp.title = tenMuc(muc); sp.style.marginLeft = '6px';
-      sp.innerHTML = veLua(muc, 20); a.appendChild(sp);
+      sp.innerHTML = veLua(muc, 20); (a.querySelector('.t') || a).appendChild(sp);
     });
   }
   if(!window.BAI){
