@@ -191,10 +191,10 @@ function laVuong(O, A, B){ return Math.abs(gocGiua(O,A,B)-90)<0.5; }
 function laTrungDiem(m, a, b){ return m[0]*2===a[0]+b[0] && m[1]*2===a[1]+b[1] && !(a[0]===b[0] && a[1]===b[1]); }
 /* ---- Hình mới 1 (D1–D4): lưới ô vuông w × h (toạ độ y hướng lên), điểm có tên, đoạn nối. pts = {T:[x,y]}, segs = [['A','B'], …], polys = [{pts:['A','B','C'], ten}] ---- */
 function luoiHinh43(w, h, pts, segs, polys){
-  var o=30, m=30, W=w*o+2*m, H=h*o+2*m, s=svgX(W,H), i, k;
-  for(i=0;i<=w;i++) s+='<line x1="'+(m+i*o)+'" y1="'+m+'" x2="'+(m+i*o)+'" y2="'+(m+h*o)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
-  for(i=0;i<=h;i++) s+='<line x1="'+m+'" y1="'+(m+i*o)+'" x2="'+(m+w*o)+'" y2="'+(m+i*o)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
-  function X(p){ return m+p[0]*o; } function Y(p){ return m+(h-p[1])*o; }
+  var o=30, m=30, mt=50, W=w*o+2*m, H=h*o+m+mt, s=svgX(W,H), i, k;
+  for(i=0;i<=w;i++) s+='<line x1="'+(m+i*o)+'" y1="'+mt+'" x2="'+(m+i*o)+'" y2="'+(mt+h*o)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
+  for(i=0;i<=h;i++) s+='<line x1="'+m+'" y1="'+(mt+i*o)+'" x2="'+(m+w*o)+'" y2="'+(mt+i*o)+'" stroke="'+HM.day+'" stroke-width="1.5"/>';
+  function X(p){ return m+p[0]*o; } function Y(p){ return mt+(h-p[1])*o; }
   (polys||[]).forEach(function(pg){ s+='<polygon data-poly="'+pg.pts.join('')+'" points="'+pg.pts.map(function(t){ return X(pts[t])+','+Y(pts[t]); }).join(' ')+'" fill="'+HM.troi+'" fill-opacity="0.25" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>'; });
   (segs||[]).forEach(function(g){ var a=pts[g[0]], b=pts[g[1]]; s+='<line data-seg="'+g[0]+g[1]+'" x1="'+X(a)+'" y1="'+Y(a)+'" x2="'+X(b)+'" y2="'+Y(b)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'; });
   for(k in pts){ var p=pts[k], cx=X(p), cy=Y(p), dx = p[0]>=w ? 14 : (p[0]<=0 ? -14 : 0), dy = p[1]>=h ? -11 : (p[1]<=0 ? 25 : (dx ? 7 : -11)), an = dx>0 ? 'start' : (dx<0 ? 'end' : 'middle');
