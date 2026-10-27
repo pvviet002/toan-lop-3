@@ -101,3 +101,38 @@ html[data-theme="sepia"] #card [style*="background:#fff"] { background-color: #f
 @keyframes luaBung { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .lua-song, .lua-bung { animation: none; } }
 html[data-theme="dark"] .text-rose-700 { color: #fda4af; }
+
+/* ================= RESPONSIVE: cảm ứng, iPad, laptop màn hình thấp ================= */
+/* Vùng bấm tối thiểu 44x44 trên màn hình cảm ứng */
+@media (pointer: coarse) {
+  #appwrap button, #appwrap a, #dispPanel button { min-height: 44px; min-width: 44px; }
+  #answerArea input { min-height: 48px; }
+}
+/* Điện thoại: hình không quá 32% chiều cao màn hình */
+@media (max-width: 639px) { #qhtml svg { max-height: 32vh; } }
+/* Điện thoại thấp (vd 375x667): hình không quá 34% chiều cao, bớt đệm để nút Kiểm tra lên cao */
+@media (max-height: 700px) {
+  #qhtml svg { max-height: 28vh; }
+  #appwrap .bg-gradient-to-r h1 { font-size: 1rem; line-height: 1.25; }
+  #appwrap .bg-gradient-to-r { padding: .45rem .75rem; }
+  #appwrap .bg-gradient-to-r p { display: none; }
+  #modeBar button { padding-top: .35rem; padding-bottom: .35rem; }
+  #luaBox { min-height: 40px !important; }
+  #secWrap { margin-bottom: .25rem; }
+  #card { padding: .75rem; }
+  #qhtml { margin-bottom: .5rem; }
+  #feedback { margin-top: .4rem; }
+}
+/* Laptop thấp (768px): hình và khối phép tính không quá 38% chiều cao, bớt đệm đầu trang để nút Kiểm tra luôn thấy */
+@media (min-width: 768px) and (max-height: 820px) {
+  #qhtml svg { max-height: 30vh; }
+  body[class] { padding-top: .5rem; padding-bottom: .5rem; }
+  #appwrap .bg-gradient-to-r { padding: .5rem 1rem; }
+  #appwrap .bg-gradient-to-r h1 { font-size: 1.35rem; line-height: 1.25; }
+  #appwrap .bg-gradient-to-r p { font-size: .78rem; margin-top: .1rem; }
+  #modeBar button { padding-top: .4rem; padding-bottom: .4rem; }
+  #luaBox { min-height: 40px !important; }
+  #secWrap { margin-bottom: .25rem; }
+  #card { padding: 1rem; }
+  #qhtml { margin-bottom: .6rem; font-size: 1.1rem; }
+}

@@ -213,7 +213,7 @@ try {
           let daChup = false;
           for (let q = 0; q < SO_CAU; q++) {
             if (ANH && mob && q === 0) {
-              const clip = await ev("(function(){ var s=document.getElementById('secname'); s.scrollIntoView({block:'start'}); var a=s.getBoundingClientRect(), c=document.getElementById('card').getBoundingClientRect(); return {x:0, y:Math.max(0,a.top-6)+scrollY, width:innerWidth, height:Math.min(c.bottom+8, a.top+1400)-Math.max(0,a.top-6)}; })()");
+              const clip = await ev("(function(){ var s=document.getElementById('secWrap')||document.getElementById('secname'); s.scrollIntoView({block:'start'}); var a=s.getBoundingClientRect(), c=document.getElementById('card').getBoundingClientRect(); return {x:0, y:Math.max(0,a.top-6)+scrollY, width:innerWidth, height:Math.min(c.bottom+8, a.top+1400)-Math.max(0,a.top-6)}; })()");
               await sleep(350);
               const s = await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { ...clip, scale: 1 } });
               fs.writeFileSync(path.join(ANH, `${bai}_${th}_tab${i + 1}${L > 1 ? "_m" + l : ""}.png`), Buffer.from(s.data, "base64"));

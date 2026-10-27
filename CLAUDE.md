@@ -62,3 +62,14 @@ Viết cho học sinh lớp 3 và thầy giáo: tiếng Việt có dấu, câu n
 
 Sửa skill ở `~/.claude/skills/` xong ⇒ `node .claude/dong-bo-skill.mjs --len-repo` rồi commit `.claude/skills`
 cùng lần đưa lên tới. Chạy không tham số để xem hai bên có lệch không.
+
+## Tailwind tĩnh (từ 27/10/2026)
+
+Các trang không còn nạp `cdn.tailwindcss.com`; style Tailwind nằm trong `tailwind.css` ở gốc repo (sinh bằng Tailwind v3 CLI,
+cấu hình `tailwind.config.js`, đầu vào `tailwind.src.css`). **Thêm hoặc đổi class Tailwind** trong `*.html` / `*.js` ở gốc repo
+(kể cả `bai-N.js`) thì build lại rồi commit `tailwind.css`:
+
+    npx tailwindcss@3.4.17 -c tailwind.config.js -i tailwind.src.css -o tailwind.css --minify
+
+Phiên đám mây không build được thì ghi vào PR: "CHƯA build tailwind.css, cần chạy trên máy thầy". Bài 1-8 (giao diện cũ) có
+thêm `legacy.css` cho điện thoại / máy tính bảng.

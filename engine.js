@@ -65,7 +65,7 @@
   var T=null;                                         /* chế độ Luyện thông minh */
   var firstTry=true, qT0=0, luaTruoc=-1, dangTruoc=-1;
   var tabMaxH=0;  /* khoá chiều cao thẻ theo câu cao nhất (chống nhảy khung) */
-  var fitOn=false, fitScale=1;  /* Vừa màn hình: co bằng CSS cho lọt một màn hình thiết bị */
+  var rzD=0, fitOn=false, fitScale=1;  /* Vừa màn hình: co bằng CSS cho lọt một màn hình thiết bị */
 
   function byId(x){ return document.getElementById(x); }
 
@@ -81,27 +81,36 @@
   function starsFor(miss){ var t3=Math.max(1,Math.round(goal*0.15)); var t2=Math.max(t3+1,Math.round(goal*0.5)); if(miss<=t3) return 3; if(miss<=t2) return 2; return 1; }
   function starRow(n, big){ var sz=big?'text-4xl md:text-5xl':'text-base'; var s=''; for(var i=0;i<3;i++){ s+='<span class="'+sz+' '+(i<n?'text-amber-400':'text-slate-300')+(big?' star-pop':'')+'" style="animation-delay:'+(i*0.15)+'s">&#9733;</span>'; } return s; }
 
-  var NUT='bg-white text-slate-600 px-2 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm';
+  /* Tiêu đề bài: dữ liệu cũ viết hoa từng chữ -> đưa về kiểu Mục lục (chỉ hoa chữ đầu mỗi câu; chữ hoa đơn lẻ như "C" giữ nguyên) */
+  function caTieuDe(t){
+    var up=true;
+    return String(t).split(' ').map(function(w){
+      var out = up ? w : ((w.length>1 || !/[A-ZÀ-Ỹ]/.test(w)) ? w.toLowerCase() : w);
+      up = /[.!?]$/.test(w);
+      return out;
+    }).join(' ');
+  }
+  var NUT='bg-white text-slate-600 inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-1.5 sm:px-3 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 btn-press font-semibold text-sm';
   /* ----- Dựng khung giao diện ----- */
   function build(){
     var h='';
     h+='<div id="appwrap" class="w-full flex-grow flex flex-col" style="margin:0 auto">';
     h+= '<div class="w-full mb-3 flex justify-between items-center gap-2">';
-    h+=  '<div class="flex flex-wrap gap-1.5 sm:gap-2">';
-    h+=   '<a href="index.html" class="'+NUT+'">&#127968;<span class="hidden sm:inline"> Sảnh chính</span></a>';
-    h+=   '<button id="btnFull" title="Vừa màn hình" class="'+NUT+'">&#128306;<span class="hidden sm:inline"> Vừa màn hình</span></button>';
-    h+=   '<button id="btnDisp" title="Hiển thị" class="'+NUT+'">&#128421;</button>';
-    h+=   '<button id="btnTheme" title="Đổi giao diện (Sáng / Tối / Dịu mắt)" class="'+NUT+'">'+THEMES[themeIdx()][2]+'</button>';
-    h+=   '<button id="btnSound" title="Âm thanh" class="'+NUT+'">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
+    h+=  '<div class="flex flex-wrap gap-1 sm:gap-2">';
+    h+=   '<a href="index.html" title="Về Mục lục" aria-label="Về Mục lục (Sảnh chính)" class="'+NUT+'">&#127968;<span class="hidden sm:inline"> Sảnh chính</span></a>';
+    h+=   '<button id="btnFull" title="Vừa màn hình" aria-label="Vừa màn hình" class="'+NUT+'">&#128306;<span class="hidden sm:inline"> Vừa màn hình</span></button>';
+    h+=   '<button id="btnDisp" title="Hiển thị: cỡ chữ, giao diện, chế độ điện thoại" aria-label="Hiển thị (cỡ chữ, giao diện, chế độ điện thoại)" class="'+NUT+'">&#128421;</button>';
+    h+=   '<button id="btnTheme" title="Đổi giao diện (Sáng / Tối / Dịu mắt)" aria-label="Đổi giao diện: Sáng, Tối, Dịu mắt" class="'+NUT+'">'+THEMES[themeIdx()][2]+'</button>';
+    h+=   '<button id="btnSound" title="Bật hoặc tắt âm thanh" aria-label="Bật hoặc tắt âm thanh" class="'+NUT+'">'+(CFG.sound?'&#128266;':'&#128263;')+'</button>';
     h+=  '</div>';
-    h+=  '<div class="bg-white px-3 sm:px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 font-bold shrink-0">';
+    h+=  '<div class="bg-white px-2 sm:px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-2 sm:gap-4 font-bold shrink-0">';
     h+=   '<span class="text-amber-700" title="Điểm">&#11088; <span id="score">0</span></span>';
     h+=   '<span class="text-sky-700" title="Chuỗi đúng liên tiếp">&#9889; <span id="streak">0</span></span>';
     h+=  '</div>';
     h+= '</div>';
     h+= '<div class="w-full bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden flex-grow flex flex-col">';
     h+=  '<div class="bg-gradient-to-r from-amber-600 to-orange-700 text-white p-4 md:p-5 text-center">';
-    h+=   '<h1 class="text-xl md:text-3xl font-extrabold tracking-wide">Bài '+BAI.n+': '+BAI.title+'</h1>';
+    h+=   '<h1 class="text-xl md:text-2xl font-extrabold tracking-wide" style="text-wrap:balance">Bài '+BAI.n+': '+caTieuDe(BAI.title)+'</h1>';
     h+=   '<p class="text-white font-medium text-sm md:text-base mt-1">'+(BAI.sub||'Bé chọn một hoạt động rồi luyện tập nhé!')+'</p>';
     h+=  '</div>';
     if(SMART){
@@ -113,15 +122,18 @@
     h+=  '<div id="tabs" class="flex flex-wrap bg-slate-100 border-b border-slate-200"></div>';
     h+=  '<div class="px-4 md:px-6 pt-3">';
     h+=   '<div class="flex items-center gap-2">';
-    h+=    '<span id="luaBox" class="inline-flex items-end gap-1 shrink-0" style="min-height:42px"></span>';
-    h+=    '<span id="tienDoTen" class="text-xs font-bold text-slate-500 whitespace-nowrap">Mục tiêu</span>';
+    h+=    '<span id="luaBox" class="inline-flex items-end gap-1 shrink-0" style="min-height:48px"></span>';
+    h+=    '<span id="tienDoTen" class="text-sm font-extrabold text-slate-600 whitespace-nowrap">Mục tiêu</span>';
     h+=    '<div class="flex-grow h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200"><div id="progbar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-300" style="width:0%"></div></div>';
     h+=    '<span class="text-xs font-bold text-emerald-700 whitespace-nowrap"><span id="sesC">0</span>/<span id="sesT">'+goal+'</span></span>';
-    h+=    '<button id="btnHoSo" title="Hồ sơ luyện tập" class="text-sm px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 btn-press">&#128202;</button>';
+    h+=    '<button id="btnHoSo" title="Hồ sơ luyện tập" aria-label="Hồ sơ luyện tập" class="text-sm min-h-[44px] min-w-[44px] px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 btn-press">&#128202;</button>';
     h+=   '</div>';
     h+=  '</div>';
     h+=  '<div class="p-4 md:p-6 flex-grow flex flex-col items-center justify-start">';
-    h+=   '<div id="secname" class="text-orange-700 font-extrabold text-sm mb-2"></div>';
+    h+=   '<div id="secWrap" class="w-full max-w-xl mb-2 text-left">';
+    h+=    '<button id="secBtn" type="button" aria-expanded="false" aria-controls="secname" title="Xem phần sách giáo khoa liên quan (có thể chứa lời giải)" class="inline-flex items-center gap-1 min-h-[36px] px-3 py-1 text-xs font-semibold text-slate-500 bg-white border border-slate-200 rounded-full hover:bg-slate-50 btn-press">&#128214; Tham khảo SGK <span id="secArrow" aria-hidden="true">&#9662;</span></button>';
+    h+=    '<div id="secname" hidden class="mt-2 text-xs text-slate-500 bg-white border border-slate-200 rounded-lg px-3 py-2"></div>';
+    h+=   '</div>';
     h+=   '<div id="card" class="w-full max-w-xl bg-amber-50 border-2 border-amber-100 rounded-2xl p-5 md:p-6 text-center pop">';
     h+=    '<div id="qhtml" class="text-lg md:text-xl font-bold text-slate-700 mb-4 leading-relaxed"></div>';
     h+=    '<div id="answerArea"></div>';
@@ -154,6 +166,7 @@
     byId('btnSound').onclick=toggleSound;
     byId('btnTheme').onclick=cycleTheme;
     byId('btnNext').onclick=function(){ if(che==='tm') tiepTM(); else nextQ(); };
+    byId('secBtn').onclick=function(){ var s=byId('secname'); s.hidden=!s.hidden; this.setAttribute('aria-expanded', s.hidden?'false':'true'); byId('secArrow').innerHTML = s.hidden ? '&#9662;' : '&#9652;'; };
     byId('btnDisp').onclick=function(){ buildDispPanel(); byId('dispPanel').classList.remove('hidden'); };
     byId('dispClose').onclick=closeDisp;
     byId('dispBackdrop').onclick=closeDisp;
@@ -173,11 +186,15 @@
   /* ----- Nút Hiển thị: cỡ chữ + loại thiết bị ----- */
   var SIZES={sm:0.85, md:1, lg:1.2};
   var DEVS={auto:'48rem', phone:'26rem', tablet:'45rem', desktop:'60rem'};
-  function applyZoom(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=(SIZES[CFG.size]||1)*(fitOn?fitScale:1); }catch(e){} }
+  /* Máy tính bảng (cảm ứng, >= 768px): khung rộng hơn và chữ to hơn ~15% khi để chế độ Tự động / Máy tính bảng */
+  function laTablet(){ try{ return (CFG.device==='auto' || CFG.device==='tablet') && window.matchMedia('(min-width: 768px) and (pointer: coarse)').matches; }catch(e){ return false; } }
+  function boost(){ return laTablet() ? ((window.innerHeight||0)>=900 ? 1.15 : 1.05) : 1; }
+  function rongTuDong(){ var iw=window.innerWidth||0; return laTablet() ? '56rem' : (iw>=1200 ? '56rem' : '48rem'); }
+  function applyZoom(){ var w=byId('appwrap'); if(!w) return; try{ w.style.zoom=(SIZES[CFG.size]||1)*boost()*(fitOn?fitScale:1); }catch(e){} }
   /* Vừa màn hình: đo chiều cao cần rồi co để lọt viewport (sàn 0.5 giữ chữ đọc được; dài quá thì cuộn) */
   function refit(){
     var w=byId('appwrap'); if(!w || !fitOn){ fitScale=1; applyZoom(); return; }
-    var base=SIZES[CFG.size]||1;
+    var base=(SIZES[CFG.size]||1)*boost();
     try{ w.style.zoom=base; }catch(e){}
     var top=Math.max(0, Math.round(w.getBoundingClientRect().top));
     var avail=window.innerHeight - top*2;
@@ -186,7 +203,7 @@
     fitScale = Math.max(0.5, Math.min(1, avail/need));
     applyZoom();
   }
-  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; w.style.maxWidth=DEVS[CFG.device]||'48rem'; tabMaxH=0; if(cur) lockHeight(); if(fitOn) refit(); else applyZoom(); }
+  function applyDisplay(){ var w=byId('appwrap'); if(!w) return; w.style.maxWidth=(CFG.device==='auto' ? rongTuDong() : (DEVS[CFG.device]||'48rem')); tabMaxH=0; if(cur) lockHeight(); if(fitOn) refit(); else applyZoom(); }
   function seg(k,v,label){ var on=CFG[k]===v; return '<button data-k="'+k+'" data-v="'+v+'" class="w-full px-2 py-1.5 rounded-lg text-xs font-bold border btn-press '+(on?'bg-amber-500 text-amber-950 border-amber-500':'bg-white text-slate-600 border-slate-200 hover:bg-slate-50')+'">'+label+'</button>'; }
   function buildDispPanel(){
     var sizes=[['sm','Nhỏ'],['md','Vừa'],['lg','Lớn']];
@@ -236,7 +253,7 @@
   function mucHienTai(){ return che==='tm' ? uocLuongTM(T.log).tong : danhGia(sesLog).dat; }
   function capNhatLua(){
     var m=mucHienTai(), b=byId('luaBox'); if(!b) return;
-    b.innerHTML=lua(m, 42, 'lua-song'+(luaTruoc>=0 && m>luaTruoc ? ' lua-bung' : ''))+'<span class="text-xs font-extrabold text-slate-600 hidden sm:inline">'+(m?'Mức '+m:'')+'</span>';
+    b.innerHTML=lua(m, 48, 'lua-song'+(luaTruoc>=0 && m>luaTruoc ? ' lua-bung' : ''))+'<span class="text-sm font-extrabold text-slate-600 hidden sm:inline">'+(m?'Mức '+m:'')+'</span>';
     b.title='Cấp độ tư duy hiện tại: '+(m?'Mức '+m+' · ':'')+MUC_TEN[m];
     luaTruoc=m;
   }
@@ -302,7 +319,10 @@
 
   /* ----- Câu hỏi ----- */
   function render(){
+    /* Nhãn nguồn SGK: nhắc lại ví dụ trong sách (có thể có cả lời giải) nên mặc định GẬP, mỗi câu mới gập lại */
     byId('secname').innerText = topics[topic].sec || '';
+    byId('secname').hidden = true; byId('secBtn').setAttribute('aria-expanded','false'); byId('secArrow').innerHTML = '&#9662;';
+    byId('secWrap').style.display = topics[topic].sec ? '' : 'none';
     byId('qhtml').innerHTML = cur.q;
     var area=byId('answerArea'); area.innerHTML='';
     byId('feedback').innerHTML='';
@@ -529,7 +549,7 @@
   function toggleSound(){ CFG.sound=!CFG.sound; save('toanlop3-cfg',CFG); byId('btnSound').innerHTML=CFG.sound?'&#128266;':'&#128263;'; if(CFG.sound) sGood(); }
 
   var rzT=null;
-  function onResize(){ if(!fitOn) return; if(rzT) clearTimeout(rzT); rzT=setTimeout(refit, 150); }
+  function onResize(){ if(CFG.device==='auto' || CFG.device==='tablet'){ if(rzD) clearTimeout(rzD); rzD=setTimeout(applyDisplay, 120); } if(!fitOn) return; if(rzT) clearTimeout(rzT); rzT=setTimeout(refit, 150); }
   function loadCounter(){ try{ if(document.getElementById('siteCounter')||window.__cnt) return; window.__cnt=1; var s=document.createElement('script'); s.src='counter.js'; s.async=true; document.body.appendChild(s); }catch(e){} }
   /* Cổng kiểm thử (chỉ khi URL có ?kiemthu=1): cho công cụ soát đọc trạng thái, đặt mức, mở màn kết thúc */
   function congKiemThu(){

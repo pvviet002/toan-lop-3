@@ -1,0 +1,65 @@
+/* legacy.css - sửa vừa vặn điện thoại / máy tính bảng cho bài 1-8 (giao diện cũ, chưa dùng engine v2) */
+
+/* Nút Sảnh chính / Quay lại / Phóng to: không rớt chữ, cao tối thiểu 44px */
+a[href="index.html"], #btn-fullscreen, button[onclick^="toggleFull"] {
+  white-space: nowrap; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+}
+@media (max-width: 639px) {
+  a[href="index.html"], #btn-fullscreen, button[onclick^="toggleFull"] { padding-left: .65rem; padding-right: .65rem; font-size: .85rem; }
+}
+
+/* Thanh tab chính: xuống dòng thay vì cuộn ngang ẩn (điện thoại, iPad dọc) */
+@media (max-width: 1023px) {
+  .flex-nowrap.hide-scrollbar { flex-wrap: wrap; overflow-x: visible; }
+  .flex-nowrap.hide-scrollbar > button {
+    flex: 1 1 30%; white-space: normal; padding: 10px 6px; min-height: 44px; font-size: .9rem; line-height: 1.25;
+  }
+}
+
+/* Khung hình minh hoạ bài 1: thấp lại để khung câu hỏi hiện sớm hơn */
+@media (max-width: 639px) {
+  .bt-pane [class*="min-h-[300px]"] { min-height: 0; padding: .5rem; }
+  #bt1-visual-container { zoom: .68; gap: .6rem; }
+}
+/* Bàn chơi con ong (bài 4, 5): không cao quá ~55% màn hình thấp */
+@media (max-height: 800px) {
+  #game-board { max-width: min(100%, 55vh); }
+}
+
+/* Vùng bấm tối thiểu 44px trên màn hình cảm ứng */
+@media (pointer: coarse) {
+  button, .btn-press { min-height: 44px; min-width: 44px; }
+}
+
+/* Bài 1 trên điện thoại: gọn lại để khung câu hỏi và nút Kiểm tra lên cao */
+@media (max-width: 639px) {
+  .bt-pane h1 { font-size: 1.05rem; }
+  .bt-pane > div:first-child { padding: .5rem .75rem; }
+  .bt-pane h3 { margin-bottom: .4rem; font-size: .72rem; }
+  .bt-pane div:has(> [id*="btn-hint"]) { flex-direction: row; flex-wrap: wrap; gap: .4rem; }
+  .bt-pane [id*="btn-hint"] { width: auto; flex: 1 1 28%; padding: .35rem .25rem; font-size: .8rem; }
+  .bt-pane .space-y-6 > * + * { margin-top: .6rem; }
+  .bt-pane .lg\:w-2\/5 { padding: .75rem; }
+  .bt-pane .rounded-3xl.p-6 { padding: .75rem; }
+  .bt-pane .mb-6 { margin-bottom: .6rem; }
+  .bt-pane input.h-16 { height: 3rem; font-size: 1.75rem; }
+}
+
+/* Điện thoại thấp (vd 375x667): bỏ băng tiêu đề (tab đã ghi tên bài), hình thấp hơn nữa */
+@media (max-width: 639px) and (max-height: 700px) {
+  .bt-pane > div:first-child { display: none; }
+  #bt1-visual-container { zoom: .48; gap: .4rem; }
+  .bt-pane .space-y-6 > * + * { margin-top: .35rem; }
+  .bt-pane input.h-16 { height: 2.6rem; font-size: 1.5rem; }
+  .bt-pane [id*="btn-hint"] { padding: .25rem; }
+  .bt-pane .flex.justify-end.w-full { justify-content: center; margin-top: -.25rem; }
+  .bt-pane .flex.justify-end.w-full button { padding: .35rem .75rem; font-size: .85rem; }
+  .bt-pane label.block { margin-bottom: .15rem; font-size: .7rem; }
+  .bt-pane .text-xl.leading-relaxed { font-size: 1rem; margin-bottom: .4rem; }
+}
+
+@media (max-width: 639px) and (max-height: 700px) {
+  .flex-nowrap.hide-scrollbar > button { padding: 4px; font-size: .8rem; line-height: 1.15; }
+  .bt-pane .flex-grow.w-full.flex { flex-grow: 0; }
+  .bt-pane .p-4 { padding: .5rem; }
+}
