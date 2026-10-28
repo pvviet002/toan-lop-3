@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mục Lục - Toán Lớp 3 Tập 1</title>
+    <title>Mục Lục - Toán Lớp 3</title>
     <script>
         /* Giao diện Sáng / Tối / Dịu mắt: dùng CHUNG khoá với các trang bài (toanlop3-cfg.theme), đặt trước khi vẽ để khỏi nháy màu */
         (function(){ try{ var c = JSON.parse(localStorage.getItem('toanlop3-cfg') || '{}'); if(c && c.theme) document.documentElement.setAttribute('data-theme', c.theme); }catch(e){} })();
@@ -72,6 +72,7 @@
         .toc-topic > span:nth-child(1) { font-size: 1.25rem; }
         .toc-topic > span:nth-child(2) { text-transform: uppercase; letter-spacing: .03em; font-size: .95rem; line-height: 1.3; }
         .toc-topic > span:nth-child(3) { font-size: 1.05rem; }
+        .toc-vol { background: var(--head-bg); color: var(--head-fg); font-weight: 800; text-align: center; padding: 12px 8px; font-size: 1.15rem; letter-spacing: .06em; text-transform: uppercase; border-top: 2px solid var(--line); }
         .toc-row { color: var(--link); text-decoration: none; background: var(--row-a); min-height: 48px; position: relative; transition: background-color .15s ease; }
         .toc-row.alt { background: var(--row-b); }
         .toc-row > .t { padding: 10px 8px 10px 14px; line-height: 1.4; font-size: 1rem; transition: transform .15s ease; }
@@ -121,7 +122,7 @@
         </div>
 
         <!-- Bảng Mục Lục -->
-        <div class="toc" role="table" aria-label="Mục lục Toán lớp 3 Tập 1">
+        <div class="toc" role="table" aria-label="Mục lục Toán lớp 3">
             <div class="toc-head" role="row">
                 <span role="columnheader">Chủ đề</span>
                 <span role="columnheader">Nội dung</span>
@@ -137,6 +138,7 @@
     <script>
         // Dữ liệu mục lục bám sát chính xác 100% hình ảnh SGK
         const tocData = [
+            { type: 'volume', title: 'Tập 1' },
             { type: 'header', topic: '1', title: 'ÔN TẬP VÀ BỔ SUNG', page: '6' },
             { type: 'lesson', num: 1, title: 'Bài 1. Ôn tập các số đến 1 000', page: '6' },
             { type: 'lesson', num: 2, title: 'Bài 2. Ôn tập phép cộng, phép trừ trong phạm vi 1 000', page: '9' },
@@ -195,7 +197,65 @@
             { type: 'lesson', num: 43, title: 'Bài 43. Ôn tập hình học và đo lường', page: '118' },
             { type: 'lesson', num: 44, title: 'Bài 44. Ôn tập chung', page: '120' },
 
-            { type: 'extra', title: 'Một số thuật ngữ dùng trong sách', page: '122' }
+            { type: 'extra', title: 'Một số thuật ngữ dùng trong sách', page: '122' },
+
+            { type: 'volume', title: 'Tập 2' },
+            { type: 'header', topic: '8', title: 'CÁC SỐ ĐẾN 10 000', page: '4' },
+            { type: 'lesson', num: 45, title: 'Bài 45. Các số có bốn chữ số. Số 10 000', page: '4' },
+            { type: 'lesson', num: 46, title: 'Bài 46. So sánh các số trong phạm vi 10 000', page: '9' },
+            { type: 'lesson', num: 47, title: 'Bài 47. Làm quen với chữ số La Mã', page: '12' },
+            { type: 'lesson', num: 48, title: 'Bài 48. Làm tròn số đến hàng chục, hàng trăm', page: '15' },
+            { type: 'lesson', num: 49, title: 'Bài 49. Luyện tập chung', page: '17' },
+
+            { type: 'header', topic: '9', title: 'CHU VI, DIỆN TÍCH MỘT SỐ HÌNH PHẲNG', page: '21' },
+            { type: 'lesson', num: 50, title: 'Bài 50. Chu vi hình tam giác, hình tứ giác, hình chữ nhật, hình vuông', page: '21' },
+            { type: 'lesson', num: 51, title: 'Bài 51. Diện tích của một hình. Xăng-ti-mét vuông', page: '26' },
+            { type: 'lesson', num: 52, title: 'Bài 52. Diện tích hình chữ nhật, diện tích hình vuông', page: '30' },
+            { type: 'lesson', num: 53, title: 'Bài 53. Luyện tập chung', page: '35' },
+
+            { type: 'header', topic: '10', title: 'CỘNG, TRỪ, NHÂN, CHIA TRONG PHẠM VI 10 000', page: '38' },
+            { type: 'lesson', num: 54, title: 'Bài 54. Phép cộng trong phạm vi 10 000', page: '38' },
+            { type: 'lesson', num: 55, title: 'Bài 55. Phép trừ trong phạm vi 10 000', page: '41' },
+            { type: 'lesson', num: 56, title: 'Bài 56. Nhân số có bốn chữ số với số có một chữ số', page: '43' },
+            { type: 'lesson', num: 57, title: 'Bài 57. Chia số có bốn chữ số cho số có một chữ số', page: '47' },
+            { type: 'lesson', num: 58, title: 'Bài 58. Luyện tập chung', page: '52' },
+
+            { type: 'header', topic: '11', title: 'CÁC SỐ ĐẾN 100 000', page: '56' },
+            { type: 'lesson', num: 59, title: 'Bài 59. Các số có năm chữ số. Số 100 000', page: '56' },
+            { type: 'lesson', num: 60, title: 'Bài 60. So sánh các số trong phạm vi 100 000', page: '61' },
+            { type: 'lesson', num: 61, title: 'Bài 61. Làm tròn số đến hàng nghìn, hàng chục nghìn', page: '64' },
+            { type: 'lesson', num: 62, title: 'Bài 62. Luyện tập chung', page: '66' },
+
+            { type: 'header', topic: '12', title: 'CỘNG, TRỪ TRONG PHẠM VI 100 000', page: '70' },
+            { type: 'lesson', num: 63, title: 'Bài 63. Phép cộng trong phạm vi 100 000', page: '70' },
+            { type: 'lesson', num: 64, title: 'Bài 64. Phép trừ trong phạm vi 100 000', page: '73' },
+            { type: 'lesson', num: 65, title: 'Bài 65. Luyện tập chung', page: '76' },
+
+            { type: 'header', topic: '13', title: 'XEM ĐỒNG HỒ. THÁNG – NĂM. TIỀN VIỆT NAM', page: '77' },
+            { type: 'lesson', num: 66, title: 'Bài 66. Xem đồng hồ. Tháng – năm', page: '77' },
+            { type: 'lesson', num: 67, title: 'Bài 67. Thực hành xem đồng hồ, xem lịch', page: '81' },
+            { type: 'lesson', num: 68, title: 'Bài 68. Tiền Việt Nam', page: '85' },
+            { type: 'lesson', num: 69, title: 'Bài 69. Luyện tập chung', page: '88' },
+
+            { type: 'header', topic: '14', title: 'NHÂN, CHIA TRONG PHẠM VI 100 000', page: '94' },
+            { type: 'lesson', num: 70, title: 'Bài 70. Nhân số có năm chữ số với số có một chữ số', page: '94' },
+            { type: 'lesson', num: 71, title: 'Bài 71. Chia số có năm chữ số cho số có một chữ số', page: '97' },
+            { type: 'lesson', num: 72, title: 'Bài 72. Luyện tập chung', page: '101' },
+
+            { type: 'header', topic: '15', title: 'LÀM QUEN VỚI YẾU TỐ THỐNG KÊ, XÁC SUẤT', page: '103' },
+            { type: 'lesson', num: 73, title: 'Bài 73. Thu thập, phân loại, ghi chép số liệu. Bảng số liệu', page: '103' },
+            { type: 'lesson', num: 74, title: 'Bài 74. Khả năng xảy ra của một sự kiện', page: '108' },
+            { type: 'lesson', num: 75, title: 'Bài 75. Thực hành và trải nghiệm thu thập, phân loại, ghi chép số liệu, đọc bảng số liệu', page: '110' },
+
+            { type: 'header', topic: '16', title: 'ÔN TẬP CUỐI NĂM', page: '112' },
+            { type: 'lesson', num: 76, title: 'Bài 76. Ôn tập các số trong phạm vi 10 000, 100 000', page: '112' },
+            { type: 'lesson', num: 77, title: 'Bài 77. Ôn tập phép cộng, phép trừ trong phạm vi 100 000', page: '115' },
+            { type: 'lesson', num: 78, title: 'Bài 78. Ôn tập phép nhân, phép chia trong phạm vi 100 000', page: '118' },
+            { type: 'lesson', num: 79, title: 'Bài 79. Ôn tập hình học và đo lường', page: '121' },
+            { type: 'lesson', num: 80, title: 'Bài 80. Ôn tập bảng số liệu, khả năng xảy ra của một sự kiện', page: '123' },
+            { type: 'lesson', num: 81, title: 'Bài 81. Ôn tập chung', page: '125' },
+
+            { type: 'extra', title: 'Một số thuật ngữ dùng trong sách (Tập 2)', page: '127' }
         ];
 
         function renderTable() {
@@ -207,7 +267,11 @@
             let alt = false;
 
             tocData.forEach(item => {
-                if (item.type === 'header') {
+                if (item.type === 'volume') {
+                    html += `<div class="toc-vol" role="row"><span role="cell">${item.title}</span></div>`;
+                    alt = false;
+                }
+                else if (item.type === 'header') {
                     // Dòng Chủ Đề
                     html += `<div class="toc-topic" role="row"><span role="cell">${item.topic}</span><span role="cell">${item.title}</span><span role="cell">${item.page}</span><span aria-hidden="true"></span></div>`;
                     alt = false;
